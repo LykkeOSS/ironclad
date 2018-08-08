@@ -1,16 +1,26 @@
 ﻿@using Ironclad.Views.Manage
+@using IdentityServer4.Extensions
 @inject SignInManager<ApplicationUser> SignInManager
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
-}
-
-<nav class="nav nav-pills flex-column flex-row">
-    <a class="flex-fill nav-link @ManageNavPages.IndexNavClass(ViewContext)" asp-action="Index">Profile</a>
-    <a class="flex-fill nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" asp-action="ChangePassword">Password</a>
-    @if (hasExternalLogins)
+    string name = null;
+    if (!true.Equals(ViewData["signed-out"]))
     {
-        <a class="flex-fill nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" asp-action="ExternalLogins">External logins</a>
+        name = Context.User?.GetDisplayName();
     }
-    <a class="flex-fill nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" asp-action="TwoFactorAuthentication">Two-factor authentication</a>
-</nav>
-
+}
+<div class="card manage-nav">
+    <div class="manage-nav-header">
+        <!-- We should add check for an image and display that image -->
+        <span class="user-display-name">@name</span>
+    </div>
+    <nav class="nav nav-pills flex-column flex-row">
+        <a class="flex-fill nav-link @ManageNavPages.IndexNavClass(ViewContext)" asp-action="Index">Profile</a>
+        <a class="flex-fill nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" asp-action="ChangePassword">Password</a>
+        @if (hasExternalLogins)
+        {
+            <a class="flex-fill nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" asp-action="ExternalLogins">External logins</a>
+        }
+        <a class="flex-fill nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" asp-action="TwoFactorAuthentication">Two-factor authentication</a>
+    </nav>
+</div>

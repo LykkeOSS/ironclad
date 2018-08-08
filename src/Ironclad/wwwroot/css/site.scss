@@ -1,6 +1,10 @@
-﻿body {
+﻿/* Ironclad custom styles */
+body {
     margin-bottom: 35px;
 }
+
+@import '../lib/bootstrap/scss/bootstrap';
+
 
 header {
     margin-bottom: 20px;
@@ -119,4 +123,4 @@ header {
     }
 }
 
-
+@import 'components/manage';
