@@ -2,12 +2,11 @@
 @{
     ViewData["Title"] = "Register";
 }
-
-<h2>@ViewData["Title"]</h2>
-<h4>Complete your registration.</h4>
-<hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="pffset-md-4 col-md-4">
+        <h2>@ViewData["Title"]</h2>
+        <h4>Complete your registration.</h4>
+        <hr />
         <form method="post">
             <div asp-validation-summary="All" class="text-danger"></div>
             <input asp-for="UserId" type="hidden" />

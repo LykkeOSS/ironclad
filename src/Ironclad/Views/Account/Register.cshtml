@@ -2,11 +2,9 @@
 @{
     ViewData["Title"] = "Register";
 }
-
-<h2>@ViewData["Title"]</h2>
-
 <div class="row">
-    <div class="col-md-4">
+    <div class="offset-md-4 col-md-4">
+        <h2>@ViewData["Title"]</h2>
         <form asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
             <h4>Create a new account.</h4>
             <hr />

@@ -1,5 +1,8 @@
-﻿body {
-  margin-top: 65px;
+body {
+  margin-bottom: 35px;
+}
+header {
+  margin-bottom: 20px;
 }
 .navbar-header {
   position: relative;
@@ -51,8 +54,8 @@
   border-bottom: 1px solid lightgray;
 }
 .grants .grant img {
-  width: 100px;
-  height: 100px;
+  max-width: 100%;
+  height: auto;
 }
 .grants .grant .clientname {
   font-size: 140%;

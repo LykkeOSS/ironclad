@@ -2,12 +2,11 @@
 @{
     ViewData["Title"] = "Two-factor authentication";
 }
-
-<h2>@ViewData["Title"]</h2>
-<hr />
-<p>Your login is protected with an authenticator app. Enter your authenticator code below.</p>
 <div class="row">
-    <div class="col-md-4">
+    <div class="offset-md-4 col-md-4">
+        <h2>@ViewData["Title"]</h2>
+        <hr />
+        <p>Your login is protected with an authenticator app. Enter your authenticator code below.</p>
         <form method="post" asp-route-returnUrl="@ViewData["ReturnUrl"]">
             <input asp-for="RememberMe" type="hidden" />
             <div asp-validation-summary="All" class="text-danger"></div>
