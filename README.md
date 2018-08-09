@@ -106,3 +106,61 @@ This will run the project inside a docker container running behind nginx. Nginx 
 
 Navigate to the ```src/Ironclad``` folder and type ```dotnet run```.  
 This will run the project directly using dotnet.exe without attaching the debugger. You will need to use your debugger of choice to attach to the dotnet.exe process.
+
+### Theming
+
+
+#### Using the new theme
+
+In order to put the new css file and custom logo in use, you should specify that files in appsettings.json or your environment variables:
+
+```json
+...
+  "theme": {
+    "stylesFile": "css/site.css",
+    "logoFile":  "img/icon.jpg"
+  },
+...
+```
+
+#### Creating custom theme
+
+The easiest way to create your own theme for the application is to create a new scss file in the ```src/Ironclad/wwwroot/scss``` folder, then import the core styles. This is how the new file should look like:
+
+```scss
+/* Ironclad custom styles */
+
+// variable overrides
+
+@import 'core';
+
+// style overrides
+```
+
+The variables you can override are located in the ```src/Ironclad/wwwroot/lib/bootstrap/scss/utils/_variables.scss``` files.
+
+Since the application is using Bootstrap v4.1.3 for its framework, you can use [this][bootstrapThemeingGuide] guide for further configuration reference.
+
+#### Compiling SCSS
+
+You can compile your new scss file by doing the following:
+
+Install the official SASS compiler globally using npm:
+
+```cmd
+npm i sass -g
+```
+
+Then from within ```src/Ironclad/wwwroot``` folder run:
+
+```cmd
+sass scss/<you-new-scss-file>.scss css/<your-new-css-file>.css
+```
+
+Or you can set watcher, which will compiler you scss file everytime you made a change to it:
+
+```cmd
+sass scss/<you-new-scss-file>.scss css/<your-new-css-file>.css --watch
+```
+
+[bootstrapThemeingGuide]: https://getbootstrap.com/docs/4.1/getting-started/theming
