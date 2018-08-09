@@ -1,5 +1,10 @@
 ﻿@inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
 @using IdentityServer4.Extensions
+@using Microsoft.Extensions.Options;
+@using Ironclad;
+
+@inject IOptions<Settings.VisualSettings> ThemeConfiguration
+
 @{
     string name = null;
     if (!true.Equals(ViewData["signed-out"]))
@@ -20,6 +25,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css" />
     <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap-grid.css" />*@
     <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/@ThemeConfiguration.Value.StylesFile" />
 </head>
 <body>
     <header>
@@ -27,12 +33,9 @@
             <div class="container d-flex justify-content-between">
                 <a href="~/" class="navbar-brand d-flex align-items-center">
                     <span class="navbar-brand">
-                        <img src="~/lykke_new.png" class="icon-banner" height="32">
+                        <img src="~/@ThemeConfiguration.Value.LogoFile" class="icon-banner" height="32">
                     </span>
                 </a>
-                @*<button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>*@
                 <nav class="my-2 my-md-0 mr-md-3">
                     @if (!string.IsNullOrWhiteSpace(name))
                     {

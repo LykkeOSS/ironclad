@@ -1,4 +1,8 @@
 @charset "UTF-8";
+header {
+  margin-bottom: 20px;
+}
+
 body {
   margin-bottom: 35px;
 }
@@ -8614,32 +8618,6 @@ h3 {
     border-color: #dee2e6;
   }
 }
-header {
-  margin-bottom: 20px;
-}
-
-.navbar-header {
-  position: relative;
-  top: -4px;
-}
-
-.navbar-brand > .icon-banner {
-  position: relative;
-  top: -2px;
-  display: inline;
-}
-
-.icon {
-  position: relative;
-  top: -10px;
-}
-
-.logged-out iframe {
-  display: none;
-  width: 0;
-  height: 0;
-}
-
 .page-consent .client-logo {
   float: left;
 }
@@ -8722,4 +8700,26 @@ header {
   padding: 0;
 }
 
-/*# sourceMappingURL=site.css.map */
+.navbar-header {
+  position: relative;
+  top: -4px;
+}
+
+.navbar-brand > .icon-banner {
+  position: relative;
+  top: -2px;
+  display: inline;
+}
+
+.icon {
+  position: relative;
+  top: -10px;
+}
+
+.logged-out iframe {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/*# sourceMappingURL=default.css.map */

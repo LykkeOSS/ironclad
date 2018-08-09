@@ -1,0 +1,37 @@
+﻿.page-consent {
+    .client-logo {
+        float: left;
+
+        img {
+            width: 80px;
+            height: 80px;
+        }
+    }
+
+    .consent-buttons {
+        margin-top: 25px;
+    }
+
+    .consent-form {
+        .consent-scopecheck {
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .consent-scopecheck[disabled] {
+            //visibility:hidden;
+        }
+
+        .consent-description {
+            margin-left: 25px;
+
+            label {
+                font-weight: normal;
+            }
+        }
+
+        .consent-remember {
+            padding-left: 16px;
+        }
+    }
+}

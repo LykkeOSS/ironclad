@@ -16,11 +16,13 @@ namespace Ironclad
     using Microsoft.Azure.Services.AppAuthentication;
 
     // TODO (Cameron): This class is a huge mess - for many reasons. Something needs to be done...
-    internal sealed class Settings
+    public sealed class Settings
     {
         public ServerSettings Server { get; set; }
 
         public ApiSettings Api { get; set; }
+
+        public VisualSettings Visual { get; set; }
 
         public IdpSettings Idp { get; set; }
 
@@ -330,5 +332,13 @@ Please see https://gist.github.com/cameronfletcher/58673a468c8ebbbf91b81e706063b
                 public void Dispose() => this.client?.Dispose();
             }
         }
+
+        public sealed class VisualSettings
+        {
+            public string StylesFile { get; set; }
+
+            public string LogoFile { get; set; }
+        }
+
     }
 }

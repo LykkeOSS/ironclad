@@ -9,6 +9,7 @@ namespace Ironclad
     using IdentityServer4.Postgresql.Extensions;
     using Ironclad.Application;
     using Ironclad.Authorization;
+    using Ironclad.Configuration;
     using Ironclad.Data;
     using Ironclad.Services.Email;
     using Microsoft.AspNetCore.Authorization;
@@ -42,6 +43,12 @@ namespace Ironclad
         public void ConfigureServices(IServiceCollection services)
         {
             var migrationsAssembly = typeof(Startup).GetType().Assembly.GetName().Name;
+
+            services.AddSingleton<Settings.VisualSettings>(new Settings.VisualSettings
+            {
+                LogoFile = this.settings.Visual.LogoFile,
+                StylesFile = this.settings.Visual.StylesFile
+            });
 
             services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(this.settings.Server.Database));
 

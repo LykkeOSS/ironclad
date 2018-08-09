@@ -1,0 +1,75 @@
+﻿/* Ironclad custom styles */
+
+header {
+    margin-bottom: 20px;
+}
+
+$primary: #42a242;
+$secondary: lightblue;
+
+@import 'core';
+
+@import url("https://use.fontawesome.com/releases/v5.2.0/css/all.css");
+
+header {
+    box-shadow: 0 3px 6px rgba(#000, .16), 0 3px 6px rgba(#000, .23);
+}
+
+.manage-nav {
+    height: 100%;
+
+    .manage-nav-header {
+        text-align: left;
+        padding: 10px 20px;
+
+        .user-display-name {
+            font-size: 24px;
+
+            &:before {
+                font-family: "Font Awesome 5 Free";
+                content: '\f007';
+                margin-right: 10px;
+            }
+        }
+    }
+
+    .nav {
+        .nav-link {
+            &:hover {
+                background-color: $primary;
+                color: $white;
+            }
+        }
+    }
+}
+
+.btn,
+.form-control {
+    border-radius: 0;
+
+    &:focus {
+        border-color: transparent;
+        box-shadow: none;
+    }
+
+    label {
+        font-weight: 600;
+    }
+}
+
+input.form-control {
+    border: 0;
+    border-bottom: 2px solid $gray-900;
+    border-left: 2px solid $gray-900;
+
+    &:focus {
+        background-color: $gray-300;
+        border-bottom: 2px solid $gray-900;
+        border-left: 2px solid $gray-900;
+    }
+}
+
+.card {
+    box-shadow: 0 3px 6px rgba(#000, .16), 0 3px 6px rgba(#000, .23);
+    border-radius: 0;
+}

@@ -1,0 +1,32 @@
+﻿/* Ironclad core styles */
+body {
+    margin-bottom: 35px;
+}
+
+@import '../lib/bootstrap/scss/bootstrap';
+
+@import 'components/consent';
+@import 'components/grants';
+@import 'components/manage';
+
+.navbar-header {
+    position: relative;
+    top: -4px;
+}
+
+.navbar-brand > .icon-banner {
+    position: relative;
+    top: -2px;
+    display: inline;
+}
+
+.icon {
+    position: relative;
+    top: -10px;
+}
+
+.logged-out iframe {
+    display: none;
+    width: 0;
+    height: 0;
+}
