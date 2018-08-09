@@ -110,7 +110,7 @@ This will run the project directly using dotnet.exe without attaching the debugg
 ### Theming
 
 
-#### Using the new theme
+#### Using a new theme
 
 In order to put the new css file and custom logo in use, you should specify that files in appsettings.json or your environment variables:
 
