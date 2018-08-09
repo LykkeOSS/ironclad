@@ -8,6 +8,7 @@ docker-compose.yml
 docker-compose.*.yml
 */bin
 !Ironclad/bin/Release/netcoreapp2.1/linux-x64/publish/**/*
+!tests/Ironclad.Tests/bin/Release/netcoreapp2.1/linux-x64/publish/**/*
 */obj
 !obj/Docker/publish/*
 !obj/Docker/empty/

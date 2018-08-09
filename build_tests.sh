@@ -1,0 +1,1 @@
+docker build --rm -f src/Dockerfile -t ironclad:latest src && docker build --rm -f src/tests.Dockerfile -t ironclad.tests:latest src --no-cache

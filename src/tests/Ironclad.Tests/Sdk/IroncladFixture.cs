@@ -20,19 +20,41 @@ namespace Ironclad.Tests.Sdk
 
         private readonly Process ironcladProcess;
 
+        private bool useDockerImage;
+
+        protected readonly string Authority;
+
         public IroncladFixture()
         {
-            var configFile = Path.Combine(Path.GetDirectoryName(typeof(IroncladFixture).Assembly.Location), "testsettings.json");
-            var config = new ConfigurationBuilder().AddJsonFile(configFile).Build();
+            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (string.IsNullOrWhiteSpace(environmentName))
+            {
+                environmentName = "test";
+            }
 
-            var authority = config.GetValue<string>("authority");
-            var useDockerImage = config.GetValue<bool>("use_docker_image");
+            var config = new ConfigurationBuilder()
+#pragma warning disable CA1308 // Normalize strings to uppercase
+                .AddJsonFile($"{environmentName.ToLowerInvariant()}settings.json")
+#pragma warning restore CA1308 // Normalize strings to uppercase
+                .Build();
 
-            this.ironcladProcess = useDockerImage ? this.StartIroncladProcessFromDocker(authority) : this.StartIroncladProcessFromSource(authority);
+            Console.WriteLine($"Environment: '{environmentName}'");
+
+            this.Authority = config.GetValue<string>("authority");
+            this.useDockerImage = config.GetValue<bool>("use_docker_image");
+
+            this.ironcladProcess = this.useDockerImage ? this.UseIroncladProcessFromDocker() : this.StartIroncladProcessFromSource();
         }
 
         public void Dispose()
         {
+            Console.WriteLine($"{nameof(IroncladFixture)} cleanup.");
+
+            if (this.useDockerImage)
+            {
+                return;
+            }
+
             try
             {
                 this.ironcladProcess.Kill();
@@ -58,8 +80,9 @@ namespace Ironclad.Tests.Sdk
         }
 
         [DebuggerStepThrough]
-        private Process StartIroncladProcessFromSource(string authority)
+        private Process StartIroncladProcessFromSource()
         {
+            Console.WriteLine("Starting Ironclad process from source...");
             var path = string.Format(
                 CultureInfo.InvariantCulture,
                 "..{0}..{0}..{0}..{0}..{0}Ironclad{0}Ironclad.csproj",
@@ -80,7 +103,7 @@ namespace Ironclad.Tests.Sdk
                     Thread.Sleep(500);
                     try
                     {
-                        using (var response = client.GetAsync(new Uri(authority + "/api")).GetAwaiter().GetResult())
+                        using (var response = client.GetAsync(new Uri(this.Authority + "/api")).GetAwaiter().GetResult())
                         {
                             var api = JsonConvert.DeserializeObject<IroncladApi>(response.Content.ReadAsStringAsync().GetAwaiter().GetResult(), GetJsonSerializerSettings());
                             processId = int.Parse(api.ProcessId, CultureInfo.InvariantCulture);
@@ -101,18 +124,11 @@ namespace Ironclad.Tests.Sdk
             return Process.GetProcessById(processId);
         }
 
-        private Process StartIroncladProcessFromDocker(string authority)
+        private Process UseIroncladProcessFromDocker()
         {
-            var process = Process.Start(
-                ////new ProcessStartInfo("docker", $"run --rm --name {DockerContainerId} -e IRONCLAD_CONNECTIONSTRING={PostgresFixture.ConnectionString} -p 5005:80 ironclad:dev")
-                new ProcessStartInfo("docker-compose", $"run --rm --name {DockerContainerId} -e IRONCLAD_CONNECTIONSTRING={PostgresFixture.ConnectionString} -p 5005:80 ironclad:dev")
-                {
-                    UseShellExecute = true,
-                });
+            Console.WriteLine("Using Ironclad process from Docker container.");
+            Console.WriteLine("Let's give some time for Ironclad to spin up...");
 
-            Thread.Sleep(1000);
-
-            var processId = default(int);
             using (var client = new HttpClient())
             {
                 var attempt = 0;
@@ -121,25 +137,26 @@ namespace Ironclad.Tests.Sdk
                     Thread.Sleep(500);
                     try
                     {
-                        using (var response = client.GetAsync(new Uri(authority + "/api")).GetAwaiter().GetResult())
+                        using (var response = client.GetAsync(new Uri(this.Authority + "/api")).GetAwaiter().GetResult())
                         {
                             var api = JsonConvert.DeserializeObject<IroncladApi>(response.Content.ReadAsStringAsync().GetAwaiter().GetResult(), GetJsonSerializerSettings());
-                            processId = int.Parse(api.ProcessId, CultureInfo.InvariantCulture);
+                            int.Parse(api.ProcessId, CultureInfo.InvariantCulture);
                         }
 
                         break;
                     }
                     catch (HttpRequestException)
                     {
-                        if (++attempt >= 20)
+                        if (++attempt >= 40)
                         {
+                            Console.WriteLine("It seems that Ironclad is not running");
                             throw;
                         }
                     }
                 }
             }
 
-            return Process.GetProcessById(processId);
+            return null;
         }
 
 #pragma warning disable CA1812

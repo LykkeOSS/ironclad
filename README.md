@@ -106,3 +106,11 @@ This will run the project inside a docker container running behind nginx. Nginx 
 
 Navigate to the ```src/Ironclad``` folder and type ```dotnet run```.  
 This will run the project directly using dotnet.exe without attaching the debugger. You will need to use your debugger of choice to attach to the dotnet.exe process.
+
+#### Running tests
+You can run tests directly in Visual Studio using test runner. You can as well run isolated test session using Docker.
+First you have to build two images by executing ```build_test.sh``` script or by building them manually:
+1) Ironclad ```docker build --rm -f src\Dockerfile -t ironclad:latest src```
+2) Container with tests ```docker build --rm -f src\tests.Dockerfile -t ironclad.tests:latest src --no-cache```
+
+Then run ```./test.sh``` script in order to start the test run.

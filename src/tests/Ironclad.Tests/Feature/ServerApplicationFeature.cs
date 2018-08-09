@@ -20,7 +20,7 @@ namespace Ironclad.Tests.Feature
             "Given some hard-coded credentials eg. bob/bob"
                 .x(async () =>
                 {
-                    var discoveryClient = new DiscoveryClient("http://localhost:5005");
+                    var discoveryClient = new DiscoveryClient(this.Authority);
                     var discoveryResponse = await discoveryClient.GetAsync().ConfigureAwait(false);
                 });
 

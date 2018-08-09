@@ -1,0 +1,1 @@
+docker-compose -f src/tests/docker-compose.yml up --force-recreate --abort-on-container-exit;docker-compose -f src/tests/docker-compose.yml down --volumes

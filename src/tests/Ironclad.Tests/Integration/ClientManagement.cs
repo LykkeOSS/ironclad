@@ -51,9 +51,9 @@ namespace Ironclad.Tests.Feature
                 Id = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
                 Name = $"{nameof(ClientManagement)}.{nameof(this.CanAddClient)} (integration test)",
                 Secret = "secret",
-                AllowedCorsOrigins = { "http://localhost:5005" },
-                RedirectUris = { "http://localhost:5005/redirect" },
-                PostLogoutRedirectUris = { "http://localhost:5005/post-logout-redirect" },
+                AllowedCorsOrigins = { this.Authority },
+                RedirectUris = { $"{this.Authority}/redirect" },
+                PostLogoutRedirectUris = { $"{this.Authority}/post-logout-redirect" },
                 AllowedScopes = { "role", "name" },
                 AccessTokenType = "Reference",
                 AllowedGrantTypes = { "implicit", "custom" },
@@ -128,9 +128,9 @@ namespace Ironclad.Tests.Feature
                 Id = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
                 Name = $"{nameof(ClientManagement)}.{nameof(this.CanModifyClient)} (integration test)",
                 Secret = "secret",
-                AllowedCorsOrigins = { "http://localhost:5005" },
-                RedirectUris = { "http://localhost:5005/redirect" },
-                PostLogoutRedirectUris = { "http://localhost:5005/post-logout-redirect" },
+                AllowedCorsOrigins = { this.Authority },
+                RedirectUris = { $"{this.Authority}/redirect" },
+                PostLogoutRedirectUris = { $"{this.Authority}/post-logout-redirect" },
                 AllowedScopes = { "role", "name" },
                 AccessTokenType = "Reference",
                 AllowedGrantTypes = { "implicit", "custom" },
@@ -279,7 +279,7 @@ namespace Ironclad.Tests.Feature
                 Scope = "openid profile sample_api offline_access",
                 FilterClaims = false,
                 Browser = browser,
-                Policy = new Policy { Discovery = new DiscoveryPolicy { ValidateIssuerName = false } }
+                Policy = new Policy { Discovery = new DiscoveryPolicy { ValidateIssuerName = false, RequireHttps = false } }
             };
 
             var oidcClient = new OidcClient(options);

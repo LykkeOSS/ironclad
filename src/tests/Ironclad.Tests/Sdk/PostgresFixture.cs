@@ -9,6 +9,7 @@ namespace Ironclad.Tests.Sdk
     using System.IO;
     using System.Net.Sockets;
     using System.Threading;
+    using Microsoft.Extensions.Configuration;
     using Npgsql;
 
     public sealed class PostgresFixture : IDisposable
@@ -19,13 +20,45 @@ namespace Ironclad.Tests.Sdk
 
         private readonly Process process;
 
+        private readonly bool useDockerImage;
+
         public PostgresFixture()
         {
-            this.process = this.StartPostgresProcess();
+            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (string.IsNullOrWhiteSpace(environmentName))
+            {
+                environmentName = "test";
+            }
+
+            var config = new ConfigurationBuilder()
+#pragma warning disable CA1308 // Normalize strings to uppercase
+                .AddJsonFile($"{environmentName.ToLowerInvariant()}settings.json")
+#pragma warning restore CA1308 // Normalize strings to uppercase
+                .Build();
+
+            var authority = config.GetValue<string>("authority");
+            this.useDockerImage = config.GetValue<bool>("use_docker_image");
+
+            if (!this.useDockerImage)
+            {
+                Console.WriteLine("Starting Postgres process...");
+                this.process = this.StartPostgresProcess();
+            }
+            else
+            {
+                Console.WriteLine("Using docker image - Postgres process will not be initiated.");
+            }
         }
 
         public void Dispose()
         {
+            Console.WriteLine($"{nameof(PostgresFixture)} cleanup.");
+
+            if (this.useDockerImage)
+            {
+                return;
+            }
+
             try
             {
                 this.process.Kill();
@@ -35,9 +68,6 @@ namespace Ironclad.Tests.Sdk
             }
 
             this.process.Dispose();
-
-            // NOTE (Cameron): Remove the docker container.
-            Process.Start(new ProcessStartInfo("docker", $"stop {DockerContainerId}")).WaitForExit(10000);
         }
 
         private Process StartPostgresProcess()

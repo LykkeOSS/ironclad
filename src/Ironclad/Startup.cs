@@ -22,6 +22,8 @@ namespace Ironclad
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
     using Newtonsoft.Json.Serialization;
+    using Serilog;
+    using System.Threading;
 
     public class Startup
     {
@@ -142,7 +144,35 @@ namespace Ironclad
             app.UseStaticFiles();
             app.UseIdentityServer();
             app.UseMvcWithDefaultRoute();
-            app.InitializeDatabase().SeedDatabase(this.configuration);
+
+            int retryCount = 10;
+
+            for (int i = 1; i <= retryCount; i++)
+            {
+                try
+                {
+                    app.InitializeDatabase();
+                }
+                catch (Npgsql.PostgresException ex)
+                {
+                    if (ex.Message.Contains("the database system is starting up", System.StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        this.Wait(retryCount, i, ex);
+                    }
+                }
+                catch (System.Net.Sockets.SocketException ex)
+                {
+                    this.Wait(retryCount, i, ex);
+                }
+            }
+
+            app.SeedDatabase(this.configuration);
+        }
+
+        private void Wait(int retryCount, int i, System.Exception ex)
+        {
+            Log.Error(ex, $"Will retry {retryCount - i} more times");
+            Thread.Sleep(1000);
         }
     }
 }

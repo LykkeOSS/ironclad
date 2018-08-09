@@ -214,7 +214,7 @@ namespace Ironclad.Tests.Feature
                 Scope = "openid profile auth_api offline_access",
                 FilterClaims = false,
                 Browser = browser,
-                Policy = new Policy { Discovery = new DiscoveryPolicy { ValidateIssuerName = false } }
+                Policy = new Policy { Discovery = new DiscoveryPolicy { ValidateIssuerName = false, RequireHttps = false } }
             };
 
             var oidcClient = new OidcClient(options);

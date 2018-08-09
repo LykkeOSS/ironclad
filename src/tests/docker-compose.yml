@@ -1,0 +1,24 @@
+version: '3'
+services:
+  db:
+    image: postgres:10.1-alpine
+    container_name: postgres
+  ironclad:
+    image: ironclad
+    container_name: ironclad
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - GOOGLE_CLIENT_ID=SOME_RANDOM_GOOGLE_CLIENT_ID
+      - GOOGLE_SECRET=NOT_A_REAL_GOOGLE_SECRET
+      - IRONCLAD_CONNECTIONSTRING=Host=db;Database=ironclad;Username=postgres;
+      - ISSUERURI=http://ironclad
+      - VIRTUAL_HOST=ironclad
+    volumes:
+      - C:/logs/ironclad:/app/logs
+    depends_on: 
+      - db
+  tests:
+    image: ironclad.tests
+    depends_on:
+      - ironclad
+      - db

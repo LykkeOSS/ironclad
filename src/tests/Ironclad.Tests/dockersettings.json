@@ -1,0 +1,8 @@
+﻿{
+  "authority": "http://ironclad",
+  "username": "admin",
+  "password": "password",
+  "client_id": "auth_console",
+  "scope": "openid profile auth_api",
+  "use_docker_image": true
+}

@@ -5,6 +5,7 @@
 
 namespace Ironclad.Tests.Sdk
 {
+    using System;
     using System.Configuration;
     using System.Net.Http;
     using System.Net.Http.Headers;
@@ -20,7 +21,17 @@ namespace Ironclad.Tests.Sdk
 
         public AuthenticationFixture()
         {
-            this.configuration = new ConfigurationBuilder().AddJsonFile("testsettings.json").Build();
+            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (string.IsNullOrWhiteSpace(environmentName))
+            {
+                environmentName = "test";
+            }
+
+            this.configuration = new ConfigurationBuilder()
+#pragma warning disable CA1308 // Normalize strings to uppercase
+                .AddJsonFile($"{environmentName.ToLowerInvariant()}settings.json")
+#pragma warning restore CA1308 // Normalize strings to uppercase
+                .Build();
 
             this.Handler = CreateTokenHandler(
                 this.Authority = this.configuration.GetValue<string>("authority") ?? throw new ConfigurationErrorsException("Missing configuration value 'authority'"),
@@ -48,7 +59,7 @@ namespace Ironclad.Tests.Sdk
                 Scope = scope,
                 FilterClaims = false,
                 Browser = browser,
-                Policy = new Policy { Discovery = new DiscoveryPolicy { ValidateIssuerName = false } }
+                Policy = new Policy { Discovery = new DiscoveryPolicy { ValidateIssuerName = false, RequireHttps = false } }
             };
 
             var oidcClient = new OidcClient(options);
