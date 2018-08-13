@@ -3,9 +3,9 @@ services:
   db:
     image: postgres:10.1-alpine
     container_name: postgres
-  ironclad:
+  ironclad_1:
     image: ironclad
-    container_name: ironclad
+    container_name: ironclad_1
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - GOOGLE_CLIENT_ID=SOME_RANDOM_GOOGLE_CLIENT_ID
@@ -17,18 +17,32 @@ services:
       - C:/logs/ironclad:/app/logs
     depends_on: 
       - db
+  ironclad_2:
+    image: ironclad
+    container_name: ironclad_2
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - GOOGLE_CLIENT_ID=SOME_RANDOM_GOOGLE_CLIENT_ID
+      - GOOGLE_SECRET=NOT_A_REAL_GOOGLE_SECRET
+      - IRONCLAD_CONNECTIONSTRING=Host=db;Database=ironclad;Username=postgres;
+      - ISSUERURI=http://nginx-proxy
+      - VIRTUAL_HOST=nginx-proxy
+      - NO_DB_INIT=true
+    volumes:
+      - C:/logs/ironclad_2:/app/logs
+    depends_on: 
+      - db
   nginx-proxy:
     image: jwilder/nginx-proxy
     ports:
       - "80:80"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
-    depends_on: 
-      - ironclad
   tests:
     image: ironclad.tests
     depends_on:
-      - nginx-proxy
+      - ironclad_1
+      - ironclad_2
   sshd:
     image: rastasheep/ubuntu-sshd:16.04
     container_name: test_sshd

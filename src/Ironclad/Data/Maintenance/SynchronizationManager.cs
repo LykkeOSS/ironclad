@@ -35,7 +35,7 @@ namespace Ironclad.Data.Maintenance
             this.logger = logger;
         }
 
-        public async Task SynchonizeAdminUserAsync()
+        public async Task SynchronizeAdminUserAsync()
         {
             var adminUser = await this.userManager.FindByIdAsync(Config.DefaultAdminUserId);
             if (adminUser != null)

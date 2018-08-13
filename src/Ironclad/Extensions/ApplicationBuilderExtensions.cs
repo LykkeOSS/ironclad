@@ -38,7 +38,7 @@ namespace Ironclad
                 var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<SynchronizationManager>>();
 
                 var synchronizationManager = new SynchronizationManager(userManager, roleManager, store, logger);
-                synchronizationManager.SynchonizeAdminUserAsync().Wait();
+                synchronizationManager.SynchronizeAdminUserAsync().Wait();
                 synchronizationManager.SynchronizeConfigurationAsync(configuration).Wait();
 
                 var compatiabilityManager = new CompatiabilityManager(serviceScope);

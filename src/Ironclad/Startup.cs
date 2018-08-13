@@ -3,6 +3,7 @@
 
 namespace Ironclad
 {
+    using System.Threading;
     using IdentityModel.Client;
     using IdentityServer4.AccessTokenValidation;
     using IdentityServer4.Postgresql.Extensions;
@@ -23,7 +24,6 @@ namespace Ironclad
     using Newtonsoft.Json.Converters;
     using Newtonsoft.Json.Serialization;
     using Serilog;
-    using System.Threading;
 
     public class Startup
     {
@@ -144,6 +144,12 @@ namespace Ironclad
             app.UseStaticFiles();
             app.UseIdentityServer();
             app.UseMvcWithDefaultRoute();
+
+            if (this.configuration.GetValue<bool>("NO_DB_INIT"))
+            {
+                Log.Information("NO_DB_INIT environment variable present. Database initialization will be skipped.");
+                return;
+            }
 
             int retryCount = 10;
 
