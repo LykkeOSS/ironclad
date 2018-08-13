@@ -1,5 +1,5 @@
 ﻿{
-  "authority": "http://ironclad",
+  "authority": "http://nginx-proxy",
   "username": "admin",
   "password": "password",
   "client_id": "auth_console",

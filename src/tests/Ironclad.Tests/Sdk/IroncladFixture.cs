@@ -139,7 +139,15 @@ namespace Ironclad.Tests.Sdk
                     {
                         using (var response = client.GetAsync(new Uri(this.Authority + "/api")).GetAwaiter().GetResult())
                         {
-                            var api = JsonConvert.DeserializeObject<IroncladApi>(response.Content.ReadAsStringAsync().GetAwaiter().GetResult(), GetJsonSerializerSettings());
+                            // Nginx is up, but Ironclad not yet
+                            if (response.StatusCode == System.Net.HttpStatusCode.BadGateway)
+                            {
+                                continue;
+                            }
+
+                            var responseString = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+                            var api = JsonConvert.DeserializeObject<IroncladApi>(responseString, GetJsonSerializerSettings());
                             int.Parse(api.ProcessId, CultureInfo.InvariantCulture);
                         }
 

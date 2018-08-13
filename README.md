@@ -114,3 +114,9 @@ First you have to build two images by executing ```build_test.sh``` script or by
 2) Container with tests ```docker build --rm -f src\tests.Dockerfile -t ironclad.tests:latest src --no-cache```
 
 Then run ```./test.sh``` script in order to start the test run.
+
+This script will run docker-compose file and spin up the following docker containers:
+- postgres
+- ironclad
+- ironclad.tests
+- test_sshd (A docker container with ssh deamon. Useful to debug the setup. ```ssh root@localhost -p 2222``` password: root)

@@ -1,1 +1,2 @@
-docker-compose -f src/tests/docker-compose.yml up --force-recreate --abort-on-container-exit;docker-compose -f src/tests/docker-compose.yml down --volumes
+# https://github.com/docker/for-win/issues/1829
+export COMPOSE_CONVERT_WINDOWS_PATHS=1 && docker-compose -f src/tests/docker-compose.yml up --force-recreate --abort-on-container-exit;docker-compose -f src/tests/docker-compose.yml down --volumes
