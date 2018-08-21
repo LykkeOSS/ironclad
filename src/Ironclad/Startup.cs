@@ -67,7 +67,7 @@ namespace Ironclad
                     });
 
             services.AddIdentityServer(options => options.IssuerUri = this.settings.Server.IssuerUri)
-                .AddDeveloperSigningCredential()
+                .AddSigningCredential(this.settings, this.logger)
                 .AddConfigurationStore(this.settings.Server.Database)
                 .AddOperationalStore()
                 .AddAppAuthRedirectUriValidator()
