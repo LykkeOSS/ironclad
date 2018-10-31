@@ -18,7 +18,7 @@ namespace Ironclad.Controllers
             {
                 Title = typeof(Program).Assembly.Attribute<AssemblyTitleAttribute>(attribute => attribute.Title),
                 Version = typeof(Program).Assembly.Attribute<AssemblyInformationalVersionAttribute>(attribute => attribute.InformationalVersion),
-                OS = System.Runtime.InteropServices.RuntimeInformation.OSDescription.TrimEnd(),
+                OS = System.Runtime.InteropServices.RuntimeInformation.OSDescription.TrimEnd()
             };
 
         private readonly IIdentityServerInteractionService interaction;

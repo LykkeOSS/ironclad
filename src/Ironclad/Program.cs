@@ -6,6 +6,7 @@ namespace Ironclad
     using System;
     using System.Reflection;
     using System.Runtime.InteropServices;
+    using Ironclad.Extensions;
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
@@ -35,10 +36,11 @@ namespace Ironclad
 
             // LINK (Cameron): https://mitchelsellers.com/blogs/2017/10/09/real-world-aspnet-core-logging-configuration
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.Async(a => a.Console())
+                .WriteTo.Async(a => a.Console(outputTemplate: "[{InstanceId}] [{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"))
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
+                .Enrich.With(new AzureInstanceIdSerilogEnricher())
                 .ReadFrom.Configuration(configuration)
                 .CreateLogger();
 
