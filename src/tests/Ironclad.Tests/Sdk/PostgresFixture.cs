@@ -1,78 +1,35 @@
-﻿// Copyright (c) Lykke Corp.
-// See the LICENSE file in the project root for more information.
+using System;
+using System.Threading.Tasks;
+using Npgsql;
 
 namespace Ironclad.Tests.Sdk
 {
-    using System;
-    using System.Diagnostics;
-    using System.Globalization;
-    using System.IO;
-    using System.Net.Sockets;
-    using System.Threading;
-    using Npgsql;
-
-    public sealed class PostgresFixture : IDisposable
+    public class PostgresFixture : IPostgresFixture
     {
-        internal const string ConnectionString = "Host=localhost;Database=ironclad;Username=postgres;Password=postgres;";
-
-        private static readonly string DockerContainerId = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture).Substring(12);
-
-        private readonly Process process;
-
+        private readonly IPostgresFixture _fixture;
+        
         public PostgresFixture()
         {
-            this.process = this.StartPostgresProcess();
+            if (Environment.GetEnvironmentVariable("CI") != null)
+            {
+                _fixture = new DockerComposedPostgres();
+            }
+            else
+            {
+                _fixture = new DockerizedPostgres();
+            }
         }
 
-        public void Dispose()
+        public NpgsqlConnectionStringBuilder ConnectionStringBuilder => _fixture.ConnectionStringBuilder;
+
+        public Task InitializeAsync()
         {
-            try
-            {
-                this.process.Kill();
-            }
-            catch (InvalidOperationException)
-            {
-            }
-
-            this.process.Dispose();
-
-            // NOTE (Cameron): Remove the docker container.
-            Process.Start(new ProcessStartInfo("docker", $"stop {DockerContainerId}")).WaitForExit(10000);
+            return _fixture.InitializeAsync();
         }
 
-        private Process StartPostgresProcess()
+        public Task DisposeAsync()
         {
-            var process = Process.Start(
-                new ProcessStartInfo("docker", $"run --rm --name {DockerContainerId} -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=ironclad -p 5432:5432 postgres:10.1-alpine")
-                {
-                    UseShellExecute = true,
-                });
-
-            // NOTE (Cameron): Trying to find a sensible value here so as to not throw during a debug session.
-            Thread.Sleep(4000);
-
-            using (var connection = new NpgsqlConnection(ConnectionString))
-            {
-                var attempt = 0;
-                while (true)
-                {
-                    Thread.Sleep(500);
-                    try
-                    {
-                        connection.Open();
-                        break;
-                    }
-                    catch (Exception ex) when (ex is NpgsqlException || ex is SocketException || ex is EndOfStreamException)
-                    {
-                        if (++attempt >= 20)
-                        {
-                            throw;
-                        }
-                    }
-                }
-            }
-
-            return process;
+            return _fixture.DisposeAsync();
         }
     }
 }

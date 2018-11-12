@@ -11,8 +11,9 @@ namespace Ironclad.Tests.Sdk
     using System.Threading.Tasks;
     using Docker.DotNet;
     using Docker.DotNet.Models;
+    using Xunit;
 
-    internal class LocalDockerContainer : IDisposable
+    public abstract class LocalDockerContainer : IAsyncLifetime
     {
         private const string UnixPipe = "unix:///var/run/docker.sock";
         private const string WindowsPipe = "npipe://./pipe/docker_engine";
@@ -23,102 +24,121 @@ namespace Ironclad.Tests.Sdk
             );
 
         private readonly DockerClient _client;
-        private readonly LocalDockerContainerConfiguration _configuration;
+        private LocalDockerContainerConfiguration _configuration;
 
-        public LocalDockerContainer(LocalDockerContainerConfiguration configuration)
+        protected LocalDockerContainer()
         {
-            if (configuration == null)
-            {
-                throw new ArgumentNullException(nameof(configuration));
-            }
-
-            if (string.IsNullOrEmpty(configuration.Image))
-            {
-                throw new ArgumentException("Please specify the Image the container is based on.",
-                    nameof(configuration));
-            }
-
-            if (string.IsNullOrEmpty(configuration.Tag))
-            {
-                throw new ArgumentException("Please specify the Tag of the Image the container is based on.",
-                    nameof(configuration));
-            }
-
-            if (string.IsNullOrEmpty(configuration.ContainerName))
-            {
-                throw new ArgumentException("Please specify the ContainerName of the container.",
-                    nameof(configuration));
-            }
-
-            if (configuration.ContainerPortBindings == null)
-            {
-                throw new ArgumentException(
-                    "Please specify either an empty or filled list of ContainerPortBindings for the container.",
-                    nameof(configuration));
-            }
-
-            if (configuration.ContainerEnvironmentVariables == null)
-            {
-                throw new ArgumentException(
-                    "Please specify either an empty or filled list of ContainerEnvironmentVariables for the container.",
-                    nameof(configuration));
-            }
-
-            if (configuration.WaitUntilAvailable == null)
-            {
-                throw new ArgumentException("Please specify the WaitUntilAvailable action to execute on the container.",
-                    nameof(configuration));
-            }
-
-            if (configuration.MaximumWaitUntilAvailableAttempts <= 0)
-            {
-                throw new ArgumentException(
-                    "Please specify a MaximumWaitUntilAvailableAttempts greater than or equal to 1.",
-                    nameof(configuration));
-            }
-
-            if (configuration.TimeBetweenWaitUntilAvailableAttempts < TimeSpan.Zero)
-            {
-                throw new ArgumentException(
-                    "Please specify a TimeBetweenWaitUntilAvailableAttempts greater than or equal to TimeSpan.Zero.",
-                    nameof(configuration));
-            }
-
             _client = _clientConfiguration.CreateClient();
-            _configuration = configuration;
         }
 
-        public async Task StartAsync(CancellationToken token = default)
+        protected LocalDockerContainerConfiguration Configuration
         {
-            if (_configuration.IsContainerReusable)
+            get => _configuration;
+            set
             {
-                var id = await TryFindContainer(token);
-                if (id == null)
+                if (value == null)
                 {
-                    await AutoCreateImage(token);
-                    id = await CreateContainer(token);
+                    throw new ArgumentNullException(nameof(value));
                 }
 
-                await StartContainer(id, token);
+                if (string.IsNullOrEmpty(value.Image))
+                {
+                    throw new ArgumentException("Please specify the Image the container is based on.",
+                        nameof(value));
+                }
+
+                if (string.IsNullOrEmpty(value.Tag))
+                {
+                    throw new ArgumentException("Please specify the Tag of the Image the container is based on.",
+                        nameof(value));
+                }
+
+                if (string.IsNullOrEmpty(value.ContainerName))
+                {
+                    throw new ArgumentException("Please specify the ContainerName of the container.",
+                        nameof(value));
+                }
+
+                if (value.ContainerPortBindings == null)
+                {
+                    throw new ArgumentException(
+                        "Please specify either an empty or filled list of ContainerPortBindings for the container.",
+                        nameof(value));
+                }
+
+                if (value.ContainerEnvironmentVariables == null)
+                {
+                    throw new ArgumentException(
+                        "Please specify either an empty or filled list of ContainerEnvironmentVariables for the container.",
+                        nameof(value));
+                }
+
+                if (value.WaitUntilAvailable == null)
+                {
+                    throw new ArgumentException(
+                        "Please specify the WaitUntilAvailable action to execute on the container.",
+                        nameof(value));
+                }
+
+                if (value.MaximumWaitUntilAvailableAttempts <= 0)
+                {
+                    throw new ArgumentException(
+                        "Please specify a MaximumWaitUntilAvailableAttempts greater than or equal to 1.",
+                        nameof(value));
+                }
+
+                if (value.TimeBetweenWaitUntilAvailableAttempts < TimeSpan.Zero)
+                {
+                    throw new ArgumentException(
+                        "Please specify a TimeBetweenWaitUntilAvailableAttempts greater than or equal to TimeSpan.Zero.",
+                        nameof(value));
+                }
+
+                _configuration = value;
+            }
+        }
+
+        public async Task InitializeAsync()
+        {
+            if (Configuration == null)
+            {
+                throw new InvalidOperationException("Please provide the Configuration before initializing the fixture.");
+            }
+            
+            if (Configuration.IsContainerReusable)
+            {
+                var id = await TryFindContainer(default);
+                if (id == null)
+                {
+                    await AutoCreateImage(default);
+                    id = await CreateContainer(default);
+                }
+
+                await StartContainer(id, default);
             }
             else
             {
-                await AutoCreateImage(token);
-                await StartContainer(await CreateContainer(token), token);
+                await AutoCreateImage(default);
+                await AutoStartContainer(default);
             }
         }
 
-        public async Task StopAsync(CancellationToken token = default)
+        public async Task DisposeAsync()
         {
-            var id = await TryFindContainer(token);
-            if (id != null)
+            if (_client != null && Configuration != null)
             {
-                await StopContainer(id, token);
-                if(_configuration.AutoRemoveContainer)
+                var id = await TryFindContainer(default);
+                if (id != null)
                 {
-                    await RemoveContainer(id, token);
+                    await StopContainer(id, default);
+                    if (_configuration.AutoRemoveContainer)
+                    {
+                        await RemoveContainer(id, default);
+                    }
                 }
             }
+            _client?.Dispose();
+            _clientConfiguration.Dispose();
         }
 
         private async Task<string> TryFindContainer(CancellationToken token)
@@ -130,7 +150,7 @@ namespace Ironclad.Tests.Sdk
                 {
                     ["name"] = new Dictionary<string, bool>
                     {
-                        [_configuration.ContainerName] = true
+                        [Configuration.ContainerName] = true
                     }
                 }
             }, token).ConfigureAwait(false);
@@ -142,7 +162,7 @@ namespace Ironclad.Tests.Sdk
 
         private async Task<string> CreateContainer(CancellationToken token)
         {
-            var portBindings = _configuration.ContainerPortBindings.ToDictionary(
+            var portBindings = Configuration.ContainerPortBindings.ToDictionary(
                 binding => $"{binding.GuestTcpPort}/tcp",
                 binding => (IList<PortBinding>) new List<PortBinding>
                 {
@@ -154,10 +174,10 @@ namespace Ironclad.Tests.Sdk
 
             var parameters = new CreateContainerParameters
             {
-                Image = _configuration.TagQualifiedImage,
-                Name = _configuration.ContainerName,
+                Image = Configuration.TagQualifiedImage,
+                Name = Configuration.ContainerName,
                 Tty = true,
-                Env = _configuration.ContainerEnvironmentVariables,
+                Env = Configuration.ContainerEnvironmentVariables,
                 HostConfig = new HostConfig
                 {
                     PortBindings = portBindings
@@ -171,6 +191,15 @@ namespace Ironclad.Tests.Sdk
             return container.ID;
         }
 
+        private async Task AutoStartContainer(CancellationToken token)
+        {
+            var id = await CreateContainer(token);
+            if (id != null)
+            {
+                await StartContainer(id, token);
+            }
+        }
+
         private async Task StartContainer(string id, CancellationToken token)
         {
             var started = await _client.Containers
@@ -181,23 +210,23 @@ namespace Ironclad.Tests.Sdk
             {
                 var attempt = 0;
                 while (
-                    attempt < _configuration.MaximumWaitUntilAvailableAttempts &&
-                    !await _configuration.WaitUntilAvailable(token).ConfigureAwait(false))
+                    attempt < Configuration.MaximumWaitUntilAvailableAttempts &&
+                    !await Configuration.WaitUntilAvailable(token).ConfigureAwait(false))
                 {
-                    if (attempt != _configuration.MaximumWaitUntilAvailableAttempts - 1)
+                    if (attempt != Configuration.MaximumWaitUntilAvailableAttempts - 1)
                     {
                         await Task
-                            .Delay(_configuration.TimeBetweenWaitUntilAvailableAttempts, token)
+                            .Delay(Configuration.TimeBetweenWaitUntilAvailableAttempts, token)
                             .ConfigureAwait(false);
                     }
 
                     attempt++;
                 }
 
-                if (attempt == _configuration.MaximumWaitUntilAvailableAttempts)
+                if (attempt == Configuration.MaximumWaitUntilAvailableAttempts)
                 {
                     throw new Exception(
-                        $"The container {_configuration.ContainerName} did not become available in a timely fashion.");
+                        $"The container {Configuration.ContainerName} did not become available in a timely fashion.");
                 }
             }
         }
@@ -218,15 +247,15 @@ namespace Ironclad.Tests.Sdk
 
         private async Task AutoCreateImage(CancellationToken token)
         {
-            if (!await ImageExists(token))
+            if (!await ImageExists(token).ConfigureAwait(false))
             {
                 await _client
                     .Images
                     .CreateImageAsync(
                         new ImagesCreateParameters
                         {
-                            FromImage = _configuration.Image,
-                            Tag = _configuration.Tag
+                            FromImage = Configuration.Image,
+                            Tag = Configuration.Tag
                         },
                         null,
                         Progress.IsBeingIgnored,
@@ -240,16 +269,10 @@ namespace Ironclad.Tests.Sdk
         {
             var images = await _client.Images.ListImagesAsync(new ImagesListParameters
             {
-                MatchName = _configuration.TagQualifiedImage
+                MatchName = Configuration.TagQualifiedImage
             }, token).ConfigureAwait(false);
 
             return images.Count != 0;
-        }
-
-        public void Dispose()
-        {
-            _client?.Dispose();
-            _clientConfiguration.Dispose();
         }
 
         private class Progress : IProgress<JSONMessage>

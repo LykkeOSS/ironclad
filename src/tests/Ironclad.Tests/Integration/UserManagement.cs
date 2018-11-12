@@ -16,8 +16,8 @@ namespace Ironclad.Tests.Feature
 
     public class UserManagement : IntegrationTest
     {
-        public UserManagement(AuthenticationFixture securityFixture, IroncladFixture ironcladFixture, PostgresFixture2 postgresFixture)
-            : base(securityFixture, ironcladFixture, postgresFixture)
+        public UserManagement(AuthenticationFixture securityFixture, IroncladFixture ironcladFixture)
+            : base(securityFixture, ironcladFixture)
         {
         }
 

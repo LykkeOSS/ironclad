@@ -17,8 +17,8 @@ namespace Ironclad.Tests.Feature
 
     public class ClientManagement : IntegrationTest
     {
-        public ClientManagement(AuthenticationFixture securityFixture, IroncladFixture ironcladFixture, PostgresFixture2 postgresFixture)
-            : base(securityFixture, ironcladFixture, postgresFixture)
+        public ClientManagement(AuthenticationFixture securityFixture, IroncladFixture ironcladFixture)
+            : base(securityFixture, ironcladFixture)
         {
         }
 
