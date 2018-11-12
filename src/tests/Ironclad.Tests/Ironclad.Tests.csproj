@@ -12,6 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Docker.DotNet" Version="3.125.2" />
     <PackageReference Include="FluentAssertions" Version="5.4.2" />
     <PackageReference Include="IdentityModel" Version="3.8.0" />
     <PackageReference Include="IdentityModel.OidcClient" Version="2.8.1" />

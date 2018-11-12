@@ -66,7 +66,7 @@ namespace Ironclad.Tests.Sdk
                 Path.DirectorySeparatorChar);
 
             Process.Start(
-                new ProcessStartInfo("dotnet", $"run -p {path} --connectionString '{PostgresFixture.ConnectionString}'")
+                new ProcessStartInfo("dotnet", $"run -p {path} --connectionString '{PostgresFixture2.ConnectionString}'")
                 {
                     UseShellExecute = true,
                 });
@@ -105,7 +105,7 @@ namespace Ironclad.Tests.Sdk
         {
             var process = Process.Start(
                 ////new ProcessStartInfo("docker", $"run --rm --name {DockerContainerId} -e IRONCLAD_CONNECTIONSTRING={PostgresFixture.ConnectionString} -p 5005:80 ironclad:dev")
-                new ProcessStartInfo("docker-compose", $"run --rm --name {DockerContainerId} -e IRONCLAD_CONNECTIONSTRING={PostgresFixture.ConnectionString} -p 5005:80 ironclad:dev")
+                new ProcessStartInfo("docker-compose", $"run --rm --name {DockerContainerId} -e IRONCLAD_CONNECTIONSTRING={PostgresFixture2.ConnectionString} -p 5005:80 ironclad:dev")
                 {
                     UseShellExecute = true,
                 });

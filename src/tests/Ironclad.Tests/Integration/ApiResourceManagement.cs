@@ -15,7 +15,7 @@ namespace Ironclad.Tests.Feature
 
     public class ApiResourceManagement : IntegrationTest
     {
-        public ApiResourceManagement(AuthenticationFixture securityFixture, IroncladFixture ironcladFixture, PostgresFixture postgresFixture)
+        public ApiResourceManagement(AuthenticationFixture securityFixture, IroncladFixture ironcladFixture, PostgresFixture2 postgresFixture)
             : base(securityFixture, ironcladFixture, postgresFixture)
         {
         }

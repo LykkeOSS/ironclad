@@ -13,7 +13,7 @@ namespace Ironclad.Tests.Feature
     [TestCaseOrderer("Ironclad.Tests.Sdk.OrderStrategy", "Ironclad.Tests")]
     public class InteractiveEndUserFeature : IntegrationTest
     {
-        public InteractiveEndUserFeature(AuthenticationFixture securityFixture, IroncladFixture ironcladFixture, PostgresFixture postgresFixture)
+        public InteractiveEndUserFeature(AuthenticationFixture securityFixture, IroncladFixture ironcladFixture, PostgresFixture2 postgresFixture)
             : base(securityFixture, ironcladFixture, postgresFixture)
         {
         }

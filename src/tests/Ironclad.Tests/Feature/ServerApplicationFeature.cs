@@ -9,7 +9,7 @@ namespace Ironclad.Tests.Feature
 
     public class ServerApplicationFeature : IntegrationTest
     {
-        public ServerApplicationFeature(AuthenticationFixture securityFixture, IroncladFixture ironcladFixture, PostgresFixture postgresFixture)
+        public ServerApplicationFeature(AuthenticationFixture securityFixture, IroncladFixture ironcladFixture, PostgresFixture2 postgresFixture)
             : base(securityFixture, ironcladFixture, postgresFixture)
         {
         }

@@ -12,7 +12,7 @@ namespace Ironclad.Tests.Bug
 
     public class Bug00096 : IntegrationTest
     {
-        public Bug00096(AuthenticationFixture securityFixture, IroncladFixture ironcladFixture, PostgresFixture postgresFixture)
+        public Bug00096(AuthenticationFixture securityFixture, IroncladFixture ironcladFixture, PostgresFixture2 postgresFixture)
             : base(securityFixture, ironcladFixture, postgresFixture)
         {
         }

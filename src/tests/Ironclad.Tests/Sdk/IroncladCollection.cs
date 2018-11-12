@@ -8,7 +8,7 @@ namespace Ironclad.Tests.Sdk
     // LINK (Cameron): https://xunit.github.io/docs/shared-context.html
     [CollectionDefinition("Ironclad")]
     public class IroncladCollection :
-        ICollectionFixture<PostgresFixture>,
+        ICollectionFixture<PostgresFixture2>,
         ICollectionFixture<IroncladFixture>,
         ICollectionFixture<AuthenticationFixture>
     {
