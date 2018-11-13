@@ -11,7 +11,7 @@ namespace Ironclad.Tests.Sdk
 
     public class DockerizedPostgres : LocalDockerContainer, IPostgresFixture
     {
-        private static int PostgresContainerNameSuffix;
+        private static long PostgresContainerNameSuffix = DateTime.UtcNow.Ticks;
         
         private static readonly string ConnectionString =
             "Host=localhost;Database=ironclad;Username=postgres;Password=postgres;";

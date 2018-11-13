@@ -33,9 +33,12 @@ namespace Ironclad.Tests.Sdk
                 Path.DirectorySeparatorChar);
 
             _process = Process.Start(
-                new ProcessStartInfo("dotnet", $"run -p {path} --connectionString '{_connectionString}'")
+                new ProcessStartInfo("dotnet", 
+                    Environment.OSVersion.Platform.Equals(PlatformID.Unix)
+                    ? $"run -p {path} -- --connectionString '{_connectionString}'"
+                    : $"run -p {path} --connectionString '{_connectionString}'")
                 {
-                    UseShellExecute = true
+                    UseShellExecute = Environment.OSVersion.Platform.Equals(PlatformID.Unix) ? false : true
                 });
 
             async Task<bool> WaitUntilAvailable(CancellationToken token)
@@ -89,12 +92,12 @@ namespace Ironclad.Tests.Sdk
         {
             try
             {
-                _process.Kill();
+                _process?.Kill();
             }
             catch(Win32Exception)
             {
             }
-            _process.Dispose();
+            _process?.Dispose();
             return Task.CompletedTask;
         }
     }

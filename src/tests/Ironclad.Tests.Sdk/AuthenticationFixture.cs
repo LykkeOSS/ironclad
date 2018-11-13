@@ -38,27 +38,6 @@ namespace Ironclad.Tests.Sdk
         public string Scope { get; }
         public HttpMessageHandler Handler { get; private set; }
 
-        private static async Task<HttpMessageHandler> CreateTokenHandler(string authority, string username, string password, string clientId, string scope)
-        {
-            var automation = new BrowserAutomation(username, password);
-            var browser = new Browser(automation);
-            var options = new OidcClientOptions
-            {
-                Authority = authority,
-                ClientId = clientId,
-                RedirectUri = $"http://127.0.0.1:{browser.Port}",
-                Scope = scope,
-                FilterClaims = false,
-                Browser = browser,
-                Policy = new Policy { Discovery = new DiscoveryPolicy { ValidateIssuerName = false } }
-            };
-
-            var oidcClient = new OidcClient(options);
-            var result = await oidcClient.LoginAsync(new LoginRequest()).ConfigureAwait(false);
-
-            return new TokenHandler(result.AccessToken);
-        }
-
         public async Task InitializeAsync()
         {
             var automation = new BrowserAutomation(Username, Password);
