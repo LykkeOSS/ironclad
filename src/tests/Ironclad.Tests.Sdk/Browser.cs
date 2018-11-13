@@ -23,7 +23,7 @@ namespace Ironclad.Tests.Sdk
         {
             this.automation = automation;
             this.path = path;
-            this.Port = port ?? GetAvailablePort(1025); // GetRandomUnusedPort();
+            this.Port = port ?? PortManager.GetNextPort();
         }
 
         public int Port { get; }
@@ -54,48 +54,6 @@ namespace Ironclad.Tests.Sdk
                     return new BrowserResult { ResultType = BrowserResultType.UnknownError, Error = ex.Message };
                 }
             }
-        }
-
-        private static int GetRandomUnusedPort()
-        {
-            var listener = new TcpListener(IPAddress.Loopback, 0);
-            listener.Start();
-            var port = ((IPEndPoint)listener.LocalEndpoint).Port;
-            listener.Stop();
-            return port;
-        }
-
-        private static int GetAvailablePort(int startingPort)
-        {
-            var portArray = new List<int>();
-
-            var properties = IPGlobalProperties.GetIPGlobalProperties();
-
-            // Ignore active connections
-            var connections = properties.GetActiveTcpConnections();
-            portArray.AddRange(from n in connections
-                               where n.LocalEndPoint.Port >= startingPort
-                               select n.LocalEndPoint.Port);
-
-            // Ignore active tcp listners
-            var endPoints = properties.GetActiveTcpListeners();
-            portArray.AddRange(from n in endPoints
-                               where n.Port >= startingPort
-                               select n.Port);
-
-            // Ignore active udp listeners
-            endPoints = properties.GetActiveUdpListeners();
-            portArray.AddRange(from n in endPoints
-                               where n.Port >= startingPort
-                               select n.Port);
-
-            portArray.Sort();
-
-            for (var i = startingPort; i < UInt16.MaxValue; i++)
-                if (!portArray.Contains(i))
-                    return i;
-
-            return 0;
         }
     }
 }

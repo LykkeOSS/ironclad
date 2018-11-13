@@ -7,6 +7,7 @@ namespace Ironclad.Tests.Sdk
     using System.IO;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Configuration;
+    using Xunit.Abstractions;
 
     public class IroncladFixture : IIroncladFixture
     {

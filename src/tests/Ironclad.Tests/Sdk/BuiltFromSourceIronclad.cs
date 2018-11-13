@@ -8,6 +8,7 @@ namespace Ironclad.Tests.Sdk
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Threading;
@@ -33,7 +34,7 @@ namespace Ironclad.Tests.Sdk
                 Path.DirectorySeparatorChar);
 
             _process = Process.Start(
-                new ProcessStartInfo("dotnet", 
+                new ProcessStartInfo("dotnet",
                     Environment.OSVersion.Platform.Equals(PlatformID.Unix)
                     ? $"run -p {path} -- --connectionString '{_connectionString}'"
                     : $"run -p {path} --connectionString '{_connectionString}'")
@@ -90,12 +91,25 @@ namespace Ironclad.Tests.Sdk
 
         public Task DisposeAsync()
         {
-            try
+            if (_process != null)
             {
-                _process?.Kill();
-            }
-            catch(Win32Exception)
-            {
+                try
+                {
+                    if (Environment.OSVersion.Platform.Equals(PlatformID.Unix))
+                    {
+                        using (var killer = Process.Start(new ProcessStartInfo("pkill", $"-TERM -P {_process.Id}")))
+                        {
+                            killer.WaitForExit();
+                        }
+                    }
+                    else
+                    {
+                        _process.Kill();
+                    }
+                }
+                catch (Win32Exception)
+                {
+                }
             }
             _process?.Dispose();
             return Task.CompletedTask;

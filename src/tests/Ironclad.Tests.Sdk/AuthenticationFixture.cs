@@ -55,15 +55,15 @@ namespace Ironclad.Tests.Sdk
 
             var oidcClient = new OidcClient(options);
             
-            async Task<bool> WaitUntilAvailable(CancellationToken token)
+            async Task<WaitUntilAvailableResult> WaitUntilAvailable(CancellationToken token)
             {
                 using (var client = new HttpClient())
                 {
                     try
                     {
-                        await oidcClient.LoginAsync(new LoginRequest()).ConfigureAwait(false);
+                        var response = await oidcClient.LoginAsync(new LoginRequest()).ConfigureAwait(false);
 
-                        return true;
+                        return WaitUntilAvailableResult.Available(response.AccessToken);
                     }
                     catch (HttpRequestException)
                     {
@@ -73,24 +73,35 @@ namespace Ironclad.Tests.Sdk
                     }
                 }
 
-                return false;
+                return WaitUntilAvailableResult.NotAvailable;
             }
 
-            const int maximumWaitUntilAvailableAttempts = 30;
+            const int maximumWaitUntilAvailableAttempts = 60;
             var timeBetweenWaitUntilAvailableAttempts = TimeSpan.FromSeconds(2);
             var attempt = 0;
+            var exit = false;
+            string accessToken = null;
             while (
                 attempt < maximumWaitUntilAvailableAttempts &&
-                !await WaitUntilAvailable(default).ConfigureAwait(false))
+                !exit)
             {
-                if (attempt != maximumWaitUntilAvailableAttempts - 1)
+                var result = await WaitUntilAvailable(default).ConfigureAwait(false);
+                if(!ReferenceEquals(result, WaitUntilAvailableResult.NotAvailable))
                 {
-                    await Task
-                        .Delay(timeBetweenWaitUntilAvailableAttempts, default)
-                        .ConfigureAwait(false);
+                    exit = true;
+                    accessToken = result.AccessToken;
                 }
+                else 
+                {
+                    if (attempt != maximumWaitUntilAvailableAttempts - 1)
+                    {
+                        await Task
+                            .Delay(timeBetweenWaitUntilAvailableAttempts, default)
+                            .ConfigureAwait(false);
+                    }
 
-                attempt++;
+                    attempt++;
+                }
             }
 
             if (attempt == maximumWaitUntilAvailableAttempts)
@@ -99,15 +110,27 @@ namespace Ironclad.Tests.Sdk
                     "The Ironclad instance did not become available in a timely fashion.");
             }
 
-            var result = await oidcClient.LoginAsync(new LoginRequest()).ConfigureAwait(false);
-
-            Handler = new TokenHandler(result.AccessToken);
+            Handler = new TokenHandler(accessToken);
         }
 
         public Task DisposeAsync()
         {
             Handler?.Dispose();
             return Task.CompletedTask;
+        }
+
+        private class WaitUntilAvailableResult
+        {
+            public static readonly WaitUntilAvailableResult NotAvailable = new WaitUntilAvailableResult(null);
+
+            private WaitUntilAvailableResult(string accessToken)
+            {
+                this.AccessToken = accessToken;
+            }
+
+            public string AccessToken { get; }
+
+            public static WaitUntilAvailableResult Available(string accessToken) => new WaitUntilAvailableResult(accessToken);
         }
 
         private sealed class TokenHandler : DelegatingHandler
