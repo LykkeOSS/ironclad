@@ -11,13 +11,16 @@ namespace Ironclad.Tests.Sdk
     {
         //Image related
         public string Image { get; set; }
+
         public string Tag { get; set; }
 
         public string TagQualifiedImage => Image + ":" + Tag;
 
         //Container related
         public bool IsContainerReusable { get; set; }
+
         public string ContainerName { get; set; }
+
         public bool AutoRemoveContainer { get; set; }
 
         public LocalDockerContainerPortBinding[] ContainerPortBindings { get; set; } =
@@ -28,7 +31,9 @@ namespace Ironclad.Tests.Sdk
 
         //Availability related
         public Func<CancellationToken, Task<bool>> WaitUntilAvailable { get; set; }
+
         public int MaximumWaitUntilAvailableAttempts { get; set; }
+
         public TimeSpan TimeBetweenWaitUntilAvailableAttempts { get; set; }
     }
 }

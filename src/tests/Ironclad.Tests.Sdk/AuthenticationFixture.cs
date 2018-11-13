@@ -32,22 +32,27 @@ namespace Ironclad.Tests.Sdk
         }
 
         public string Authority { get; }
+
         public string Username { get; }
+
         public string Password { get; }
+
         public string ClientId { get; }
+
         public string Scope { get; }
+
         public HttpMessageHandler Handler { get; private set; }
 
         public async Task InitializeAsync()
         {
-            var automation = new BrowserAutomation(Username, Password);
+            var automation = new BrowserAutomation(this.Username, this.Password);
             var browser = new Browser(automation);
             var options = new OidcClientOptions
             {
-                Authority = Authority,
-                ClientId = ClientId,
+                Authority = this.Authority,
+                ClientId = this.ClientId,
                 RedirectUri = $"http://127.0.0.1:{browser.Port}",
-                Scope = Scope,
+                Scope = this.Scope,
                 FilterClaims = false,
                 Browser = browser,
                 Policy = new Policy { Discovery = new DiscoveryPolicy { ValidateIssuerName = false } }
@@ -57,20 +62,17 @@ namespace Ironclad.Tests.Sdk
             
             async Task<WaitUntilAvailableResult> WaitUntilAvailable(CancellationToken token)
             {
-                using (var client = new HttpClient())
+                try
                 {
-                    try
-                    {
-                        var response = await oidcClient.LoginAsync(new LoginRequest()).ConfigureAwait(false);
+                    var response = await oidcClient.LoginAsync(new LoginRequest()).ConfigureAwait(false);
 
-                        return WaitUntilAvailableResult.Available(response.AccessToken);
-                    }
-                    catch (HttpRequestException)
-                    {
-                    }
-                    catch (InvalidOperationException)
-                    {
-                    }
+                    return WaitUntilAvailableResult.Available(response.AccessToken);
+                }
+                catch (HttpRequestException)
+                {
+                }
+                catch (InvalidOperationException)
+                {
                 }
 
                 return WaitUntilAvailableResult.NotAvailable;
@@ -110,12 +112,12 @@ namespace Ironclad.Tests.Sdk
                     "The Ironclad instance did not become available in a timely fashion.");
             }
 
-            Handler = new TokenHandler(accessToken);
+            this.Handler = new TokenHandler(accessToken);
         }
 
         public Task DisposeAsync()
         {
-            Handler?.Dispose();
+            this.Handler?.Dispose();
             return Task.CompletedTask;
         }
 

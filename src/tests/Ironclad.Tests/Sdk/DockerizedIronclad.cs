@@ -10,7 +10,7 @@ namespace Ironclad.Tests.Sdk
     
     public class DockerizedIronclad : LocalDockerContainer, IIroncladFixture
     {
-        private static int IroncladContainerNameSuffix;
+        private static int ironcladContainerNameSuffix;
         
         public DockerizedIronclad(string authority, string connectionString)
         {
@@ -24,20 +24,20 @@ namespace Ironclad.Tests.Sdk
                 throw new ArgumentNullException(nameof(connectionString));
             }
 
-            Configuration = new LocalDockerContainerConfiguration
+            this.Configuration = new LocalDockerContainerConfiguration
             {
                 Image = "ironclad",
                 Tag = "dev",
-                ContainerName = "ironclad-postgres" + Interlocked.Increment(ref IroncladContainerNameSuffix),
+                ContainerName = "ironclad-postgres" + Interlocked.Increment(ref ironcladContainerNameSuffix),
                 AutoRemoveContainer = true,
-                ContainerPortBindings = new []
+                ContainerPortBindings = new[]
                 {
                     new LocalDockerContainerPortBinding
                     {
                         GuestTcpPort = 80, HostTcpPort = 5005
                     }
                 },
-                ContainerEnvironmentVariables = new []
+                ContainerEnvironmentVariables = new[]
                 {
                     $"IRONCLAD_CONNECTIONSTRING={connectionString}"
                 },

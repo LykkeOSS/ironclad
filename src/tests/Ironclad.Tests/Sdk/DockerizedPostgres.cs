@@ -11,39 +11,39 @@ namespace Ironclad.Tests.Sdk
 
     public class DockerizedPostgres : LocalDockerContainer, IPostgresFixture
     {
-        private static long PostgresContainerNameSuffix = DateTime.UtcNow.Ticks;
+        private static long postgresContainerNameSuffix = DateTime.UtcNow.Ticks;
         
         private static readonly string ConnectionString =
             "Host=localhost;Database=ironclad;Username=postgres;Password=postgres;";
 
-        private readonly NpgsqlConnectionStringBuilder _builder; 
+        private readonly NpgsqlConnectionStringBuilder builder; 
         
         public DockerizedPostgres()
         {
-            _builder = new NpgsqlConnectionStringBuilder(ConnectionString);
+            this.builder = new NpgsqlConnectionStringBuilder(ConnectionString);
             
-            Configuration = new LocalDockerContainerConfiguration
+            this.Configuration = new LocalDockerContainerConfiguration
             {
                 Image = "postgres", Tag = "10.1-alpine",
-                ContainerName = "ironclad-postgres" + Interlocked.Increment(ref PostgresContainerNameSuffix),
+                ContainerName = "ironclad-postgres" + Interlocked.Increment(ref postgresContainerNameSuffix),
                 ContainerPortBindings = new[]
                 {
                     new LocalDockerContainerPortBinding
                     {
-                        GuestTcpPort = _builder.Port, HostTcpPort = 5432
+                        GuestTcpPort = builder.Port, HostTcpPort = 5432
                     }
                 },
                 ContainerEnvironmentVariables = new[]
                 {
-                    "POSTGRES_PASSWORD=" + _builder.Password,
-                    "POSTGRES_DB=" + _builder.Database
+                    "POSTGRES_PASSWORD=" + builder.Password,
+                    "POSTGRES_DB=" + builder.Database
                 },
                 AutoRemoveContainer = true,
                 WaitUntilAvailable = async token =>
                 {
                     try
                     {
-                        using (var connection = new NpgsqlConnection(_builder.ConnectionString))
+                        using (var connection = new NpgsqlConnection(this.builder.ConnectionString))
                         {
                             await connection.OpenAsync(token).ConfigureAwait(false);
                         }
@@ -63,6 +63,6 @@ namespace Ironclad.Tests.Sdk
             };
         }
 
-        public NpgsqlConnectionStringBuilder ConnectionStringBuilder => _builder;
+        public NpgsqlConnectionStringBuilder ConnectionStringBuilder => builder;
     }
 }

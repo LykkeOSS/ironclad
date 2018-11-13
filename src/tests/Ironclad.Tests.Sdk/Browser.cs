@@ -6,11 +6,6 @@
 namespace Ironclad.Tests.Sdk
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Net.NetworkInformation;
-    using System.Net.Sockets;
     using System.Threading.Tasks;
     using IdentityModel.OidcClient.Browser;
 

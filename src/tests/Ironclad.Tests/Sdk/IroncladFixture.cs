@@ -7,16 +7,15 @@ namespace Ironclad.Tests.Sdk
     using System.IO;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Configuration;
-    using Xunit.Abstractions;
 
     public class IroncladFixture : IIroncladFixture
     {
-        private readonly PostgresFixture _postgres;
-        private readonly IIroncladFixture _ironclad;
+        private readonly PostgresFixture postgres;
+        private readonly IIroncladFixture ironclad;
 
         public IroncladFixture()
         {
-            _postgres = new PostgresFixture();
+            this.postgres = new PostgresFixture();
             
             var configFile = Path.Combine(
                 Path.GetDirectoryName(typeof(IroncladFixture).Assembly.Location),
@@ -28,24 +27,24 @@ namespace Ironclad.Tests.Sdk
 
             if (Environment.GetEnvironmentVariable("CI") == null || useDockerImage)
             {
-                _ironclad = new BuiltFromSourceIronclad(authority, _postgres.ConnectionStringBuilder.ConnectionString);
+                this.ironclad = new BuiltFromSourceIronclad(authority, this.postgres.ConnectionStringBuilder.ConnectionString);
             }
             else
             {
-                _ironclad = new DockerizedIronclad(authority, _postgres.ConnectionStringBuilder.ConnectionString);
+                this.ironclad = new DockerizedIronclad(authority, this.postgres.ConnectionStringBuilder.ConnectionString);
             }
         }
         
         public async Task InitializeAsync()
         {
-            await _postgres.InitializeAsync();
-            await _ironclad.InitializeAsync();
+            await this.postgres.InitializeAsync();
+            await this.ironclad.InitializeAsync();
         }
 
         public async Task DisposeAsync()
         {
-            await _postgres.DisposeAsync();
-            await _ironclad.DisposeAsync();
+            await this.postgres.DisposeAsync();
+            await this.ironclad.DisposeAsync();
         }
     }
 }

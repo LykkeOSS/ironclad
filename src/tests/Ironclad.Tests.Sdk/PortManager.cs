@@ -10,12 +10,12 @@ namespace Ironclad.Tests.Sdk
 
     internal static class PortManager
     {
-        private static object _portLock = new object();
+        private static readonly object PortLock = new object();
         
         public static int GetNextPort()
         {
-            var port = 0;
-            lock (_portLock)
+            int port;
+            lock (PortLock)
             {
                 using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
                 {

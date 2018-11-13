@@ -16,14 +16,14 @@ namespace Ironclad.Tests.Sdk
 
     public class BuiltFromSourceIronclad : IIroncladFixture
     {
-        private readonly string _authority;
-        private readonly string _connectionString;
-        private Process _process;
+        private readonly string authority;
+        private readonly string connectionString;
+        private Process process;
 
         public BuiltFromSourceIronclad(string authority, string connectionString)
         {
-            _authority = authority ?? throw new ArgumentNullException(nameof(authority));
-            _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
+            this.authority = authority ?? throw new ArgumentNullException(nameof(authority));
+            this.connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
         }
 
         public async Task InitializeAsync()
@@ -33,11 +33,12 @@ namespace Ironclad.Tests.Sdk
                 "..{0}..{0}..{0}..{0}..{0}Ironclad{0}Ironclad.csproj",
                 Path.DirectorySeparatorChar);
 
-            _process = Process.Start(
-                new ProcessStartInfo("dotnet",
+            process = Process.Start(
+                new ProcessStartInfo(
+                    "dotnet",
                     Environment.OSVersion.Platform.Equals(PlatformID.Unix)
-                    ? $"run -p {path} -- --connectionString '{_connectionString}'"
-                    : $"run -p {path} --connectionString '{_connectionString}'")
+                    ? $"run -p {path} -- --connectionString '{this.connectionString}'"
+                    : $"run -p {path} --connectionString '{this.connectionString}'")
                 {
                     UseShellExecute = Environment.OSVersion.Platform.Equals(PlatformID.Unix) ? false : true
                 });
@@ -48,7 +49,7 @@ namespace Ironclad.Tests.Sdk
                 {
                     try
                     {
-                        using (var response = await client.GetAsync(new Uri(_authority + "/api"), token)
+                        using (var response = await client.GetAsync(new Uri(this.authority + "/api"), token)
                             .ConfigureAwait(false))
                         {
                             if (response.StatusCode == HttpStatusCode.OK)
@@ -91,27 +92,28 @@ namespace Ironclad.Tests.Sdk
 
         public Task DisposeAsync()
         {
-            if (_process != null)
+            if (this.process != null)
             {
                 try
                 {
                     if (Environment.OSVersion.Platform.Equals(PlatformID.Unix))
                     {
-                        using (var killer = Process.Start(new ProcessStartInfo("pkill", $"-TERM -P {_process.Id}")))
+                        using (var killer = Process.Start(new ProcessStartInfo("pkill", $"-TERM -P {this.process.Id}")))
                         {
-                            killer.WaitForExit();
+                            killer?.WaitForExit();
                         }
                     }
                     else
                     {
-                        _process.Kill();
+                        //TODO: Insufficient for Windows
+                        this.process.Kill();
                     }
                 }
                 catch (Win32Exception)
                 {
                 }
             }
-            _process?.Dispose();
+            this.process?.Dispose();
             return Task.CompletedTask;
         }
     }

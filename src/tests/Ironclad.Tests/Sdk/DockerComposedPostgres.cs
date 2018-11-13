@@ -9,11 +9,9 @@ namespace Ironclad.Tests.Sdk
 
     public class DockerComposedPostgres : IPostgresFixture
     {
-        private readonly NpgsqlConnectionStringBuilder _builder;
-
         public DockerComposedPostgres()
         {
-            _builder = new NpgsqlConnectionStringBuilder(
+            this.ConnectionStringBuilder = new NpgsqlConnectionStringBuilder(
                 Environment.GetEnvironmentVariable("POSTGRES_CONNECTIONSTRING"));
         }
         
@@ -27,6 +25,6 @@ namespace Ironclad.Tests.Sdk
             return Task.CompletedTask;
         }
 
-        public NpgsqlConnectionStringBuilder ConnectionStringBuilder => _builder;
+        public NpgsqlConnectionStringBuilder ConnectionStringBuilder { get; }
     }
 }

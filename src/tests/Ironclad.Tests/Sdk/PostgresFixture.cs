@@ -1,35 +1,38 @@
-using System;
-using System.Threading.Tasks;
-using Npgsql;
+// Copyright (c) Lykke Corp.
+// See the LICENSE file in the project root for more information.
 
 namespace Ironclad.Tests.Sdk
 {
+    using System;
+    using System.Threading.Tasks;
+    using Npgsql;
+
     public class PostgresFixture : IPostgresFixture
     {
-        private readonly IPostgresFixture _fixture;
+        private readonly IPostgresFixture fixture;
         
         public PostgresFixture()
         {
             if (Environment.GetEnvironmentVariable("CI") != null)
             {
-                _fixture = new DockerComposedPostgres();
+                this.fixture = new DockerComposedPostgres();
             }
             else
             {
-                _fixture = new DockerizedPostgres();
+                this.fixture = new DockerizedPostgres();
             }
         }
 
-        public NpgsqlConnectionStringBuilder ConnectionStringBuilder => _fixture.ConnectionStringBuilder;
+        public NpgsqlConnectionStringBuilder ConnectionStringBuilder => this.fixture.ConnectionStringBuilder;
 
         public Task InitializeAsync()
         {
-            return _fixture.InitializeAsync();
+            return this.fixture.InitializeAsync();
         }
 
         public Task DisposeAsync()
         {
-            return _fixture.DisposeAsync();
+            return this.fixture.DisposeAsync();
         }
     }
 }
