@@ -21,8 +21,7 @@ namespace Ironclad.Tests.Sdk
 
         private readonly DockerClientConfiguration clientConfiguration =
             new DockerClientConfiguration(
-                new Uri(Environment.OSVersion.Platform.Equals(PlatformID.Unix) ? UnixPipe : WindowsPipe)
-            );
+                new Uri(Environment.OSVersion.Platform.Equals(PlatformID.Unix) ? UnixPipe : WindowsPipe));
 
         private readonly DockerClient client;
         private LocalDockerContainerConfiguration configuration;
@@ -108,22 +107,22 @@ namespace Ironclad.Tests.Sdk
             {
                 throw new InvalidOperationException("Please provide the Configuration before initializing the fixture.");
             }
-            
+
             if (this.Configuration.IsContainerReusable)
             {
-                var id = await TryFindContainer(default).ConfigureAwait(false);
+                var id = await this.TryFindContainer(default).ConfigureAwait(false);
                 if (id == null)
                 {
-                    await AutoCreateImage(default).ConfigureAwait(false);
-                    id = await CreateContainer(default).ConfigureAwait(false);
+                    await this.AutoCreateImage(default).ConfigureAwait(false);
+                    id = await this.CreateContainer(default).ConfigureAwait(false);
                 }
 
-                await StartContainer(id, default).ConfigureAwait(false);
+                await this.StartContainer(id, default).ConfigureAwait(false);
             }
             else
             {
-                await AutoCreateImage(default).ConfigureAwait(false);
-                await AutoStartContainer(default).ConfigureAwait(false);
+                await this.AutoCreateImage(default).ConfigureAwait(false);
+                await this.AutoStartContainer(default).ConfigureAwait(false);
             }
         }
 
@@ -131,16 +130,17 @@ namespace Ironclad.Tests.Sdk
         {
             if (this.client != null && this.Configuration != null)
             {
-                var id = await TryFindContainer(default).ConfigureAwait(false);
+                var id = await this.TryFindContainer(default).ConfigureAwait(false);
                 if (id != null)
                 {
-                    await StopContainer(id, default).ConfigureAwait(false);
+                    await this.StopContainer(id, default).ConfigureAwait(false);
                     if (this.configuration.AutoRemoveContainer)
                     {
-                        await RemoveContainer(id, default).ConfigureAwait(false);
+                        await this.RemoveContainer(id, default).ConfigureAwait(false);
                     }
                 }
             }
+
             this.client?.Dispose();
             this.clientConfiguration.Dispose();
         }
@@ -198,10 +198,10 @@ namespace Ironclad.Tests.Sdk
 
         private async Task AutoStartContainer(CancellationToken token)
         {
-            var id = await CreateContainer(token).ConfigureAwait(false);
+            var id = await this.CreateContainer(token).ConfigureAwait(false);
             if (id != null)
             {
-                await StartContainer(id, token).ConfigureAwait(false);
+                await this.StartContainer(id, token).ConfigureAwait(false);
             }
         }
 
@@ -239,14 +239,14 @@ namespace Ironclad.Tests.Sdk
         private async Task StopContainer(string id, CancellationToken token)
         {
             await this.client.Containers
-                .StopContainerAsync(id, new ContainerStopParameters {WaitBeforeKillSeconds = 5}, token)
+                .StopContainerAsync(id, new ContainerStopParameters { WaitBeforeKillSeconds = 5 }, token)
                 .ConfigureAwait(false);
         }
 
         private async Task RemoveContainer(string id, CancellationToken token)
         {
             await this.client.Containers
-                .RemoveContainerAsync(id, new ContainerRemoveParameters {Force = false}, token)
+                .RemoveContainerAsync(id, new ContainerRemoveParameters { Force = false }, token)
                 .ConfigureAwait(false);
         }
 

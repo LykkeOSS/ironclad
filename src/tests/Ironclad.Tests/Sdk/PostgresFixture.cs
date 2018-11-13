@@ -10,7 +10,7 @@ namespace Ironclad.Tests.Sdk
     public class PostgresFixture : IPostgresFixture
     {
         private readonly IPostgresFixture fixture;
-        
+
         public PostgresFixture()
         {
             if (Environment.GetEnvironmentVariable("CI") != null)

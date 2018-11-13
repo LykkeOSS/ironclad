@@ -33,14 +33,15 @@ namespace Ironclad.Tests.Sdk
                 "..{0}..{0}..{0}..{0}..{0}Ironclad{0}Ironclad.csproj",
                 Path.DirectorySeparatorChar);
 
-            process = Process.Start(
+            var arguments = Environment.OSVersion.Platform.Equals(PlatformID.Unix)
+                ? $"run -p {path} -- --connectionString '{this.connectionString}'"
+                : $"run -p {path} --connectionString '{this.connectionString}'";
+            this.process = Process.Start(
                 new ProcessStartInfo(
                     "dotnet",
-                    Environment.OSVersion.Platform.Equals(PlatformID.Unix)
-                    ? $"run -p {path} -- --connectionString '{this.connectionString}'"
-                    : $"run -p {path} --connectionString '{this.connectionString}'")
+                    arguments)
                 {
-                    UseShellExecute = Environment.OSVersion.Platform.Equals(PlatformID.Unix) ? false : true
+                    UseShellExecute = !Environment.OSVersion.Platform.Equals(PlatformID.Unix)
                 });
 
             async Task<bool> WaitUntilAvailable(CancellationToken token)
@@ -105,7 +106,7 @@ namespace Ironclad.Tests.Sdk
                     }
                     else
                     {
-                        //TODO: Insufficient for Windows
+                        // TODO: Insufficient for Windows
                         this.process.Kill();
                     }
                 }
@@ -113,6 +114,7 @@ namespace Ironclad.Tests.Sdk
                 {
                 }
             }
+
             this.process?.Dispose();
             return Task.CompletedTask;
         }

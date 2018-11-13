@@ -7,11 +7,11 @@ namespace Ironclad.Tests.Sdk
     using System.Net;
     using System.Net.Http;
     using System.Threading;
-    
+
     public class DockerizedIronclad : LocalDockerContainer, IIroncladFixture
     {
         private static int ironcladContainerNameSuffix;
-        
+
         public DockerizedIronclad(string authority, string connectionString)
         {
             if (authority == null)
@@ -61,7 +61,7 @@ namespace Ironclad.Tests.Sdk
                         {
                         }
                     }
-                    
+
                     return false;
                 },
                 MaximumWaitUntilAvailableAttempts = 30,

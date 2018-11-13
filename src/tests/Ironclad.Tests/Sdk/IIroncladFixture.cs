@@ -4,7 +4,7 @@
 namespace Ironclad.Tests.Sdk
 {
     using Xunit;
-    
+
     public interface IIroncladFixture : IAsyncLifetime
     {
     }

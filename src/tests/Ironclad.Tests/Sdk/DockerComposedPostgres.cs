@@ -14,7 +14,9 @@ namespace Ironclad.Tests.Sdk
             this.ConnectionStringBuilder = new NpgsqlConnectionStringBuilder(
                 Environment.GetEnvironmentVariable("POSTGRES_CONNECTIONSTRING"));
         }
-        
+
+        public NpgsqlConnectionStringBuilder ConnectionStringBuilder { get; }
+
         public Task InitializeAsync()
         {
             return Task.CompletedTask;
@@ -24,7 +26,5 @@ namespace Ironclad.Tests.Sdk
         {
             return Task.CompletedTask;
         }
-
-        public NpgsqlConnectionStringBuilder ConnectionStringBuilder { get; }
     }
 }

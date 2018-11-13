@@ -9,27 +9,29 @@ namespace Ironclad.Tests.Sdk
 
     public class LocalDockerContainerConfiguration
     {
-        //Image related
+        // Image related
         public string Image { get; set; }
 
         public string Tag { get; set; }
 
-        public string TagQualifiedImage => Image + ":" + Tag;
+        public string TagQualifiedImage => this.Image + ":" + this.Tag;
 
-        //Container related
+        // Container related
         public bool IsContainerReusable { get; set; }
 
         public string ContainerName { get; set; }
 
         public bool AutoRemoveContainer { get; set; }
 
+        // ReSharper disable once CA1819
         public LocalDockerContainerPortBinding[] ContainerPortBindings { get; set; } =
             Array.Empty<LocalDockerContainerPortBinding>();
 
-        public string[] ContainerEnvironmentVariables { get; set; } = 
+        // ReSharper disable once CA1819
+        public string[] ContainerEnvironmentVariables { get; set; } =
             Array.Empty<string>();
 
-        //Availability related
+        // Availability related
         public Func<CancellationToken, Task<bool>> WaitUntilAvailable { get; set; }
 
         public int MaximumWaitUntilAvailableAttempts { get; set; }

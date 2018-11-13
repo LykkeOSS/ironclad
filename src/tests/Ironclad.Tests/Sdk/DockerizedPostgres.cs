@@ -11,17 +11,17 @@ namespace Ironclad.Tests.Sdk
 
     public class DockerizedPostgres : LocalDockerContainer, IPostgresFixture
     {
-        private static long postgresContainerNameSuffix = DateTime.UtcNow.Ticks;
-        
-        private static readonly string ConnectionString =
+        private const string ConnectionString =
             "Host=localhost;Database=ironclad;Username=postgres;Password=postgres;";
 
-        private readonly NpgsqlConnectionStringBuilder builder; 
-        
+        private static long postgresContainerNameSuffix = DateTime.UtcNow.Ticks;
+
+        private readonly NpgsqlConnectionStringBuilder builder;
+
         public DockerizedPostgres()
         {
             this.builder = new NpgsqlConnectionStringBuilder(ConnectionString);
-            
+
             this.Configuration = new LocalDockerContainerConfiguration
             {
                 Image = "postgres", Tag = "10.1-alpine",
@@ -30,13 +30,13 @@ namespace Ironclad.Tests.Sdk
                 {
                     new LocalDockerContainerPortBinding
                     {
-                        GuestTcpPort = builder.Port, HostTcpPort = 5432
+                        GuestTcpPort = this.builder.Port, HostTcpPort = 5432
                     }
                 },
                 ContainerEnvironmentVariables = new[]
                 {
-                    "POSTGRES_PASSWORD=" + builder.Password,
-                    "POSTGRES_DB=" + builder.Database
+                    "POSTGRES_PASSWORD=" + this.builder.Password,
+                    "POSTGRES_DB=" + this.builder.Database
                 },
                 AutoRemoveContainer = true,
                 WaitUntilAvailable = async token =>
@@ -63,6 +63,6 @@ namespace Ironclad.Tests.Sdk
             };
         }
 
-        public NpgsqlConnectionStringBuilder ConnectionStringBuilder => builder;
+        public NpgsqlConnectionStringBuilder ConnectionStringBuilder => this.builder;
     }
 }

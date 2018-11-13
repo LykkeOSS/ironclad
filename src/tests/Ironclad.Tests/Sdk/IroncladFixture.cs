@@ -16,7 +16,7 @@ namespace Ironclad.Tests.Sdk
         public IroncladFixture()
         {
             this.postgres = new PostgresFixture();
-            
+
             var configFile = Path.Combine(
                 Path.GetDirectoryName(typeof(IroncladFixture).Assembly.Location),
                 "testsettings.json");
@@ -34,17 +34,17 @@ namespace Ironclad.Tests.Sdk
                 this.ironclad = new DockerizedIronclad(authority, this.postgres.ConnectionStringBuilder.ConnectionString);
             }
         }
-        
+
         public async Task InitializeAsync()
         {
-            await this.postgres.InitializeAsync();
-            await this.ironclad.InitializeAsync();
+            await this.postgres.InitializeAsync().ConfigureAwait(false);
+            await this.ironclad.InitializeAsync().ConfigureAwait(false);
         }
 
         public async Task DisposeAsync()
         {
-            await this.postgres.DisposeAsync();
-            await this.ironclad.DisposeAsync();
+            await this.ironclad.DisposeAsync().ConfigureAwait(false);
+            await this.postgres.DisposeAsync().ConfigureAwait(false);
         }
     }
 }
