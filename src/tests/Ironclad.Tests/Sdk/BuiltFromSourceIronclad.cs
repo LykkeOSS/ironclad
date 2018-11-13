@@ -106,8 +106,11 @@ namespace Ironclad.Tests.Sdk
                     }
                     else
                     {
-                        // TODO: Insufficient for Windows
-                        this.process.Kill();
+                        using (var killer =
+                            Process.Start(new ProcessStartInfo("taskkill", $"/T /F /PID {this.process.Id}")))
+                        {
+                            killer?.WaitForExit();
+                        }
                     }
                 }
                 catch (Win32Exception)
