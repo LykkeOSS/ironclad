@@ -59,7 +59,7 @@ namespace Ironclad.Tests.Sdk
             };
 
             var oidcClient = new OidcClient(options);
-            
+
             async Task<WaitUntilAvailableResult> WaitUntilAvailable(CancellationToken token)
             {
                 try
@@ -88,12 +88,12 @@ namespace Ironclad.Tests.Sdk
                 !exit)
             {
                 var result = await WaitUntilAvailable(default).ConfigureAwait(false);
-                if(!ReferenceEquals(result, WaitUntilAvailableResult.NotAvailable))
+                if (!ReferenceEquals(result, WaitUntilAvailableResult.NotAvailable))
                 {
                     exit = true;
                     accessToken = result.AccessToken;
                 }
-                else 
+                else
                 {
                     if (attempt != maximumWaitUntilAvailableAttempts - 1)
                     {

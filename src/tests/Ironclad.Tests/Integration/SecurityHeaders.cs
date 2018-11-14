@@ -11,8 +11,8 @@ namespace Ironclad.Tests.Feature
 
     public class SecurityHeaders : IntegrationTest
     {
-        public SecurityHeaders(AuthenticationFixture securityFixture, IroncladFixture ironcladFixture, PostgresFixture postgresFixture)
-            : base(securityFixture, ironcladFixture, postgresFixture)
+        public SecurityHeaders(AuthenticationFixture securityFixture, IroncladFixture ironcladFixture)
+            : base(securityFixture, ironcladFixture)
         {
         }
 
