@@ -115,6 +115,13 @@ namespace Ironclad
                         options.ClientId = "auth_api";
                         options.ClientSecret = this.configuration.GetValue<string>("Introspection-Secret");
                         options.DiscoveryPolicy = new DiscoveryPolicy { ValidateIssuerName = false };
+                    })
+                .AddOpenIdConnect(
+                    "lykke",
+                    options =>
+                    {
+                        options.ClientId = "lykke-oidc";
+                        options.Authority = "https://auth-test.lykkecloud.com";
                     });
 
             services.AddAuthorization(
