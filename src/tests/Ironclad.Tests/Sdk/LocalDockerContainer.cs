@@ -21,7 +21,10 @@ namespace Ironclad.Tests.Sdk
 
         private readonly DockerClientConfiguration clientConfiguration =
             new DockerClientConfiguration(
-                new Uri(Environment.OSVersion.Platform.Equals(PlatformID.Unix) ? UnixPipe : WindowsPipe));
+                new Uri(
+                    Environment.GetEnvironmentVariable("DOCKER_HOST") ??
+                    (Environment.OSVersion.Platform.Equals(PlatformID.Unix) ? UnixPipe : WindowsPipe))
+            );
 
         private readonly DockerClient client;
         private LocalDockerContainerConfiguration configuration;
