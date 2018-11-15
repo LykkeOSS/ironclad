@@ -1,16 +1,14 @@
 sudo: required
 
-language: csharp
-solution: src/Ironclad.sln
+language: generic
 
 services:
   - docker
-  - postgres
-
-mono: none
-dotnet: 2.1
 
 script:
   - docker --version  # document the version travis is using
-  - dotnet restore src/Ironclad.sln
-  - dotnet build src/Ironclad.sln
+  - docker-compose -f src/Docker/docker-compose.yml -f src/Docker/docker-compose.release.yml -p ironclad config
+  - docker-compose -f src/Docker/docker-compose.yml -f src/Docker/docker-compose.release.yml -p ironclad build
+  - docker login lykkecloud.azurecr.io -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+  - docker tag ironclad:latest lykkecloud.azurecr.io/ironclad:latest
+  - docker push lykkecloud.azurecr.io/ironclad:latest

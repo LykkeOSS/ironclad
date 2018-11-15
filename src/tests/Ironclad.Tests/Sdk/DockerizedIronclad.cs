@@ -7,10 +7,11 @@ namespace Ironclad.Tests.Sdk
     using System.Net;
     using System.Net.Http;
     using System.Threading;
+    using Npgsql;
 
-    public class DockerizedIronclad : LocalDockerContainer, IIroncladFixture
+    public class DockerizedIronclad : LocalDockerContainer
     {
-        private static int ironcladContainerNameSuffix;
+        private static long ironcladContainerNameSuffix = DateTime.UtcNow.Ticks;
 
         public DockerizedIronclad(string authority, string connectionString)
         {
@@ -28,7 +29,7 @@ namespace Ironclad.Tests.Sdk
             {
                 Image = "ironclad",
                 Tag = "dev",
-                ContainerName = "ironclad-postgres" + Interlocked.Increment(ref ironcladContainerNameSuffix),
+                ContainerName = "ironclad" + Interlocked.Increment(ref ironcladContainerNameSuffix),
                 AutoRemoveContainer = true,
                 ContainerPortBindings = new[]
                 {
@@ -64,8 +65,8 @@ namespace Ironclad.Tests.Sdk
 
                     return false;
                 },
-                MaximumWaitUntilAvailableAttempts = 30,
-                TimeBetweenWaitUntilAvailableAttempts = TimeSpan.FromSeconds(2)
+                MaximumWaitUntilAvailableAttempts = 15,
+                TimeBetweenWaitUntilAvailableAttempts = TimeSpan.FromSeconds(1)
             };
         }
     }

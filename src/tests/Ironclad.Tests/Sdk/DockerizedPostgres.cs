@@ -9,18 +9,16 @@ namespace Ironclad.Tests.Sdk
     using System.Threading;
     using Npgsql;
 
-    public class DockerizedPostgres : LocalDockerContainer, IPostgresFixture
+    public class DockerizedPostgres : LocalDockerContainer
     {
-        private const string ConnectionString =
-            "Host=localhost;Database=ironclad;Username=postgres;Password=postgres;";
-
         private static long postgresContainerNameSuffix = DateTime.UtcNow.Ticks;
 
-        private readonly NpgsqlConnectionStringBuilder builder;
-
-        public DockerizedPostgres()
+        public DockerizedPostgres(NpgsqlConnectionStringBuilder connectionStringBuilder)
         {
-            this.builder = new NpgsqlConnectionStringBuilder(ConnectionString);
+            if (connectionStringBuilder == null)
+            {
+                throw new ArgumentNullException(nameof(connectionStringBuilder));
+            }
 
             this.Configuration = new LocalDockerContainerConfiguration
             {
@@ -30,20 +28,20 @@ namespace Ironclad.Tests.Sdk
                 {
                     new LocalDockerContainerPortBinding
                     {
-                        GuestTcpPort = this.builder.Port, HostTcpPort = 5432
+                        GuestTcpPort = connectionStringBuilder.Port, HostTcpPort = 5432
                     }
                 },
                 ContainerEnvironmentVariables = new[]
                 {
-                    "POSTGRES_PASSWORD=" + this.builder.Password,
-                    "POSTGRES_DB=" + this.builder.Database
+                    "POSTGRES_PASSWORD=" + connectionStringBuilder.Password,
+                    "POSTGRES_DB=" + connectionStringBuilder.Database
                 },
                 AutoRemoveContainer = true,
                 WaitUntilAvailable = async token =>
                 {
                     try
                     {
-                        using (var connection = new NpgsqlConnection(this.builder.ConnectionString))
+                        using (var connection = new NpgsqlConnection(connectionStringBuilder.ConnectionString))
                         {
                             await connection.OpenAsync(token).ConfigureAwait(false);
                         }
@@ -58,11 +56,9 @@ namespace Ironclad.Tests.Sdk
 
                     return false;
                 },
-                MaximumWaitUntilAvailableAttempts = 30,
-                TimeBetweenWaitUntilAvailableAttempts = TimeSpan.FromSeconds(2)
+                MaximumWaitUntilAvailableAttempts = 10,
+                TimeBetweenWaitUntilAvailableAttempts = TimeSpan.FromSeconds(1)
             };
         }
-
-        public NpgsqlConnectionStringBuilder ConnectionStringBuilder => this.builder;
     }
 }

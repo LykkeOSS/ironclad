@@ -18,41 +18,37 @@ namespace Ironclad.Tests.Sdk
 
     public sealed class AuthenticationFixture : IAsyncLifetime
     {
-        private readonly IConfigurationRoot configuration;
+        private readonly string authority;
+        private readonly string username;
+        private readonly string password;
+        private readonly string clientId;
+        private readonly string scope;
 
         public AuthenticationFixture()
         {
-            this.configuration = new ConfigurationBuilder().AddJsonFile("testsettings.json").Build();
+            var configuration = new ConfigurationBuilder().AddJsonFile("testsettings.json").Build();
 
-            this.Authority = this.configuration.GetValue<string>("authority") ?? throw new ConfigurationErrorsException("Missing configuration value 'authority'");
-            this.Username = this.configuration.GetValue<string>("username") ?? throw new ConfigurationErrorsException("Missing configuration value 'username'");
-            this.Password = this.configuration.GetValue<string>("password") ?? throw new ConfigurationErrorsException("Missing configuration value 'password'");
-            this.ClientId = this.configuration.GetValue<string>("client_id") ?? throw new ConfigurationErrorsException("Missing configuration value 'client_id'");
-            this.Scope = this.configuration.GetValue<string>("scope") ?? throw new ConfigurationErrorsException("Missing configuration value 'scope'");
+            this.authority = configuration.GetValue<string>("authority") ?? throw new ConfigurationErrorsException("Missing configuration value 'authority'");
+            this.username = configuration.GetValue<string>("username") ?? throw new ConfigurationErrorsException("Missing configuration value 'username'");
+            this.password = configuration.GetValue<string>("password") ?? throw new ConfigurationErrorsException("Missing configuration value 'password'");
+            this.clientId = configuration.GetValue<string>("client_id") ?? throw new ConfigurationErrorsException("Missing configuration value 'client_id'");
+            this.scope = configuration.GetValue<string>("scope") ?? throw new ConfigurationErrorsException("Missing configuration value 'scope'");
         }
 
-        public string Authority { get; }
-
-        public string Username { get; }
-
-        public string Password { get; }
-
-        public string ClientId { get; }
-
-        public string Scope { get; }
+        public string Authority => this.authority;
 
         public HttpMessageHandler Handler { get; private set; }
 
         public async Task InitializeAsync()
         {
-            var automation = new BrowserAutomation(this.Username, this.Password);
+            var automation = new BrowserAutomation(this.username, this.password);
             var browser = new Browser(automation);
             var options = new OidcClientOptions
             {
-                Authority = this.Authority,
-                ClientId = this.ClientId,
+                Authority = this.authority,
+                ClientId = this.clientId,
                 RedirectUri = $"http://127.0.0.1:{browser.Port}",
-                Scope = this.Scope,
+                Scope = this.scope,
                 FilterClaims = false,
                 Browser = browser,
                 Policy = new Policy { Discovery = new DiscoveryPolicy { ValidateIssuerName = false } }

@@ -13,6 +13,7 @@ namespace Ironclad.Tests.Sdk
     using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
+    using Npgsql;
 
     public class BuiltFromSourceIronclad : IIroncladFixture
     {
@@ -67,8 +68,8 @@ namespace Ironclad.Tests.Sdk
                 return false;
             }
 
-            const int maximumWaitUntilAvailableAttempts = 30;
-            var timeBetweenWaitUntilAvailableAttempts = TimeSpan.FromSeconds(2);
+            const int maximumWaitUntilAvailableAttempts = 15;
+            var timeBetweenWaitUntilAvailableAttempts = TimeSpan.FromSeconds(1);
             var attempt = 0;
             while (
                 attempt < maximumWaitUntilAvailableAttempts &&
