@@ -118,10 +118,21 @@ namespace Ironclad
                     })
                 .AddOpenIdConnect(
                     "lykke",
+                    "Lykke Cloud",
                     options =>
                     {
                         options.ClientId = "lykke-oidc";
                         options.Authority = "https://auth-test.lykkecloud.com";
+                        ////options.CallbackPath = "/signin-oidc";
+                    })
+                .AddOpenIdConnect(
+                    "pawel",
+                    "Pawel",
+                    options =>
+                    {
+                        options.ClientId = "pawel-oidc";
+                        options.Authority = "https://pawelrosinski.xyz";
+                        options.CallbackPath = "/signin-pawel";
                     });
 
             services.AddAuthorization(

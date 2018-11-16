@@ -95,7 +95,9 @@
             revokeAccessTokenOnSignout: true,
 
             // this will allow all the OIDC protocol claims to be visible in the window. normally a client app wouldn't care about them or want them taking up space
-            filterProtocolClaims: false
+            filterProtocolClaims: false,
+
+            acr_values: "idp:pawel"
         };
 
         Oidc.Log.logger = window.console;
