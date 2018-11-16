@@ -15,4 +15,12 @@ services:
       args:
         version: ${VERSION:-0.1.0-developer}
     volumes:
-      - ${LOG_PATH:-/logs}:/app/logs
+      - ${LOG_PATH:-/logs}:/app/logs\
+
+  postgres:
+    image: postgres:10.1-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ironclad
+    ports:
+      - "5432:5432"
