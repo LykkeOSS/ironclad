@@ -10,6 +10,7 @@ namespace Ironclad
     using Ironclad.Authorization;
     using Ironclad.Data;
     using Ironclad.Services;
+    using Microsoft.AspNetCore.Authentication.OpenIdConnect;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -18,7 +19,9 @@ namespace Ironclad
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
     using Newtonsoft.Json.Serialization;
@@ -94,7 +97,7 @@ namespace Ironclad
                 .AddAppAuthRedirectUriValidator()
                 .AddAspNetIdentity<ApplicationUser>();
 
-            services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
+            var auth = services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
                 .AddGoogle(
                     options =>
                     {
@@ -115,25 +118,42 @@ namespace Ironclad
                         options.ClientId = "auth_api";
                         options.ClientSecret = this.configuration.GetValue<string>("Introspection-Secret");
                         options.DiscoveryPolicy = new DiscoveryPolicy { ValidateIssuerName = false };
-                    })
-                .AddOpenIdConnect(
-                    "lykke",
-                    "Lykke Cloud",
-                    options =>
-                    {
-                        options.ClientId = "lykke-oidc";
-                        options.Authority = "https://auth-test.lykkecloud.com";
-                        ////options.CallbackPath = "/signin-oidc";
-                    })
-                .AddOpenIdConnect(
-                    "pawel",
-                    "Pawel",
-                    options =>
-                    {
-                        options.ClientId = "pawel-oidc";
-                        options.Authority = "https://pawelrosinski.xyz";
-                        options.CallbackPath = "/signin-pawel";
                     });
+
+            var store = new Middleware.MemoryExternalIdentityProviderStore();
+            var identityProvider = new Middleware.ExternalIdentityProvider
+            {
+                AuthenticationScheme = "lykke",
+                DisplayName = "Lykke Cloud",
+                PreConfiguredOptions = new OpenIdConnectOptions { ClientId = "lykke-oidc", Authority = "https://auth-test.lykkecloud.com" }
+            };
+
+            store.AddOrUpdateAsync(identityProvider.AuthenticationScheme, identityProvider).Wait();
+
+            auth.AddExternalIdentityProviders(store);
+
+            ////auth
+            ////    .AddOpenIdConnect(
+            ////        "lykke",
+            ////        "Lykke Cloud",
+            ////        options =>
+            ////        {
+            ////            options.ClientId = "lykke-oidc";
+            ////            options.Authority = "https://auth-test.lykkecloud.com";
+            ////            ////options.CallbackPath = "/signin-oidc";
+            ////        })
+            ////    .AddOpenIdConnect(
+            ////        "pawel",
+            ////        "Pawel",
+            ////        options =>
+            ////        {
+            ////            options.ClientId = "pawel-oidc";
+            ////            options.Authority = "https://pawelrosinski.xyz";
+            ////            options.CallbackPath = "/signin-pawel";
+            ////        });
+
+            // extensions:
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<OpenIdConnectOptions>, OpenIdConnectPostConfigureOptions>());
 
             services.AddAuthorization(
                 options =>
