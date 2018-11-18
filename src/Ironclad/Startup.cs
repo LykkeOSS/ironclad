@@ -9,6 +9,7 @@ namespace Ironclad
     using Ironclad.Application;
     using Ironclad.Authorization;
     using Ironclad.Data;
+    using Ironclad.ExternalIdentityProvider.Persistence;
     using Ironclad.Services;
     using Microsoft.AspNetCore.Authentication.OpenIdConnect;
     using Microsoft.AspNetCore.Authorization;
@@ -120,15 +121,16 @@ namespace Ironclad
                         options.DiscoveryPolicy = new DiscoveryPolicy { ValidateIssuerName = false };
                     });
 
-            var store = new Middleware.MemoryExternalIdentityProviderStore();
-            var identityProvider = new Middleware.ExternalIdentityProvider
+            var store = new MemoryIdentityProviderStore();
+            var identityProvider = new IdentityProvider
             {
-                AuthenticationScheme = "lykke",
+                Name = "lykke",
                 DisplayName = "Lykke Cloud",
-                PreConfiguredOptions = new OpenIdConnectOptions { ClientId = "lykke-oidc", Authority = "https://auth-test.lykkecloud.com" }
+                ClientId = "lykke-oidc",
+                Authority = "https://auth-test.lykkecloud.com"
             };
 
-            store.AddOrUpdateAsync(identityProvider.AuthenticationScheme, identityProvider).Wait();
+            store.AddOrUpdateAsync(identityProvider.Name, identityProvider).Wait();
 
             auth.AddExternalIdentityProviders(store);
 

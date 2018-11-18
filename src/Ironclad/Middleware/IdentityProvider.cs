@@ -5,7 +5,7 @@ namespace Ironclad.Middleware
 {
     using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
-    public class ExternalIdentityProvider
+    public class IdentityProvider
     {
         public string AuthenticationScheme { get; set; }
 

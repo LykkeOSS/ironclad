@@ -8,14 +8,14 @@ namespace Ironclad.Middleware
     using System.Linq;
     using System.Threading.Tasks;
 
-    public sealed class MemoryExternalIdentityProviderStore : IStore<ExternalIdentityProvider>
+    public sealed class MemoryExternalIdentityProviderStore : IStore<IdentityProvider>
     {
-        private readonly ConcurrentDictionary<string, ExternalIdentityProvider> contents =
-            new ConcurrentDictionary<string, ExternalIdentityProvider>(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<string, IdentityProvider> contents =
+            new ConcurrentDictionary<string, IdentityProvider>(StringComparer.OrdinalIgnoreCase);
 
-        public IQueryable<ExternalIdentityProvider> Query => this.contents.Values.AsQueryable();
+        public IQueryable<IdentityProvider> Query => this.contents.Values.AsQueryable();
 
-        public Task AddOrUpdateAsync(string key, ExternalIdentityProvider value)
+        public Task AddOrUpdateAsync(string key, IdentityProvider value)
         {
             this.contents.AddOrUpdate(key, value, (k, v) => value);
             return Task.CompletedTask;

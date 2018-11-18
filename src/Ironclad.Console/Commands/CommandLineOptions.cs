@@ -30,6 +30,7 @@ namespace Ironclad.Console.Commands
             app.Command("users", command => UsersOptions.Configure(command, options, console));
             app.Command("roles", command => RolesOptions.Configure(command, options));
             app.Command("scopes", command => ScopesOptions.Configure(command, options, console));
+            app.Command("providers", command => IdentityProvidersOptions.Configure(command, options, console));
 
             // action (for this command)
             app.OnExecute(() => app.ShowVersionAndHelp());

@@ -84,7 +84,7 @@ namespace Ironclad.Console
 
             if (options.Command is LoginCommand.Reset)
             {
-                await options.Command.ExecuteAsync(new CommandContext(this.console, null, null, null, null, null, null, repository)).ConfigureAwait(false);
+                await options.Command.ExecuteAsync(new CommandContext(this.console, null, null, null, null, null, null, null, repository)).ConfigureAwait(false);
                 return 0;
             }
 
@@ -126,6 +126,7 @@ namespace Ironclad.Console
             using (var identityResourcesClient = new IdentityResourcesHttpClient(authority, refreshTokenHandler))
             using (var rolesClient = new RolesHttpClient(authority, refreshTokenHandler))
             using (var usersClient = new UsersHttpClient(authority, refreshTokenHandler))
+            using (var identityProvidersClient = new IdentityProvidersHttpClient(authority, refreshTokenHandler))
             {
                 refreshTokenHandler.TokenRefreshed += (sender, e) =>
                 {
@@ -139,7 +140,16 @@ namespace Ironclad.Console
                 };
 
                 var reporter = new ConsoleReporter(this.console, options.Verbose.HasValue(), false);
-                var context = new CommandContext(this.console, reporter, clientsClient, apiResourcesClient, identityResourcesClient, rolesClient, usersClient, repository);
+                var context = new CommandContext(
+                    this.console,
+                    reporter,
+                    clientsClient,
+                    apiResourcesClient,
+                    identityResourcesClient,
+                    rolesClient,
+                    usersClient,
+                    identityProvidersClient,
+                    repository);
 
                 try
                 {
