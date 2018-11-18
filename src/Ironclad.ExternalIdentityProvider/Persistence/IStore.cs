@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
-namespace Ironclad.Middleware
+namespace Ironclad.ExternalIdentityProvider.Persistence
 {
     using System.Linq;
     using System.Threading.Tasks;

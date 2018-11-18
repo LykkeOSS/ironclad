@@ -1,16 +1,12 @@
 ﻿// Copyright (c) Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
-#if LIBRARY
-namespace Ironclad.ExternalIdentityProvider.Persistence
-#else
 namespace Ironclad.Client
-#endif
 {
     /// <summary>
-    /// Represents an identity provider.
+    /// Represents an identity provider summary.
     /// </summary>
-    public class IdentityProvider
+    public class IdentityProviderSummary
     {
         /// <summary>
         /// Gets or sets the name of the identity provider.
@@ -37,9 +33,9 @@ namespace Ironclad.Client
         public string ClientId { get; set; }
 
         /// <summary>
-        /// Gets or sets the callback path for the identity provider.
+        /// Gets or sets a value indicating whether this <see cref="IdentityProvider"/> is enabled.
         /// </summary>
-        /// <value>The secret.</value>
-        public string CallbackPath { get; set; }
+        /// <value>Returns <c>true</c> if enabled; otherwise, <c>false</c>.</value>
+        public bool Enabled { get; set; }
     }
 }

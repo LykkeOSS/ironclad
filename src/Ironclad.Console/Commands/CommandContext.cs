@@ -17,6 +17,7 @@ namespace Ironclad.Console.Commands
             IIdentityResourcesClient identityResourcesClient,
             IRolesClient rolesClient,
             IUsersClient usersClient,
+            IIdentityProvidersClient identityProvidersClient,
             ICommandDataRepository repository)
         {
             this.Console = console;
@@ -26,6 +27,7 @@ namespace Ironclad.Console.Commands
             this.IdentityResourcesClient = identityResourcesClient;
             this.RolesClient = rolesClient;
             this.UsersClient = usersClient;
+            this.IdentityProvidersClient = identityProvidersClient;
             this.Repository = repository;
         }
 
@@ -42,6 +44,8 @@ namespace Ironclad.Console.Commands
         public IRolesClient RolesClient { get; }
 
         public IUsersClient UsersClient { get; }
+
+        public IIdentityProvidersClient IdentityProvidersClient { get; }
 
         public ICommandDataRepository Repository { get; }
     }

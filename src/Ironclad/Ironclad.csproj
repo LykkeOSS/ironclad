@@ -31,8 +31,12 @@
   
   <ItemGroup>
     <Compile Remove="logs\**" />
+    <Compile Remove="Middleware\**" />
+    <Content Remove="Middleware\**" />
     <EmbeddedResource Remove="logs\**" />
+    <EmbeddedResource Remove="Middleware\**" />
     <None Remove="logs\**" />
+    <None Remove="Middleware\**" />
   </ItemGroup>
   
   <ItemGroup>
@@ -73,6 +77,7 @@
     <Compile Include="..\Ironclad.Client\Dto\Client.cs" Link="WebApi\Dto\Client.cs" />
     <Compile Include="..\Ironclad.Client\Dto\ClientSummary.cs" Link="WebApi\Dto\ClientSummary.cs" />
     <Compile Include="..\Ironclad.Client\Dto\IdentityProvider.cs" Link="WebApi\Dto\IdentityProvider.cs" />
+    <Compile Include="..\Ironclad.Client\Dto\IdentityProviderSummary.cs" Link="WebApi\Dto\IdentityProviderSummary.cs" />
     <Compile Include="..\Ironclad.Client\Dto\IdentityResource.cs" Link="WebApi\Dto\IdentityResource.cs" />
     <Compile Include="..\Ironclad.Client\Dto\ResourceSet.cs" Link="WebApi\Dto\ResourceSet.cs" />
     <Compile Include="..\Ironclad.Client\Dto\ResourceSummary.cs" Link="WebApi\Dto\ResourceSummary.cs" />
@@ -119,6 +124,10 @@
 
   <ItemGroup>
     <Folder Include="WebApi\Dto\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ironclad.ExternalIdentityProvider\Ironclad.ExternalIdentityProvider.csproj" />
   </ItemGroup>
 
 </Project>

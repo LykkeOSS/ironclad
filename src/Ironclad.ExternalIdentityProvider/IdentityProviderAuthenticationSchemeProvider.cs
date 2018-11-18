@@ -1,22 +1,23 @@
 ﻿// Copyright (c) Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
-namespace Ironclad.Middleware
+namespace Ironclad.ExternalIdentityProvider
 {
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Ironclad.ExternalIdentityProvider.Persistence;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
     // TODO (Cameron): Need to address the fact that multiple schemes could now be added with the same name.
     // LINK (Cameron): https://github.com/aspnet/HttpAbstractions/blob/master/src/Microsoft.AspNetCore.Authentication.Core/AuthenticationSchemeProvider.cs
-    internal class ExternalIdentityProviderAuthenticationSchemeProvider : IAuthenticationSchemeProvider
+    internal class IdentityProviderAuthenticationSchemeProvider : IAuthenticationSchemeProvider
     {
         private readonly IAuthenticationSchemeProvider provider;
-        private readonly IStore<ExternalIdentityProvider> store;
+        private readonly IStore<IdentityProvider> store;
 
-        public ExternalIdentityProviderAuthenticationSchemeProvider(Decorator<IAuthenticationSchemeProvider> decorator, IStore<ExternalIdentityProvider> store)
+        public IdentityProviderAuthenticationSchemeProvider(Decorator<IAuthenticationSchemeProvider> decorator, IStore<IdentityProvider> store)
         {
             this.provider = decorator.Instance;
             this.store = store;
@@ -28,7 +29,7 @@ namespace Ironclad.Middleware
         {
             var registeredSchemes = await this.provider.GetAllSchemesAsync();
             var dynamicSchemes = this.store.Query
-                .Select(identityProvider => new AuthenticationScheme(identityProvider.AuthenticationScheme, identityProvider.DisplayName, typeof(OpenIdConnectHandler)))
+                .Select(identityProvider => new AuthenticationScheme(identityProvider.Name, identityProvider.DisplayName, typeof(OpenIdConnectHandler)))
                 .AsEnumerable();
 
             return registeredSchemes.Concat(dynamicSchemes).ToArray();
@@ -54,13 +55,13 @@ namespace Ironclad.Middleware
                 return scheme;
             }
 
-            var identityProvider = this.store.Query.SingleOrDefault(provider => provider.AuthenticationScheme == name);
+            var identityProvider = this.store.Query.SingleOrDefault(provider => provider.Name == name);
             if (identityProvider == null)
             {
                 return null;
             }
 
-            return new AuthenticationScheme(identityProvider.AuthenticationScheme, identityProvider.DisplayName, typeof(OpenIdConnectHandler));
+            return new AuthenticationScheme(identityProvider.Name, identityProvider.DisplayName, typeof(OpenIdConnectHandler));
         }
 
         public void RemoveScheme(string name) => this.provider.RemoveScheme(name);

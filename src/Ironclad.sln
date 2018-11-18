@@ -40,6 +40,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ironclad.Client", "Ironclad
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ironclad.Tests.Sdk", "tests\Ironclad.Tests.Sdk\Ironclad.Tests.Sdk.csproj", "{5B2D2786-10FD-4603-AF5D-15FB0840D78B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ironclad.ExternalIdentityProvider", "Ironclad.ExternalIdentityProvider\Ironclad.ExternalIdentityProvider.csproj", "{3E753030-A9EE-440C-8896-1449AEA94ACF}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleMvcApp", "samples\SampleMvcApp\SampleMvcApp.csproj", "{13E56496-75DD-4EDE-8526-7C978EE72637}"
 EndProject
 Global
@@ -83,6 +85,10 @@ Global
 		{5B2D2786-10FD-4603-AF5D-15FB0840D78B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B2D2786-10FD-4603-AF5D-15FB0840D78B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B2D2786-10FD-4603-AF5D-15FB0840D78B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E753030-A9EE-440C-8896-1449AEA94ACF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E753030-A9EE-440C-8896-1449AEA94ACF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E753030-A9EE-440C-8896-1449AEA94ACF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E753030-A9EE-440C-8896-1449AEA94ACF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{13E56496-75DD-4EDE-8526-7C978EE72637}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{13E56496-75DD-4EDE-8526-7C978EE72637}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13E56496-75DD-4EDE-8526-7C978EE72637}.Release|Any CPU.ActiveCfg = Release|Any CPU
