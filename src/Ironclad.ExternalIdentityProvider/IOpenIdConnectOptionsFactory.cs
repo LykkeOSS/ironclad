@@ -5,10 +5,12 @@ namespace Ironclad.ExternalIdentityProvider
 {
     using Ironclad.ExternalIdentityProvider.Persistence;
     using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+    using Microsoft.Extensions.Options;
 
     public interface IOpenIdConnectOptionsFactory
     {
-        OpenIdConnectOptions Create(IdentityProvider identityProvider);
+        OpenIdConnectOptions CreateOptions(IdentityProvider identityProvider);
 
+        IOptionsMonitor<OpenIdConnectOptions> CreateOptionsMonitor(IdentityProvider identityProvider);
     }
 }

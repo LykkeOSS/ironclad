@@ -3,6 +3,7 @@
 
 namespace Ironclad.ExternalIdentityProvider
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -10,24 +11,22 @@ namespace Ironclad.ExternalIdentityProvider
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
-    // TODO (Cameron): Need to address the fact that multiple schemes could now be added with the same name.
+    // TODO (Cameron): Need to address the fact that multiple schemes could now be added with the same name (somehow).
     // LINK (Cameron): https://github.com/aspnet/HttpAbstractions/blob/master/src/Microsoft.AspNetCore.Authentication.Core/AuthenticationSchemeProvider.cs
-    internal class IdentityProviderAuthenticationSchemeProvider : IAuthenticationSchemeProvider
+    internal sealed class IdentityProviderAuthenticationSchemeProvider : IAuthenticationSchemeProvider
     {
-        private readonly IAuthenticationSchemeProvider provider;
+        private readonly IAuthenticationSchemeProvider schemes;
         private readonly IStore<IdentityProvider> store;
 
-        public IdentityProviderAuthenticationSchemeProvider(Decorator<IAuthenticationSchemeProvider> decorator, IStore<IdentityProvider> store)
+        public IdentityProviderAuthenticationSchemeProvider(Decorator<IAuthenticationSchemeProvider> schemeProvider, IStore<IdentityProvider> store)
         {
-            this.provider = decorator.Instance;
+            this.schemes = schemeProvider.Instance;
             this.store = store;
         }
 
-        public void AddScheme(AuthenticationScheme scheme) => this.provider.AddScheme(scheme);
-
         public async Task<IEnumerable<AuthenticationScheme>> GetAllSchemesAsync()
         {
-            var registeredSchemes = await this.provider.GetAllSchemesAsync();
+            var registeredSchemes = await this.schemes.GetAllSchemesAsync();
             var dynamicSchemes = this.store.Query
                 .Select(identityProvider => new AuthenticationScheme(identityProvider.Name, identityProvider.DisplayName, typeof(OpenIdConnectHandler)))
                 .AsEnumerable();
@@ -35,21 +34,21 @@ namespace Ironclad.ExternalIdentityProvider
             return registeredSchemes.Concat(dynamicSchemes).ToArray();
         }
 
-        public Task<AuthenticationScheme> GetDefaultAuthenticateSchemeAsync() => this.provider.GetDefaultAuthenticateSchemeAsync();
+        public Task<AuthenticationScheme> GetDefaultAuthenticateSchemeAsync() => this.schemes.GetDefaultAuthenticateSchemeAsync();
 
-        public Task<AuthenticationScheme> GetDefaultChallengeSchemeAsync() => this.provider.GetDefaultChallengeSchemeAsync();
+        public Task<AuthenticationScheme> GetDefaultChallengeSchemeAsync() => this.schemes.GetDefaultChallengeSchemeAsync();
 
-        public Task<AuthenticationScheme> GetDefaultForbidSchemeAsync() => this.provider.GetDefaultForbidSchemeAsync();
+        public Task<AuthenticationScheme> GetDefaultForbidSchemeAsync() => this.schemes.GetDefaultForbidSchemeAsync();
 
-        public Task<AuthenticationScheme> GetDefaultSignInSchemeAsync() => this.provider.GetDefaultSignInSchemeAsync();
+        public Task<AuthenticationScheme> GetDefaultSignInSchemeAsync() => this.schemes.GetDefaultSignInSchemeAsync();
 
-        public Task<AuthenticationScheme> GetDefaultSignOutSchemeAsync() => this.provider.GetDefaultSignOutSchemeAsync();
+        public Task<AuthenticationScheme> GetDefaultSignOutSchemeAsync() => this.schemes.GetDefaultSignOutSchemeAsync();
 
         public Task<IEnumerable<AuthenticationScheme>> GetRequestHandlerSchemesAsync() => this.GetAllSchemesAsync();
 
         public async Task<AuthenticationScheme> GetSchemeAsync(string name)
         {
-            var scheme = await this.provider.GetSchemeAsync(name);
+            var scheme = await this.schemes.GetSchemeAsync(name);
             if (scheme != null)
             {
                 return scheme;
@@ -64,6 +63,16 @@ namespace Ironclad.ExternalIdentityProvider
             return new AuthenticationScheme(identityProvider.Name, identityProvider.DisplayName, typeof(OpenIdConnectHandler));
         }
 
-        public void RemoveScheme(string name) => this.provider.RemoveScheme(name);
+        public void AddScheme(AuthenticationScheme scheme)
+        {
+            if (this.store.Query.Any(provider => provider.Name == scheme.Name))
+            {
+                throw new InvalidOperationException($"Scheme already exists: {scheme.Name}");
+            }
+
+            this.schemes.AddScheme(scheme);
+        }
+
+        public void RemoveScheme(string name) => this.schemes.RemoveScheme(name);
     }
 }
