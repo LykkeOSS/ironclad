@@ -17,31 +17,31 @@ namespace Ironclad.ExternalIdentityProvider
 
     internal class IdentityProviderAuthenticationHandlerProvider : IAuthenticationHandlerProvider
     {
-        private readonly Dictionary<string, IAuthenticationHandler> handlers = new Dictionary<string, IAuthenticationHandler>(StringComparer.Ordinal);
+        private readonly Dictionary<string, IAuthenticationHandler> cachedHandlers = new Dictionary<string, IAuthenticationHandler>(StringComparer.Ordinal);
 
-        private readonly IAuthenticationHandlerProvider provider;
+        private readonly IAuthenticationHandlerProvider handlers;
         private readonly IAuthenticationSchemeProvider schemes;
         private readonly IStore<IdentityProvider> store;
-        private readonly IPostConfigureOptions<OpenIdConnectOptions> configureOptions;
+        private readonly IOpenIdConnectOptionsFactory optionsFactory;
         private readonly ILoggerFactory logger;
         private readonly HtmlEncoder htmlEncoder;
         private readonly UrlEncoder encoder;
         private readonly ISystemClock clock;
 
         public IdentityProviderAuthenticationHandlerProvider(
-            Decorator<IAuthenticationHandlerProvider> decorator,
-            Decorator<IAuthenticationSchemeProvider> schemes,
+            Decorator<IAuthenticationHandlerProvider> handlerProvider,
+            Decorator<IAuthenticationSchemeProvider> schemeProvider,
             IStore<IdentityProvider> store,
-            IPostConfigureOptions<OpenIdConnectOptions> configureOptions,
+            IOpenIdConnectOptionsFactory optionsFactory,
             ILoggerFactory logger,
             HtmlEncoder htmlEncoder,
             UrlEncoder encoder,
             ISystemClock clock)
         {
-            this.provider = decorator.Instance;
-            this.schemes = schemes.Instance;
+            this.handlers = handlerProvider.Instance;
+            this.schemes = schemeProvider.Instance;
             this.store = store;
-            this.configureOptions = configureOptions;
+            this.optionsFactory = optionsFactory;
             this.logger = logger;
             this.htmlEncoder = htmlEncoder;
             this.encoder = encoder;
@@ -50,15 +50,15 @@ namespace Ironclad.ExternalIdentityProvider
 
         public async Task<IAuthenticationHandler> GetHandlerAsync(HttpContext context, string authenticationScheme)
         {
-            if (this.handlers.TryGetValue(authenticationScheme, out var handler))
+            if (this.cachedHandlers.TryGetValue(authenticationScheme, out var handler))
             {
                 return handler;
             }
 
-            var matchedScheme = await this.schemes.GetSchemeAsync(authenticationScheme);
-            if (matchedScheme != null)
+            var scheme = await this.schemes.GetSchemeAsync(authenticationScheme);
+            if (scheme != null)
             {
-                handler = await this.provider.GetHandlerAsync(context, authenticationScheme);
+                handler = await this.handlers.GetHandlerAsync(context, authenticationScheme);
                 if (handler != null)
                 {
                     return handler;
@@ -73,23 +73,13 @@ namespace Ironclad.ExternalIdentityProvider
                 return null;
             }
 
-            var options = new OpenIdConnectOptions
-            {
-                Authority = identityProvider.Authority,
-                ClientId = identityProvider.ClientId,
-            };
-
-            options.CallbackPath = identityProvider.CallbackPath ?? options.CallbackPath;
-
-            this.configureOptions.PostConfigure(identityProvider.Name, options);
-            var optionsMonitor = new StaticOptionsMonitor(options);
+            var optionsMonitor = this.optionsFactory.CreateOptionsMonitor(identityProvider);
 
             handler = new OpenIdConnectHandler(optionsMonitor, this.logger, this.htmlEncoder, this.encoder, this.clock);
 
-            var scheme = new AuthenticationScheme(identityProvider.Name, identityProvider.DisplayName, typeof(OpenIdConnectHandler));
-            await handler.InitializeAsync(scheme, context);
+            await handler.InitializeAsync(new AuthenticationScheme(identityProvider.Name, identityProvider.DisplayName, typeof(OpenIdConnectHandler)), context);
 
-            this.handlers[authenticationScheme] = handler;
+            this.cachedHandlers[authenticationScheme] = handler;
 
             return handler;
         }

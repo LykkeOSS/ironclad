@@ -115,7 +115,7 @@ namespace Ironclad.WebApi
 
             try
             {
-                this.optionsFactory.Create(identityProvider).Validate();
+                this.optionsFactory.CreateOptions(identityProvider).Validate();
             }
             catch (ArgumentException ex)
             {

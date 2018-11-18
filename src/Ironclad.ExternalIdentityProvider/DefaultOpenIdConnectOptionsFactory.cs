@@ -3,6 +3,7 @@
 
 namespace Ironclad.ExternalIdentityProvider
 {
+    using System;
     using Ironclad.ExternalIdentityProvider.Persistence;
     using Microsoft.AspNetCore.Authentication.OpenIdConnect;
     using Microsoft.Extensions.Options;
@@ -16,7 +17,7 @@ namespace Ironclad.ExternalIdentityProvider
             this.configureOptions = configureOptions;
         }
 
-        public OpenIdConnectOptions Create(IdentityProvider identityProvider)
+        public OpenIdConnectOptions CreateOptions(IdentityProvider identityProvider)
         {
             var options = new OpenIdConnectOptions
             {
@@ -29,6 +30,32 @@ namespace Ironclad.ExternalIdentityProvider
             this.configureOptions.PostConfigure(identityProvider.Name, options);
 
             return options;
+        }
+
+        public IOptionsMonitor<OpenIdConnectOptions> CreateOptionsMonitor(IdentityProvider identityProvider) =>
+            new StaticOptionsMonitor(this.CreateOptions(identityProvider));
+
+        private class StaticOptionsMonitor : IOptionsMonitor<OpenIdConnectOptions>
+        {
+            private static readonly NullDisposable Disposable = new NullDisposable();
+
+            public StaticOptionsMonitor(OpenIdConnectOptions options)
+            {
+                this.CurrentValue = options;
+            }
+
+            public OpenIdConnectOptions CurrentValue { get; }
+
+            public OpenIdConnectOptions Get(string name) => this.CurrentValue;
+
+            public IDisposable OnChange(Action<OpenIdConnectOptions, string> listener) => Disposable;
+
+            private class NullDisposable : IDisposable
+            {
+                public void Dispose()
+                {
+                }
+            }
         }
     }
 }
