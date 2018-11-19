@@ -56,6 +56,12 @@ namespace Ironclad
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
+            var applicationInsightsKey = this.configuration.GetValue<string>("APPINSIGHTS_INSTRUMENTATIONKEY");
+            if (!string.IsNullOrEmpty(applicationInsightsKey))
+            {
+                this.logger.Information($"Using Application Insights {applicationInsightsKey}");
+            }
+
             // TODO (Cameron): This is a bit messy. I think ultimately this should be configurable inside the application itself.
             var mailUsername = this.configuration.GetValue<string>("Mail:Username");
             if (string.IsNullOrEmpty(mailUsername))
