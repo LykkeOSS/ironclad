@@ -12,7 +12,6 @@ namespace Ironclad
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-    using System.Security.Cryptography.X509Certificates;
 
     public static class ApplicationBuilderExtensions
     {
@@ -46,26 +45,6 @@ namespace Ironclad
             }
 
             return app;
-        }
-
-        public static IIdentityServerBuilder AddSigningCredential(this IIdentityServerBuilder builder, IConfiguration configuration, ILogger logger)
-        {
-            string signingCertificatePath = configuration.GetValue<string>("signingCertificatePath");
-
-            if (!string.IsNullOrEmpty(signingCertificatePath))
-            {
-                logger.LogInformation($"Loading signing certificate '{signingCertificatePath}'.");
-                var signingCertificatePassword = configuration.GetValue<string>("signingCertificatePassword");
-                var cert = new X509Certificate2(signingCertificatePath, signingCertificatePassword);
-
-                return builder.AddSigningCredential(cert);
-            }
-            else
-            {
-                logger.LogWarning($"No signing certificate configured. Temporary dev certificate will be used.");
-
-                return builder.AddDeveloperSigningCredential();
-            }
         }
     }
 }

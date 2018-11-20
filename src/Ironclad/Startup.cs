@@ -5,7 +5,6 @@ namespace Ironclad
 {
     using IdentityModel.Client;
     using IdentityServer4.AccessTokenValidation;
-    using IdentityServer4.Postgresql.Extensions;
     using Ironclad.Application;
     using Ironclad.Authorization;
     using Ironclad.Data;
@@ -27,12 +26,16 @@ namespace Ironclad
     {
         private readonly ILogger<Startup> logger;
         private readonly Settings settings;
+        private readonly IHostingEnvironment hostingEnvironment;
 
-        public Startup(ILogger<Startup> logger, IConfiguration configuration)
+        public Startup(ILogger<Startup> logger, IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             this.logger = logger;
+
             this.settings = configuration.Get<Settings>(options => options.BindNonPublicProperties = true);
             this.settings.Validate();
+
+            this.hostingEnvironment = hostingEnvironment;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -67,7 +70,7 @@ namespace Ironclad
                     });
 
             services.AddIdentityServer(options => options.IssuerUri = this.settings.Server.IssuerUri)
-                .AddSigningCredential(this.settings, this.logger)
+                .AddDeveloperSigningCredential()
                 .AddConfigurationStore(this.settings.Server.Database)
                 .AddOperationalStore()
                 .AddAppAuthRedirectUriValidator()
