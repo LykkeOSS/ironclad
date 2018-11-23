@@ -19,11 +19,11 @@ namespace Microsoft.Extensions.DependencyInjection
         public static AuthenticationBuilder AddExternalIdentityProviders(this AuthenticationBuilder builder, Action<DbContextOptionsBuilder> options)
         {
             builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<OpenIdConnectOptions>, OpenIdConnectPostConfigureOptions>());
-            builder.Services.AddSingleton<IStore<IdentityProvider>, IdentityProviderStore>();
+            builder.Services.AddTransient<IStore<IdentityProvider>, IdentityProviderStore>();
             builder.Services.AddTransient<IOpenIdConnectOptionsFactory, DefaultOpenIdConnectOptionsFactory>();
             builder.Services.AddTransientDecorator<IAuthenticationHandlerProvider, IdentityProviderAuthenticationHandlerProvider>();
             builder.Services.AddTransientDecorator<IAuthenticationSchemeProvider, IdentityProviderAuthenticationSchemeProvider>();
-            builder.Services.AddDbContext<ExternalProviderContext>(options);
+            builder.Services.AddDbContext<ExternalProviderContext>(options, ServiceLifetime.Singleton);
             return builder;
         }
 

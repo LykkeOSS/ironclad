@@ -126,7 +126,6 @@ namespace Ironclad
                     dbOptions.UseNpgsql(this.configuration.GetConnectionString("ironclad"));
                 });
 
-
             // extensions:
             services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<OpenIdConnectOptions>, OpenIdConnectPostConfigureOptions>());
 
