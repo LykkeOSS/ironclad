@@ -1,7 +1,10 @@
 ﻿// Copyright (c) Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
+
 #if LIBRARY
+using System.ComponentModel.DataAnnotations;
+
 namespace Ironclad.ExternalIdentityProvider.Persistence
 #else
 namespace Ironclad.Client
@@ -16,6 +19,9 @@ namespace Ironclad.Client
         /// Gets or sets the name of the identity provider.
         /// </summary>
         /// <value>The name.</value>
+        #if LIBRARY
+        [Key]
+        #endif
         public string Name { get; set; }
 
         /// <summary>
