@@ -94,12 +94,12 @@ namespace Ironclad.WebApi
                 return this.StatusCode((int)HttpStatusCode.Conflict, new { Message = "Identity provider already exists" });
             }
 
-            if (string.IsNullOrEmpty(model.Name))
+            if (string.IsNullOrEmpty(model.Authority))
             {
                 return this.BadRequest(new { Message = "Cannot create an identity provider without an authority" });
             }
 
-            if (string.IsNullOrEmpty(model.Name))
+            if (string.IsNullOrEmpty(model.ClientId))
             {
                 return this.BadRequest(new { Message = "Cannot create an identity provider without a client ID" });
             }
