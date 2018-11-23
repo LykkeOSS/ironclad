@@ -121,38 +121,11 @@ namespace Ironclad
                         options.DiscoveryPolicy = new DiscoveryPolicy { ValidateIssuerName = false };
                     });
 
-            var store = new MemoryIdentityProviderStore();
-            var identityProvider = new IdentityProvider
-            {
-                Name = "lykke",
-                DisplayName = "Lykke Cloud",
-                ClientId = "lykke-oidc",
-                Authority = "https://auth-test.lykkecloud.com"
-            };
+            auth.AddExternalIdentityProviders(dbOptions =>
+                {
+                    dbOptions.UseNpgsql(this.configuration.GetConnectionString("ironclad"));
+                });
 
-            store.AddOrUpdateAsync(identityProvider.Name, identityProvider).Wait();
-
-            auth.AddExternalIdentityProviders(store);
-
-            ////auth
-            ////    .AddOpenIdConnect(
-            ////        "lykke",
-            ////        "Lykke Cloud",
-            ////        options =>
-            ////        {
-            ////            options.ClientId = "lykke-oidc";
-            ////            options.Authority = "https://auth-test.lykkecloud.com";
-            ////            ////options.CallbackPath = "/signin-oidc";
-            ////        })
-            ////    .AddOpenIdConnect(
-            ////        "pawel",
-            ////        "Pawel",
-            ////        options =>
-            ////        {
-            ////            options.ClientId = "pawel-oidc";
-            ////            options.Authority = "https://pawelrosinski.xyz";
-            ////            options.CallbackPath = "/signin-pawel";
-            ////        });
 
             // extensions:
             services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<OpenIdConnectOptions>, OpenIdConnectPostConfigureOptions>());
@@ -182,7 +155,8 @@ namespace Ironclad
             app.UseStaticFiles();
             app.UseIdentityServer();
             app.UseMvcWithDefaultRoute();
-            app.InitializeDatabase().SeedDatabase(this.configuration);
+            app.InitializeExternalProviderDatabase().SeedDatabase(this.configuration);
+            app.InitializeExternalProviderDatabase();
         }
     }
 }
