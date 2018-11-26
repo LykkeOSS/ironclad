@@ -2,13 +2,14 @@
 // See the LICENSE file in the project root for more information.
 
 #if LIBRARY
-using System.ComponentModel.DataAnnotations;
-
 namespace Ironclad.ExternalIdentityProvider.Persistence
+{
+    using System.ComponentModel.DataAnnotations;
 #else
 namespace Ironclad.Client
-#endif
 {
+#endif
+
     /// <summary>
     /// Represents an identity provider.
     /// </summary>
@@ -18,9 +19,9 @@ namespace Ironclad.Client
         /// Gets or sets the name of the identity provider.
         /// </summary>
         /// <value>The name.</value>
-        #if LIBRARY
+#if LIBRARY
         [Key]
-        #endif
+#endif
         public string Name { get; set; }
 
         /// <summary>
