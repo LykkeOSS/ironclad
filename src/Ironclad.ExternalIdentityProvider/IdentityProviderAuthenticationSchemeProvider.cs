@@ -13,6 +13,7 @@ namespace Ironclad.ExternalIdentityProvider
 
     // TODO (Cameron): Need to address the fact that multiple schemes could now be added with the same name (somehow).
     // LINK (Cameron): https://github.com/aspnet/HttpAbstractions/blob/master/src/Microsoft.AspNetCore.Authentication.Core/AuthenticationSchemeProvider.cs
+#pragma warning disable CA1812
     internal sealed class IdentityProviderAuthenticationSchemeProvider : IAuthenticationSchemeProvider
     {
         private readonly IAuthenticationSchemeProvider schemes;
@@ -26,7 +27,7 @@ namespace Ironclad.ExternalIdentityProvider
 
         public async Task<IEnumerable<AuthenticationScheme>> GetAllSchemesAsync()
         {
-            var registeredSchemes = await this.schemes.GetAllSchemesAsync();
+            var registeredSchemes = await this.schemes.GetAllSchemesAsync().ConfigureAwait(false);
             var dynamicSchemes = this.store.Query
                 .Select(identityProvider => new AuthenticationScheme(identityProvider.Name, identityProvider.DisplayName, typeof(OpenIdConnectHandler)))
                 .AsEnumerable();
@@ -48,7 +49,7 @@ namespace Ironclad.ExternalIdentityProvider
 
         public async Task<AuthenticationScheme> GetSchemeAsync(string name)
         {
-            var scheme = await this.schemes.GetSchemeAsync(name);
+            var scheme = await this.schemes.GetSchemeAsync(name).ConfigureAwait(false);
             if (scheme != null)
             {
                 return scheme;

@@ -1,18 +1,12 @@
 ﻿// Copyright (c) Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
-using IdentityModel;
-
 namespace Ironclad.Tests.Feature
 {
     using System;
-    using System.Globalization;
-    using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
     using FluentAssertions;
-    using IdentityModel.Client;
-    using IdentityModel.OidcClient;
     using Ironclad.Client;
     using Ironclad.Tests.Sdk;
     using Xunit;
@@ -205,7 +199,7 @@ namespace Ironclad.Tests.Feature
         
         private static IdentityProvider CreateMinimumProvider(string namePrefix = "")
         {
-            //Would much rather use something like Autofixture and not worry about this, but for now...
+            // Would much rather use something like Autofixture and not worry about this, but for now...
             return new IdentityProvider
             {
                 Name = $"{namePrefix}IntegrationTest{Guid.NewGuid():N}",

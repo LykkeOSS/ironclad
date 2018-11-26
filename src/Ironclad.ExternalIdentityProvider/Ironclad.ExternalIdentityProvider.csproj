@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <DefineConstants>TRACE;LIBRARY</DefineConstants>
     <LangVersion>latest</LangVersion>
+    <CodeAnalysisRuleSet>../Ironclad.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   
   <ItemGroup>

@@ -15,6 +15,7 @@ namespace Ironclad.ExternalIdentityProvider
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
 
+#pragma warning disable CA1812
     internal class IdentityProviderAuthenticationHandlerProvider : IAuthenticationHandlerProvider
     {
         private readonly Dictionary<string, IAuthenticationHandler> cachedHandlers = new Dictionary<string, IAuthenticationHandler>(StringComparer.Ordinal);
@@ -55,10 +56,10 @@ namespace Ironclad.ExternalIdentityProvider
                 return handler;
             }
 
-            var scheme = await this.schemes.GetSchemeAsync(authenticationScheme);
+            var scheme = await this.schemes.GetSchemeAsync(authenticationScheme).ConfigureAwait(false);
             if (scheme != null)
             {
-                handler = await this.handlers.GetHandlerAsync(context, authenticationScheme);
+                handler = await this.handlers.GetHandlerAsync(context, authenticationScheme).ConfigureAwait(false);
                 if (handler != null)
                 {
                     return handler;
@@ -77,7 +78,8 @@ namespace Ironclad.ExternalIdentityProvider
 
             handler = new OpenIdConnectHandler(optionsMonitor, this.logger, this.htmlEncoder, this.encoder, this.clock);
 
-            await handler.InitializeAsync(new AuthenticationScheme(identityProvider.Name, identityProvider.DisplayName, typeof(OpenIdConnectHandler)), context);
+            await handler.InitializeAsync(new AuthenticationScheme(identityProvider.Name, identityProvider.DisplayName, typeof(OpenIdConnectHandler)), context)
+                .ConfigureAwait(false);
 
             this.cachedHandlers[authenticationScheme] = handler;
 

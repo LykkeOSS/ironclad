@@ -1,7 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿// Copyright (c) Lykke Corp.
+// See the LICENSE file in the project root for more information.
 
 namespace Ironclad.ExternalIdentityProvider.Migrations
 {
+    using Microsoft.EntityFrameworkCore.Migrations;
+
     public partial class AddExternalProviders : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

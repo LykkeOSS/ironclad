@@ -1,18 +1,18 @@
 ﻿// Copyright (c) Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
-using System;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
-
 namespace Microsoft.Extensions.DependencyInjection
 {
+    using System;
+
+    using AspNetCore.Authentication;
+    using AspNetCore.Authentication.OpenIdConnect;
+    using AspNetCore.Builder;
+    using EntityFrameworkCore;
+    using Extensions;
     using Ironclad.ExternalIdentityProvider;
     using Ironclad.ExternalIdentityProvider.Persistence;
-    using Microsoft.AspNetCore.Authentication;
-    using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-    using Microsoft.Extensions.DependencyInjection.Extensions;
-    using Microsoft.Extensions.Options;
+    using Options;
 
     public static class IdentityProviderExtensions
     {

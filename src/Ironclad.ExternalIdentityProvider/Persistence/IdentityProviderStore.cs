@@ -1,33 +1,34 @@
 ﻿// Copyright (c) Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
-using Microsoft.EntityFrameworkCore;
-
 namespace Ironclad.ExternalIdentityProvider.Persistence
 {
     using System.Linq;
     using System.Threading.Tasks;
 
+    using Microsoft.EntityFrameworkCore;
+
     public sealed class IdentityProviderStore : IStore<IdentityProvider>
     {
-        private readonly ExternalProviderContext _externalProviderContext;
-
-        public IQueryable<IdentityProvider> Query => this._externalProviderContext.ExternalIdentityProviders.AsQueryable();
+        private readonly ExternalProviderContext externalProviderContext;
 
         public IdentityProviderStore(ExternalProviderContext externalProviderContext)
         {
-            _externalProviderContext = externalProviderContext;
+            this.externalProviderContext = externalProviderContext;
         }
-        
+
+        public IQueryable<IdentityProvider> Query =>
+            this.externalProviderContext.ExternalIdentityProviders.AsQueryable();
+
         public async Task AddOrUpdateAsync(string key, IdentityProvider value)
         {
             var existingItem =
-                await this._externalProviderContext.ExternalIdentityProviders.FirstOrDefaultAsync(provider =>
-                    provider.Name == key);
+                await this.externalProviderContext.ExternalIdentityProviders.FirstOrDefaultAsync(provider =>
+                    provider.Name == key).ConfigureAwait(false);
 
             if (existingItem == null)
             {
-                await this._externalProviderContext.ExternalIdentityProviders.AddAsync(value);
+                await this.externalProviderContext.ExternalIdentityProviders.AddAsync(value).ConfigureAwait(false);
             }
             else
             {
@@ -38,19 +39,20 @@ namespace Ironclad.ExternalIdentityProvider.Persistence
                 existingItem.Name = value.Name;
             }
 
-            await this._externalProviderContext.SaveChangesAsync();
+            await this.externalProviderContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task<bool> TryRemoveAsync(string key)
         {
-            var item = await this._externalProviderContext.ExternalIdentityProviders.FirstOrDefaultAsync(provider => provider.Name == key);
+            var item = await this.externalProviderContext.ExternalIdentityProviders
+                .FirstOrDefaultAsync(provider => provider.Name == key).ConfigureAwait(false);
             if (item == null)
             {
                 return true;
             }
 
-            this._externalProviderContext.Remove(item);
-            var itemsChanged = await this._externalProviderContext.SaveChangesAsync();
+            this.externalProviderContext.Remove(item);
+            var itemsChanged = await this.externalProviderContext.SaveChangesAsync().ConfigureAwait(false);
 
             return itemsChanged == 1;
         }
