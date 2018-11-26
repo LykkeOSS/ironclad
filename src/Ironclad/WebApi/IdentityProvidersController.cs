@@ -30,7 +30,7 @@ namespace Ironclad.WebApi
         }
 
         [HttpGet]
-        public Task<IActionResult> Get(string name, int skip = default, int take = 20)
+        public IActionResult Get(string name, int skip = default, int take = 20)
         {
             skip = Math.Max(0, skip);
             take = take < 0 ? 20 : Math.Min(take, 100);
@@ -55,21 +55,20 @@ namespace Ironclad.WebApi
 
             var resourceSet = new ResourceSet<IdentityProviderSummaryResource>(skip, totalSize, resources);
 
-            return Task.FromResult((IActionResult)this.Ok(resourceSet));
+            return this.Ok(resourceSet);
         }
 
         [HttpHead("{name}")]
         [HttpGet("{name}")]
-        public Task<IActionResult> Get(string name)
+        public IActionResult Get(string name)
         {
             var identityProvider = this.store.Query.SingleOrDefault(provider => provider.Name == name);
             if (identityProvider == null)
             {
-                return Task.FromResult((IActionResult)this.NotFound(new { Message = $"Identity provider '{name}' not found" }));
+                return this.NotFound(new { Message = $"Identity provider '{name}' not found" });
             }
 
-            return Task.FromResult(
-                (IActionResult)this.Ok(
+            return this.Ok(
                     new IdentityProviderResource
                     {
                         Url = this.HttpContext.GetIdentityServerRelativeUrl("~/api/providers/" + identityProvider.Name),
@@ -78,7 +77,7 @@ namespace Ironclad.WebApi
                         Authority = identityProvider.Authority,
                         ClientId = identityProvider.ClientId,
                         CallbackPath = identityProvider.CallbackPath,
-                    }));
+                    });
         }
 
         [HttpPost]

@@ -43,7 +43,7 @@ namespace Ironclad.Tests.Feature
             var httpClient = new IdentityProvidersHttpClient(this.Authority, this.Handler);
             var expectedProvider = new IdentityProvider
             {
-                Name = "IntegrationTest{Guid.NewGuid():N}",
+                Name = $"IntegrationTest{Guid.NewGuid():N}",
                 DisplayName = $"{nameof(IdentityProviderManagement)}.{nameof(this.CanAddProvider)} (integration test)",
                 Authority = "https://auth-test.lykkecloud.com",
                 ClientId = "test-oidc",
