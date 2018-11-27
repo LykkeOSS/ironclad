@@ -30,14 +30,14 @@ namespace Ironclad.WebApi
         }
 
         [HttpGet]
-        public IActionResult Get(string name, int skip = default, int take = 20)
+        public async Task<IActionResult> Get(string name, int skip = default, int take = 20)
         {
             skip = Math.Max(0, skip);
             take = take < 0 ? 20 : Math.Min(take, 100);
 
             var identityProviderQuery = string.IsNullOrEmpty(name)
-                ? this.store.Query
-                : this.store.Query.Where(identityProvider => identityProvider.Name.StartsWith(name, StringComparison.OrdinalIgnoreCase));
+                ? (await this.store.AllAsync()).ToList()
+                : this.store.Where(identityProvider => identityProvider.Name.StartsWith(name, StringComparison.OrdinalIgnoreCase)).ToList();
 
             var totalSize = identityProviderQuery.Count();
             var identityProviders = identityProviderQuery.OrderBy(identityProvider => identityProvider.Name).Skip(skip).Take(take).ToList();
@@ -60,9 +60,9 @@ namespace Ironclad.WebApi
 
         [HttpHead("{name}")]
         [HttpGet("{name}")]
-        public IActionResult Get(string name)
+        public async Task<IActionResult> Get(string name)
         {
-            var identityProvider = this.store.Query.SingleOrDefault(provider => provider.Name == name);
+            var identityProvider = await this.store.SingleOrDefaultAsync(provider => provider.Name == name);
             if (identityProvider == null)
             {
                 return this.NotFound(new { Message = $"Identity provider '{name}' not found" });
@@ -85,10 +85,10 @@ namespace Ironclad.WebApi
         {
             if (string.IsNullOrEmpty(model.Name))
             {
-                return this.BadRequest(new { Message = "Cannot create an identity provider without a name" });
+                return this.BadRequest(new { Message = "Cannot create an identity devprovider without a name" });
             }
 
-            if (this.store.Query.Any(provider => provider.Name == model.Name))
+            if (await this.store.AnyAsync(provider => provider.Name == model.Name))
             {
                 return this.StatusCode((int)HttpStatusCode.Conflict, new { Message = "Identity provider already exists" });
             }

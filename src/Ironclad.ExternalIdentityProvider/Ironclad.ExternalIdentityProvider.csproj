@@ -1,12 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <DefineConstants>TRACE;LIBRARY</DefineConstants>
     <LangVersion>latest</LangVersion>
     <CodeAnalysisRuleSet>../Ironclad.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="2.1.2" />
@@ -15,25 +13,21 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.4">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.Packaging.Tools.Trimming" Version="1.1.0-preview1-26619-01" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.2" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
   <ItemGroup>
     <Compile Include="..\Ironclad.Client\Dto\IdentityProvider.cs" Link="Persistence\IdentityProvider.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <AdditionalFiles Include="../stylecop.json" />
   </ItemGroup>
-  
+  <ItemGroup>
+    <Reference Include="Marten, Version=2.3.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>C:\Users\Joe\.nuget\packages\marten\2.3.2\lib\netstandard2.0\Marten.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

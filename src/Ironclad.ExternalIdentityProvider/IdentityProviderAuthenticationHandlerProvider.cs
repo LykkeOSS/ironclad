@@ -68,7 +68,7 @@ namespace Ironclad.ExternalIdentityProvider
                 return null;
             }
 
-            var identityProvider = this.store.Query.SingleOrDefault(provider => provider.Name == authenticationScheme);
+            var identityProvider = await this.store.SingleOrDefaultAsync(provider => provider.Name == authenticationScheme).ConfigureAwait(false);
             if (identityProvider == null)
             {
                 return null;

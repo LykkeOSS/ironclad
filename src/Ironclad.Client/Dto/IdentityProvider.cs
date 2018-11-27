@@ -4,7 +4,7 @@
 #if LIBRARY
 namespace Ironclad.ExternalIdentityProvider.Persistence
 {
-    using System.ComponentModel.DataAnnotations;
+    using Marten.Schema;
 #else
 namespace Ironclad.Client
 {
@@ -19,9 +19,9 @@ namespace Ironclad.Client
         /// Gets or sets the name of the identity provider.
         /// </summary>
         /// <value>The name.</value>
-#if LIBRARY
-        [Key]
-#endif
+        #if LIBRARY
+        [Identity]
+        #endif
         public string Name { get; set; }
 
         /// <summary>

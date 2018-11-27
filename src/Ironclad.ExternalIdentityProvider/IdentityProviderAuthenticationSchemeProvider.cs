@@ -28,9 +28,9 @@ namespace Ironclad.ExternalIdentityProvider
         public async Task<IEnumerable<AuthenticationScheme>> GetAllSchemesAsync()
         {
             var registeredSchemes = await this.schemes.GetAllSchemesAsync().ConfigureAwait(false);
-            var dynamicSchemes = this.store.Query
-                .Select(identityProvider => new AuthenticationScheme(identityProvider.Name, identityProvider.DisplayName, typeof(OpenIdConnectHandler)))
-                .AsEnumerable();
+            var dynamicSchemes = this.store.Select(identityProvider =>
+                new AuthenticationScheme(identityProvider.Name, identityProvider.DisplayName, typeof(OpenIdConnectHandler)))
+                ;
 
             return registeredSchemes.Concat(dynamicSchemes).ToArray();
         }
@@ -55,7 +55,7 @@ namespace Ironclad.ExternalIdentityProvider
                 return scheme;
             }
 
-            var identityProvider = this.store.Query.SingleOrDefault(provider => provider.Name == name);
+            var identityProvider = await this.store.SingleOrDefaultAsync(provider => provider.Name == name).ConfigureAwait(false);
             if (identityProvider == null)
             {
                 return null;
@@ -66,7 +66,7 @@ namespace Ironclad.ExternalIdentityProvider
 
         public void AddScheme(AuthenticationScheme scheme)
         {
-            if (this.store.Query.Any(provider => provider.Name == scheme.Name))
+            if (this.store.Any(provider => provider.Name == scheme.Name))
             {
                 throw new InvalidOperationException($"Scheme already exists: {scheme.Name}");
             }

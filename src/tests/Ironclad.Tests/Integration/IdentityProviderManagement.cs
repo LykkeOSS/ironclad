@@ -78,7 +78,6 @@ namespace Ironclad.Tests.Feature
                     summary.Authority == expectedProvider.Authority);
         }
 
-
         [Fact]
         public async Task CanGetClientSummariesWithQuery()
         {
@@ -134,7 +133,7 @@ namespace Ironclad.Tests.Feature
             // assert
             func.Should().Throw<HttpException>();
         }
-        
+
         [Fact]
         public void CannotAddProviderWithBadCallback()
         {
@@ -149,7 +148,7 @@ namespace Ironclad.Tests.Feature
             // assert
             func.Should().Throw<HttpException>();
         }
-        
+
         [Fact]
         public void CannotAddProviderWithNoAuthority()
         {
@@ -164,7 +163,7 @@ namespace Ironclad.Tests.Feature
             // assert
             func.Should().Throw<HttpException>();
         }
-        
+
         [Fact]
         public void CannotAddProviderWithNoClientId()
         {
@@ -195,7 +194,7 @@ namespace Ironclad.Tests.Feature
             // assert
             func.Should().Throw<HttpException>().And.StatusCode.Should().Be(HttpStatusCode.Conflict);
         }
-        
+
         private static IdentityProvider CreateMinimumProvider(string namePrefix = "")
         {
             // Would much rather use something like Autofixture and not worry about this, but for now...

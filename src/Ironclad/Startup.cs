@@ -120,7 +120,7 @@ namespace Ironclad
                         options.ClientSecret = this.configuration.GetValue<string>("Introspection-Secret");
                         options.DiscoveryPolicy = new DiscoveryPolicy { ValidateIssuerName = false };
                     })
-                .AddExternalIdentityProviders(options => options.UseNpgsql(this.configuration.GetConnectionString("Ironclad")));
+                .AddExternalIdentityProviders();
 
             services.AddAuthorization(
                 options =>
@@ -148,7 +148,6 @@ namespace Ironclad
             app.UseIdentityServer();
             app.UseMvcWithDefaultRoute();
             app.InitializeDatabase().SeedDatabase(this.configuration);
-            app.InitializeExternalProviderDatabase();
         }
     }
 }
