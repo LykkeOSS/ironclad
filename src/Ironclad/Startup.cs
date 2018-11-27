@@ -154,7 +154,7 @@ namespace Ironclad
             app.UseStaticFiles();
             app.UseIdentityServer();
             app.UseMvcWithDefaultRoute();
-            app.InitializeExternalProviderDatabase().SeedDatabase(this.configuration);
+            app.InitializeDatabase().SeedDatabase(this.configuration);
             app.InitializeExternalProviderDatabase();
         }
     }
