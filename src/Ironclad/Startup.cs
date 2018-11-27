@@ -119,15 +119,8 @@ namespace Ironclad
                         options.ClientId = "auth_api";
                         options.ClientSecret = this.configuration.GetValue<string>("Introspection-Secret");
                         options.DiscoveryPolicy = new DiscoveryPolicy { ValidateIssuerName = false };
-                    });
-
-            auth.AddExternalIdentityProviders(dbOptions =>
-                {
-                    dbOptions.UseNpgsql(this.configuration.GetConnectionString("ironclad"));
-                });
-
-            // extensions:
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<OpenIdConnectOptions>, OpenIdConnectPostConfigureOptions>());
+                    })
+                .AddExternalIdentityProviders(options => options.UseNpgsql(this.configuration.GetConnectionString("Ironclad")));
 
             services.AddAuthorization(
                 options =>

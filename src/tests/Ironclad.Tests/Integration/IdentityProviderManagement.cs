@@ -13,9 +13,8 @@ namespace Ironclad.Tests.Feature
 
     public class IdentityProviderManagement : IntegrationTest
     {
-        public IdentityProviderManagement(AuthenticationFixture securityFixture, IroncladFixture ironcladFixture,
-            PostgresFixture postgresFixture)
-            : base(securityFixture, ironcladFixture, postgresFixture)
+        public IdentityProviderManagement(AuthenticationFixture securityFixture, IroncladFixture ironcladFixture)
+            : base(securityFixture, ironcladFixture)
         {
         }
 

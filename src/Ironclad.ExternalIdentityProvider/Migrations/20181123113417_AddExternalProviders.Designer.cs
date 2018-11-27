@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Ironclad.ExternalIdentityProvider.Migrations
 {
-    [DbContext(typeof(ExternalProviderContext))]
+    [DbContext(typeof(ExternalProviderDbContext))]
     [Migration("20181123113417_AddExternalProviders")]
     partial class AddExternalProviders
     {

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Ironclad.ExternalIdentityProvider.Migrations
 {
-    [DbContext(typeof(ExternalProviderContext))]
+    [DbContext(typeof(ExternalProviderDbContext))]
     partial class ExternalProviderContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

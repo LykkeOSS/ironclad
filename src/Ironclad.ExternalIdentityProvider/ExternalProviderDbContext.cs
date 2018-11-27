@@ -6,9 +6,9 @@ namespace Ironclad.ExternalIdentityProvider
     using Microsoft.EntityFrameworkCore;
     using Persistence;
 
-    public class ExternalProviderContext : DbContext
+    public class ExternalProviderDbContext : DbContext
     {
-        public ExternalProviderContext(DbContextOptions<ExternalProviderContext> options)
+        public ExternalProviderDbContext(DbContextOptions<ExternalProviderDbContext> options)
             : base(options)
         {
         }

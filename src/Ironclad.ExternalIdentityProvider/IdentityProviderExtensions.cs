@@ -23,7 +23,7 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.AddTransient<IOpenIdConnectOptionsFactory, DefaultOpenIdConnectOptionsFactory>();
             builder.Services.AddTransientDecorator<IAuthenticationHandlerProvider, IdentityProviderAuthenticationHandlerProvider>();
             builder.Services.AddTransientDecorator<IAuthenticationSchemeProvider, IdentityProviderAuthenticationSchemeProvider>();
-            builder.Services.AddDbContext<ExternalProviderContext>(options, ServiceLifetime.Singleton);
+            builder.Services.AddDbContext<ExternalProviderDbContext>(options, ServiceLifetime.Singleton);
             return builder;
         }
 
@@ -32,7 +32,7 @@ namespace Microsoft.Extensions.DependencyInjection
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 // NOTE (Cameron): Set up ASP.NET Core Identity using Entity Framework (with Postgres).
-                var applicationDbContext = serviceScope.ServiceProvider.GetRequiredService<ExternalProviderContext>();
+                var applicationDbContext = serviceScope.ServiceProvider.GetRequiredService<ExternalProviderDbContext>();
                 applicationDbContext.Database.Migrate();
             }
 

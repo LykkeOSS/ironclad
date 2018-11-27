@@ -10,9 +10,9 @@ namespace Ironclad.ExternalIdentityProvider.Persistence
 
     public sealed class IdentityProviderStore : IStore<IdentityProvider>
     {
-        private readonly ExternalProviderContext externalProviderContext;
+        private readonly ExternalProviderDbContext externalProviderContext;
 
-        public IdentityProviderStore(ExternalProviderContext externalProviderContext)
+        public IdentityProviderStore(ExternalProviderDbContext externalProviderContext)
         {
             this.externalProviderContext = externalProviderContext;
         }
