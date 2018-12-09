@@ -129,6 +129,9 @@ namespace Ironclad
                     options.AddPolicy("auth_admin", policy => policy.AddAuthenticationSchemes("token").Requirements.Add(new SystemAdministratorRequirement()));
                     options.AddPolicy("user_admin", policy => policy.AddAuthenticationSchemes("token").Requirements.Add(new UserAdministratorRequirement()));
                 });
+
+            var test = new Services.Certificates.AzureKeyVaultCertificateProvider(this.settings.Azure.KeyVault, "https://ironclad-dev.vault.azure.net/certificates/ironclad-dev-signing-certificate/8fe359f05fdd41539f29e5bd0a15c486", this.logger);
+            var x = test.GetCertificateAsync().Result;
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
