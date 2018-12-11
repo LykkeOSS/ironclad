@@ -46,6 +46,7 @@ namespace Ironclad.Console.Commands
             var optionDoNotRequireConsent =         app.Option("-q|--no_constent",                 "Do not require consent",                                                  CommandOptionType.NoValue);
             var optionDisabled =                    app.Option("-d|--disabled",                    "Creates the new client in a disabled state",                              CommandOptionType.NoValue);
             var optionInteractive =                 app.Option("-i|--interactive",                 "Enters interactive mode",                                                 CommandOptionType.NoValue);
+            var optionDisableLocalLogin =           app.Option("-e|--disable_local_login",         "Disable local login",                                                     CommandOptionType.NoValue);
 #pragma warning restore SA1025
 
             app.HelpOption();
@@ -114,6 +115,7 @@ namespace Ironclad.Console.Commands
                             RequireClientSecret = optionDoNotRequireClientSecret.HasValue() ? (bool?)false : null,
                             RequireConsent = optionDoNotRequireConsent.HasValue() ? (bool?)false : null,
                             Enabled = optionDisabled.HasValue() ? (bool?)false : null,
+                            EnableLocalLogin = optionDisableLocalLogin.HasValue() ? (bool?)false : null,
                         });
 
                     reporter.Verbose("Prototype client (from command line arguments):");
@@ -279,6 +281,7 @@ namespace Ironclad.Console.Commands
                     .Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 client.AllowOfflineAccess = Prompt.GetYesNo("Allow offline access?", true);
                 client.RequireConsent = Prompt.GetYesNo("Require consent?", true);
+                client.EnableLocalLogin = Prompt.GetYesNo("Enable local login? (default: true)", true);
 
                 // defaults
                 client.Name = string.IsNullOrWhiteSpace(client.Name) ? null : client.Name;

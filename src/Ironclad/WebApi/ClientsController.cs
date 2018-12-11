@@ -91,6 +91,7 @@ namespace Ironclad.WebApi
                         RequirePkce = document.RequirePkce,
                         RequireConsent = document.RequireConsent,
                         Enabled = document.Enabled,
+                        EnableLocalLogin = document.EnableLocalLogin,
                     });
             }
         }
@@ -127,6 +128,7 @@ namespace Ironclad.WebApi
             client.RequirePkce = model.RequirePkce ?? client.RequirePkce;
             client.RequireConsent = model.RequireConsent ?? client.RequireConsent;
             client.Enabled = model.Enabled ?? client.Enabled;
+            client.EnableLocalLogin = model.EnableLocalLogin ?? client.EnableLocalLogin;
 
             using (var session = this.store.LightweightSession())
             {
@@ -199,6 +201,7 @@ namespace Ironclad.WebApi
                 document.RequirePkce = model.RequirePkce ?? document.RequirePkce;
                 document.RequireConsent = model.RequireConsent ?? document.RequireConsent;
                 document.Enabled = model.Enabled ?? document.Enabled;
+                document.EnableLocalLogin = model.EnableLocalLogin?? document.EnableLocalLogin;
 
                 if (!string.IsNullOrEmpty(model.Secret))
                 {

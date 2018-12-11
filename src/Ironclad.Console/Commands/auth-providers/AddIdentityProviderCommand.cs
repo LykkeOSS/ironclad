@@ -32,6 +32,7 @@ namespace Ironclad.Console.Commands
 #pragma warning disable SA1025
             var optionDisplayName =  app.Option("-d|--description <description>",    "The identity provider description",            CommandOptionType.SingleValue);
             var optionCallbackPath = app.Option("-c|--callback <path>",              "The callback path for the identity provider",  CommandOptionType.SingleValue);
+            var optionAcrValues =    app.Option("-a|--acr <value>",                  "The acr_values for the identity provider (you can call this several times). Example: (\"tenant:ironclad\").",  CommandOptionType.MultipleValue);
             var optionInteractive =  app.Option("-i|--interactive",                  "Enters interactive mode",                      CommandOptionType.NoValue);
 #pragma warning restore SA1025
 
@@ -58,6 +59,7 @@ namespace Ironclad.Console.Commands
                         Authority = argumentAuthority.Value,
                         ClientId = argumentClientId.Value,
                         CallbackPath = optionCallbackPath.Value(),
+                        AcrValues = optionAcrValues.Value()
                     };
 
                     reporter.Verbose("Prototype identity provider (from command line arguments):");
@@ -111,6 +113,7 @@ namespace Ironclad.Console.Commands
                 identityProvider.ClientId = identityProvider.ClientId ??
                     Safe(Prompt.GetString("Client identifier:"), "Cannot create an identity provider without a client identifier.");
                 identityProvider.CallbackPath = Prompt.GetString("Callback path for the identity provider [optional]:", identityProvider.CallbackPath);
+                identityProvider.AcrValues = Prompt.GetString("AcrValues for the identity provider(Example \"tenant:ironclad idp:ironclad\"). [optional]:", identityProvider.AcrValues);
 
                 // defaults
                 identityProvider.DisplayName = string.IsNullOrWhiteSpace(identityProvider.DisplayName) ? null : identityProvider.DisplayName;

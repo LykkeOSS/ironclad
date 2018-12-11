@@ -46,7 +46,8 @@ namespace Ironclad.Tests.Feature
                 DisplayName = $"{nameof(IdentityProviderManagement)}.{nameof(this.CanAddProvider)} (integration test)",
                 Authority = "https://auth-test.lykkecloud.com",
                 ClientId = "test-oidc",
-                CallbackPath = "/test"
+                CallbackPath = "/test",
+                AcrValues = "idp:lykke tenant:ironclad"
             };
 
             // act

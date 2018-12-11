@@ -47,5 +47,12 @@ namespace Ironclad.Client
         /// </summary>
         /// <value>The secret.</value>
         public string CallbackPath { get; set; }
+
+        /// <summary>
+        /// Gets or sets the acr_values string for the identity provider.
+        /// </summary>
+        /// <value>Space-separated string that specifies the acr values.</value>
+        public string AcrValues { get; set; }
+
     }
 }

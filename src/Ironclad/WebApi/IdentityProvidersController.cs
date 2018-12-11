@@ -77,6 +77,7 @@ namespace Ironclad.WebApi
                         Authority = identityProvider.Authority,
                         ClientId = identityProvider.ClientId,
                         CallbackPath = identityProvider.CallbackPath,
+                        AcrValues = identityProvider.AcrValues,
                     });
         }
 
@@ -110,6 +111,7 @@ namespace Ironclad.WebApi
                 Authority = model.Authority,
                 ClientId = model.ClientId,
                 CallbackPath = model.CallbackPath,
+                AcrValues = model.AcrValues,
             };
 
             try

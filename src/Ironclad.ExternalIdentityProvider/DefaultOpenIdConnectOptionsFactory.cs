@@ -4,6 +4,8 @@
 namespace Ironclad.ExternalIdentityProvider
 {
     using System;
+    using System.Threading.Tasks;
+
     using Ironclad.ExternalIdentityProvider.Persistence;
     using Microsoft.AspNetCore.Authentication.OpenIdConnect;
     using Microsoft.Extensions.Options;
@@ -28,6 +30,15 @@ namespace Ironclad.ExternalIdentityProvider
             options.CallbackPath = identityProvider.CallbackPath ?? options.CallbackPath;
 
             this.configureOptions.PostConfigure(identityProvider.Name, options);
+
+            if (!string.IsNullOrEmpty(identityProvider.AcrValues))
+            {
+                options.Events.OnRedirectToIdentityProvider = context =>
+                    {
+                        context.ProtocolMessage.AcrValues = identityProvider.AcrValues;
+                        return Task.CompletedTask;
+                    };
+            }
 
             return options;
         }

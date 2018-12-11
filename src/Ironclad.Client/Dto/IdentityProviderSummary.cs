@@ -37,5 +37,11 @@ namespace Ironclad.Client
         /// </summary>
         /// <value>Returns <c>true</c> if enabled; otherwise, <c>false</c>.</value>
         public bool Enabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets the acr_values string for the identity provider.
+        /// </summary>
+        /// <value>Space-separated string that specifies the acr values.</value>
+        public string AcrValues { get; set; }
     }
 }

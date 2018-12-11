@@ -63,6 +63,7 @@ namespace Ironclad.Tests.Integration
                 RequirePkce = true,
                 RequireConsent = false,
                 Enabled = false,
+                EnableLocalLogin = false
             };
 
             // act
@@ -140,6 +141,7 @@ namespace Ironclad.Tests.Integration
                 RequirePkce = true,
                 RequireConsent = false,
                 Enabled = false,
+                EnableLocalLogin = true
             };
 
             var expectedClient = new Client
@@ -158,6 +160,7 @@ namespace Ironclad.Tests.Integration
                 RequirePkce = false,
                 RequireConsent = true,
                 Enabled = true,
+                EnableLocalLogin = false
             };
 
             await httpClient.AddClientAsync(originalClient).ConfigureAwait(false);

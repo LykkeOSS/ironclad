@@ -117,5 +117,13 @@ namespace Ironclad.Client
         /// </summary>
         /// <value>Returns <c>true</c> if enabled; otherwise, <c>false</c>.</value>
         public bool? Enabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the local login is allowed for this client. Defaults to <c>true</c>.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if local logins are enabled; otherwise, <c>false</c>.
+        /// </value>
+        public bool? EnableLocalLogin { get; set; }
     }
 }
