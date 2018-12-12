@@ -4,7 +4,7 @@ mono: none
 git:
   depth: false
 dotnet: 2.1.400
-script: dotnet run --project ./src/build/build.csproj -- --parallel
+script: ./build.sh
 notifications:
   slack:
     secure: vs4xD4L3b0sdwqfIe3+iOMEQ7/l9ci7GKTCmwR7GCPVlO4e8sfDfLK03RxJ8XQhxM9cTEljxaoW+3Ars18/dXQhPjOWaOzhlpnVfWPxhvvvVx0XE+8gHbKv1TEw6+GPHmkvHikNGk22ncWkSa54S3MXRctyldtNLdIzMhPPKP0tMnf2/LgovlSSnOCJw1K6UWqF6XoWYj+uCKwo7IMKeM23PhjxQYD9fIKwQPezcrDwYoyBYUhNqvNw492O2YmehJC9D5hay84Yh4ykv52nV7KX8QhIAUWo343OfXbJmJPZtEcdluIHdG9UvSB3Mc/wOF+z7EE7oPpybK2krmrhTUPGDd6DWYR/rVPotDiB4bJ9/ouUz0yL6w52pSE8Hb2x+pzBUCpXK6MkD1f9ZybkLjjX3vxFDwesYzztShYOT4ODHMA3ytlGGN/LyoHFyO7MSKPDxcdeiKWtkxx1u0WrOnGEAgr6wI7DiX8jucL89l6bZLLhBbzObNPCG+DlvOHUQE2VnMwLzF3EzFYC0Jk/qQpiVSMyxULH/Wyg4fCrqI8tKGnNZnoxQRoBKSRaeShGgofGnOfzeYuQbdHAFgVH1IkedJQ8VNQjftPqd6Bj3N6jus1hZ31Yr6KbmUitlBxMOSZ/NIbAfaz0D7k0JepnYaxQC7AKa0cOlARApClESXjU=
