@@ -46,7 +46,7 @@ namespace Ironclad.Console.Commands
             var optionDoNotRequireConsent =         app.Option("-q|--no_constent",                 "Do not require consent",                                                  CommandOptionType.NoValue);
             var optionDisabled =                    app.Option("-d|--disabled",                    "Creates the new client in a disabled state",                              CommandOptionType.NoValue);
             var optionInteractive =                 app.Option("-i|--interactive",                 "Enters interactive mode",                                                 CommandOptionType.NoValue);
-            var optionDisableLocalLogin =           app.Option("-e|--disable_local_login",         "Disable local login",                                                     CommandOptionType.NoValue);
+            var optionDisableLocalLogin =           app.Option("-dl|--disable_local_login",        "Disable local login",                                                     CommandOptionType.NoValue);
 #pragma warning restore SA1025
 
             app.HelpOption();

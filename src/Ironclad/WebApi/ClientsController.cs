@@ -201,7 +201,7 @@ namespace Ironclad.WebApi
                 document.RequirePkce = model.RequirePkce ?? document.RequirePkce;
                 document.RequireConsent = model.RequireConsent ?? document.RequireConsent;
                 document.Enabled = model.Enabled ?? document.Enabled;
-                document.EnableLocalLogin = model.EnableLocalLogin?? document.EnableLocalLogin;
+                document.EnableLocalLogin = model.EnableLocalLogin ?? document.EnableLocalLogin;
 
                 if (!string.IsNullOrEmpty(model.Secret))
                 {
