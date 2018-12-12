@@ -119,6 +119,26 @@ namespace Ironclad.Client
         public bool? Enabled { get; set; }
 
         /// <summary>
+        /// Gets or sets maximum lifetime of a refresh token in seconds.
+        /// Zero allows refresh tokens that never expire when used with ``RefreshTokenUsage = ReUse`` and ``RefreshTokenExpiration = Sliding``.
+        /// </summary>
+        public int? AbsoluteRefreshTokenLifetime { get; set; }
+
+        /// <summary>
+        /// Gets or sets refresh token usage settings.
+        /// ReUse: the refresh token handle will stay the same when refreshing tokens
+        /// OneTime: the refresh token handle will be updated when refreshing tokens
+        /// </summary>
+        public string RefreshTokenUsage { get; set; }
+
+        /// <summary>
+        /// Gets or sets refresh token expiration settings.
+        /// Absolute: the refresh token will expire on a fixed point in time (specified by the AbsoluteRefreshTokenLifetime)
+        /// Sliding: when refreshing the token, the lifetime of the refresh token will be renewed (by the amount specified in SlidingRefreshTokenLifetime). The lifetime will not exceed AbsoluteRefreshTokenLifetime.
+        /// </summary>
+        public string RefreshTokenExpiration { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the local login is allowed for this client. Defaults to <c>true</c>.
         /// </summary>
         /// <value>

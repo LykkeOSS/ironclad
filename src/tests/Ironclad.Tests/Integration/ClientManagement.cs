@@ -63,7 +63,10 @@ namespace Ironclad.Tests.Integration
                 RequirePkce = true,
                 RequireConsent = false,
                 Enabled = false,
-                EnableLocalLogin = false
+                EnableLocalLogin = false,
+                AbsoluteRefreshTokenLifetime = 14,
+                RefreshTokenUsage = "OneTimeOnly",
+                RefreshTokenExpiration = "Sliding"
             };
 
             // act
@@ -141,7 +144,10 @@ namespace Ironclad.Tests.Integration
                 RequirePkce = true,
                 RequireConsent = false,
                 Enabled = false,
-                EnableLocalLogin = true
+                EnableLocalLogin = true,
+                AbsoluteRefreshTokenLifetime = 1,
+                RefreshTokenUsage = "ReUse",
+                RefreshTokenExpiration = "Absolute"
             };
 
             var expectedClient = new Client
@@ -160,7 +166,10 @@ namespace Ironclad.Tests.Integration
                 RequirePkce = false,
                 RequireConsent = true,
                 Enabled = true,
-                EnableLocalLogin = false
+                EnableLocalLogin = false,
+                AbsoluteRefreshTokenLifetime = 14,
+                RefreshTokenUsage = "OneTimeOnly",
+                RefreshTokenExpiration = "Sliding"
             };
 
             await httpClient.AddClientAsync(originalClient).ConfigureAwait(false);

@@ -92,6 +92,9 @@ namespace Ironclad.WebApi
                         RequireConsent = document.RequireConsent,
                         Enabled = document.Enabled,
                         EnableLocalLogin = document.EnableLocalLogin,
+                        AbsoluteRefreshTokenLifetime = document.AbsoluteRefreshTokenLifetime,
+                        RefreshTokenUsage = ((TokenUsage)document.RefreshTokenUsage).ToString(),
+                        RefreshTokenExpiration = ((TokenExpiration)document.RefreshTokenExpiration).ToString(),
                     });
             }
         }
@@ -105,10 +108,19 @@ namespace Ironclad.WebApi
                 return this.BadRequest(new { Message = $"Cannot create a client without a client ID" });
             }
 
-            var accessTokenType = default(AccessTokenType);
-            if (model.AccessTokenType != null && !Enum.TryParse(model.AccessTokenType, out accessTokenType))
+            if (!TryParseEnum<AccessTokenType>(model.AccessTokenType, out var accessTokenType))
             {
                 return this.BadRequest(new { Message = $"Access token type '{model.AccessTokenType}' does not exist" });
+            }
+
+            if (!TryParseEnum<TokenUsage>(model.RefreshTokenUsage, out var refreshTokenUsage))
+            {
+                return this.BadRequest(new { Message = $"Refresh token usage '{model.RefreshTokenUsage}' does not exist" });
+            }
+
+            if (!TryParseEnum<TokenExpiration>(model.RefreshTokenExpiration, out var refreshTokenExpiration))
+            {
+                return this.BadRequest(new { Message = $"Refresh token expiration '{model.RefreshTokenExpiration}' does not exist" });
             }
 
             var client = new IdentityServerClient { ClientId = model.Id };
@@ -129,6 +141,9 @@ namespace Ironclad.WebApi
             client.RequireConsent = model.RequireConsent ?? client.RequireConsent;
             client.Enabled = model.Enabled ?? client.Enabled;
             client.EnableLocalLogin = model.EnableLocalLogin ?? client.EnableLocalLogin;
+            client.AbsoluteRefreshTokenLifetime = model.AbsoluteRefreshTokenLifetime ?? client.AbsoluteRefreshTokenLifetime;
+            client.RefreshTokenUsage = model.RefreshTokenUsage == null ? client.RefreshTokenUsage : refreshTokenUsage;
+            client.RefreshTokenExpiration = model.RefreshTokenExpiration == null ? client.RefreshTokenExpiration : refreshTokenExpiration;
 
             using (var session = this.store.LightweightSession())
             {
@@ -143,6 +158,16 @@ namespace Ironclad.WebApi
             }
 
             return this.Created(new Uri(this.HttpContext.GetIdentityServerRelativeUrl("~/api/clients/" + model.Id)), null);
+        }
+
+        private static bool TryParseEnum<T>(string modelValue, out T resultingValue)
+            where T : struct
+        {
+            resultingValue = default;
+
+            var result = modelValue == null || Enum.TryParse(modelValue, out resultingValue);
+
+            return result;
         }
 
         [HttpPut("{clientId}")]
@@ -161,10 +186,19 @@ namespace Ironclad.WebApi
                     return this.NotFound(new { Message = $"Client '{clientId}' not found" });
                 }
 
-                var accessTokenType = default(AccessTokenType);
-                if (model.AccessTokenType != null && !Enum.TryParse(model.AccessTokenType, out accessTokenType))
+                if (!TryParseEnum<AccessTokenType>(model.AccessTokenType, out var accessTokenType))
                 {
                     return this.BadRequest(new { Message = $"Access token type '{model.AccessTokenType}' does not exist" });
+                }
+
+                if (!TryParseEnum<TokenUsage>(model.RefreshTokenUsage, out var refreshTokenUsage))
+                {
+                    return this.BadRequest(new { Message = $"Refresh token usage '{model.RefreshTokenUsage}' does not exist" });
+                }
+
+                if (!TryParseEnum<TokenExpiration>(model.RefreshTokenExpiration, out var refreshTokenExpiration))
+                {
+                    return this.BadRequest(new { Message = $"Refresh token expiration '{model.RefreshTokenExpiration}' does not exist" });
                 }
 
                 // NOTE (Cameron): Because of the mapping/conversion unknowns we rely upon the Postgres integration to perform that operation which is why we do this...
@@ -178,7 +212,9 @@ namespace Ironclad.WebApi
                 };
 
                 client.AccessTokenType = model.AccessTokenType == null ? client.AccessTokenType : accessTokenType;
-
+                client.RefreshTokenUsage = model.RefreshTokenUsage == null ? client.RefreshTokenUsage : refreshTokenUsage;
+                client.RefreshTokenExpiration = model.RefreshTokenExpiration == null ? client.RefreshTokenExpiration : refreshTokenExpiration;
+                
                 // NOTE (Cameron): If the secret is updated we want to add the new secret...
                 if (!string.IsNullOrEmpty(model.Secret))
                 {
@@ -202,6 +238,9 @@ namespace Ironclad.WebApi
                 document.RequireConsent = model.RequireConsent ?? document.RequireConsent;
                 document.Enabled = model.Enabled ?? document.Enabled;
                 document.EnableLocalLogin = model.EnableLocalLogin ?? document.EnableLocalLogin;
+                document.AbsoluteRefreshTokenLifetime = model.AbsoluteRefreshTokenLifetime ?? document.AbsoluteRefreshTokenLifetime;
+                document.RefreshTokenUsage = model.RefreshTokenUsage == null ? document.RefreshTokenUsage : entity.RefreshTokenUsage;
+                document.RefreshTokenExpiration = model.RefreshTokenExpiration == null ? document.RefreshTokenExpiration : entity.RefreshTokenExpiration;
 
                 if (!string.IsNullOrEmpty(model.Secret))
                 {
