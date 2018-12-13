@@ -60,7 +60,7 @@ namespace Ironclad.Sdk
                "'unsafe-inline'"
             };
 
-            var csp = $"script-src {string.Join(" ", allowedScripts)}; img-src 'self'; style-src {string.Join(" ", allowedStyles)}; object-src 'none'; frame-ancestors 'none'; sandbox allow-forms allow-same-origin allow-scripts; base-uri 'self';";
+            var csp = $"script-src {string.Join(" ", allowedScripts)}; img-src 'self' data:; style-src {string.Join(" ", allowedStyles)}; object-src 'none'; frame-ancestors 'none'; sandbox allow-forms allow-same-origin allow-scripts; base-uri 'self';";
 
             // once for standards compliant browsers
             if (!context.HttpContext.Response.Headers.ContainsKey("Content-Security-Policy"))

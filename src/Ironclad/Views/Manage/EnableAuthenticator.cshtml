@@ -20,7 +20,7 @@
         </li>
         <li>
             <p>Scan the QR Code or enter this key <kbd>@Model.SharedKey</kbd> into your two factor authenticator app. Spaces and casing do not matter.</p>
-            <div id="qrCode"></div>
+            <div id="qrCode" data-text="@Html.Raw(Model.AuthenticatorUri)"></div>
             <div id="qrCodeData" data-url="@Html.Raw(Model.AuthenticatorUri)"></div>
         </li>
         <li>
@@ -46,12 +46,5 @@
 </div>
 @section Scripts {
     <script type="text/javascript" src="~/lib/qrcode/qrcode.min.js"></script>
-    <script type="text/javascript">
-        new QRCode(document.getElementById("qrCode"),
-            {
-                text: "@Html.Raw(Model.AuthenticatorUri)",
-                width: 150,
-                height: 150
-            });
-    </script>
+    <script type="text/javascript" src="~/js/qrcode.js"></script>
 }
