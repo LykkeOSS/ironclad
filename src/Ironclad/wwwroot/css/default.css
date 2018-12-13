@@ -8722,4 +8722,11 @@ h3 {
   height: 0;
 }
 
+.navbar nav a {
+  margin-right: 15px;
+}
+.navbar nav a:last-child {
+  margin-right: 0;
+}
+
 /*# sourceMappingURL=default.css.map */

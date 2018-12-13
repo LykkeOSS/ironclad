@@ -30,3 +30,15 @@ body {
     width: 0;
     height: 0;
 }
+
+.navbar {
+    nav {
+        a {
+            margin-right: 15px;
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+    }
+}
