@@ -5,6 +5,14 @@ body {
 
 @import '../lib/bootstrap/scss/bootstrap';
 
+$breakpoints: ( 
+	'small': map-get($container-max-widths, sm), 
+	'medium': map-get($container-max-widths, md), 
+	'large': map-get($container-max-widths, lg), 
+	'giant': map-get($container-max-widths, xl)
+);
+
+@import 'mixins/responsive';
 @import 'components/consent';
 @import 'components/grants';
 @import 'components/manage';
