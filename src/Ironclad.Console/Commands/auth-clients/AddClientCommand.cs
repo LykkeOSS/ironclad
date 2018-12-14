@@ -31,25 +31,25 @@ namespace Ironclad.Console.Commands
 
             // options
 #pragma warning disable SA1025
-            var optionName =                         app.Option("-n|--name <name>",                       "The name of the client",                                                  CommandOptionType.SingleValue);
-            var optionSecret =                       app.Option("-s|--secret <secret>",                   "The client secret",                                                       CommandOptionType.SingleValue);
-            var optionAllowedCorsOrigins =           app.Option("-c|--cors_uri <uri>",                    "An allowed CORS origin for the client (you can call this several times)", CommandOptionType.MultipleValue);
-            var optionRedirectUris =                 app.Option("-r|--redirect_uri <uri>",                "A redirect URI for the client (you can call this several times)",         CommandOptionType.MultipleValue);
-            var optionPostLogoutRedirectUris =       app.Option("-l|--logout_uri <uri>",                  "A logout URI for the client (you can call this several times)",           CommandOptionType.MultipleValue);
-            var optionAllowedScopes =                app.Option("-a|--scope <scope>",                     "An allowed scope for the client (you can call this several times)",       CommandOptionType.MultipleValue);
-            var optionAccessTokenType =              app.Option("-t|--token_type <Jwt/Reference>",        "The access token type for the client",                                    CommandOptionType.SingleValue);
-            var optionAllowedGrantTypes =            app.Option("-g|--grant_type <type>",                 "A grant type for the client (you can call this several times)",           CommandOptionType.MultipleValue);
-            var optionAllowAccessTokensViaBrowser =  app.Option("-b|--browser",                           "Allow access tokens via browser",                                         CommandOptionType.NoValue);
-            var optionAllowOfflineAccess =           app.Option("-o|--offline",                           "Allow offline access",                                                    CommandOptionType.NoValue);
-            var optionAbsoluteRefreshTokenLifetime = app.Option("-rl|--r_lifelime <seconds> ",            "Absolute expiration time(seconds).",                                      CommandOptionType.SingleValue);
-            var optionRefreshTokenUsage =            app.Option("-ru|--r_usage <ReUse/OneTimeOnly>",      "Refresh token usage.",                                                    CommandOptionType.SingleValue);
-            var optionRefreshTokenExpiration =       app.Option("-re|--r_expiration <Sliding/Absolute>",  "Refresh token expiration type.",                                          CommandOptionType.SingleValue);
-            var optionDoNotRequireClientSecret =     app.Option("-k|--no_secret",                         "Do not require client secret",                                            CommandOptionType.NoValue);
-            var optionRequirePkce =                  app.Option("-p|--pkce",                              "Require Proof Key for Code Exchange (PKCE)",                              CommandOptionType.NoValue);
-            var optionDoNotRequireConsent =          app.Option("-q|--no_constent",                       "Do not require consent",                                                  CommandOptionType.NoValue);
-            var optionDisabled =                     app.Option("-d|--disabled",                          "Creates the new client in a disabled state",                              CommandOptionType.NoValue);
-            var optionInteractive =                  app.Option("-i|--interactive",                       "Enters interactive mode",                                                 CommandOptionType.NoValue);
-            var optionDisableLocalLogin =            app.Option("-dl|--disable_local_login",              "Disable local login",                                                     CommandOptionType.NoValue);
+            var optionName =                         app.Option("-n|--name <name>",                                    "The name of the client",                                                  CommandOptionType.SingleValue);
+            var optionSecret =                       app.Option("-s|--secret <secret>",                                "The client secret",                                                       CommandOptionType.SingleValue);
+            var optionAllowedCorsOrigins =           app.Option("-c|--cors_uri <uri>",                                 "An allowed CORS origin for the client (you can call this several times)", CommandOptionType.MultipleValue);
+            var optionRedirectUris =                 app.Option("-r|--redirect_uri <uri>",                             "A redirect URI for the client (you can call this several times)",         CommandOptionType.MultipleValue);
+            var optionPostLogoutRedirectUris =       app.Option("-l|--logout_uri <uri>",                               "A logout URI for the client (you can call this several times)",           CommandOptionType.MultipleValue);
+            var optionAllowedScopes =                app.Option("-a|--scope <scope>",                                  "An allowed scope for the client (you can call this several times)",       CommandOptionType.MultipleValue);
+            var optionAccessTokenType =              app.Option("-t|--token_type <Jwt/Reference>",                     "The access token type for the client",                                    CommandOptionType.SingleValue);
+            var optionAllowedGrantTypes =            app.Option("-g|--grant_type <type>",                              "A grant type for the client (you can call this several times)",           CommandOptionType.MultipleValue);
+            var optionAllowAccessTokensViaBrowser =  app.Option("-b|--browser",                                        "Allow access tokens via browser",                                         CommandOptionType.NoValue);
+            var optionAllowOfflineAccess =           app.Option("-o|--offline",                                        "Allow offline access",                                                    CommandOptionType.NoValue);
+            var optionAbsoluteRefreshTokenLifetime = app.Option("-rtl|--refresh_token_lifelime <seconds> ",            "Absolute expiration time(seconds).",                                      CommandOptionType.SingleValue);
+            var optionRefreshTokenUsage =            app.Option("-rtu|--refresh_token_usage <ReUse/OneTimeOnly>",      "Refresh token usage.",                                                    CommandOptionType.SingleValue);
+            var optionRefreshTokenExpiration =       app.Option("-rte|--refresh_token_expiration <Sliding/Absolute>",  "Refresh token expiration type.",                                          CommandOptionType.SingleValue);
+            var optionDoNotRequireClientSecret =     app.Option("-k|--no_secret",                                      "Do not require client secret",                                            CommandOptionType.NoValue);
+            var optionRequirePkce =                  app.Option("-p|--pkce",                                           "Require Proof Key for Code Exchange (PKCE)",                              CommandOptionType.NoValue);
+            var optionDoNotRequireConsent =          app.Option("-q|--no_constent",                                    "Do not require consent",                                                  CommandOptionType.NoValue);
+            var optionDisabled =                     app.Option("-d|--disabled",                                       "Creates the new client in a disabled state",                              CommandOptionType.NoValue);
+            var optionInteractive =                  app.Option("-i|--interactive",                                    "Enters interactive mode",                                                 CommandOptionType.NoValue);
+            var optionDisableLocalLogin =            app.Option("-dl|--disable_local_login",                           "Disable local login",                                                     CommandOptionType.NoValue);
 #pragma warning restore SA1025
 
             app.HelpOption();

@@ -165,9 +165,7 @@ namespace Ironclad.WebApi
         {
             resultingValue = default;
 
-            var result = modelValue == null || Enum.TryParse(modelValue, out resultingValue);
-
-            return result;
+            return modelValue == null || Enum.TryParse(modelValue, out resultingValue);
         }
 
         [HttpPut("{clientId}")]
