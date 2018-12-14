@@ -31,7 +31,6 @@ namespace Ironclad
         private readonly ILogger<Startup> logger;
         private readonly ILoggerFactory loggerFactory;
         private readonly Settings settings;
-        private IConfigurationSection visualConfiguration;
 
         public Startup(ILogger<Startup> logger, ILoggerFactory loggerFactory, IConfiguration configuration)
         {
@@ -39,15 +38,17 @@ namespace Ironclad
             this.loggerFactory = loggerFactory;
             this.settings = configuration.Get<Settings>(options => options.BindNonPublicProperties = true);
             this.settings.Validate();
-
-            this.visualConfiguration = configuration.GetSection("Visual");
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
             var migrationsAssembly = typeof(Startup).GetType().Assembly.GetName().Name;
 
-            services.Configure<Settings.VisualSettings>(this.visualConfiguration);
+            services.Configure<Settings.VisualSettings>(options =>
+            {
+                options.LogoFile = this.settings.Visual.LogoFile;
+                options.StylesFile = this.settings.Visual.StylesFile;
+            });
 
             services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(this.settings.Server.Database));
 
