@@ -8,6 +8,7 @@ namespace Ironclad.Tests.Sdk
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -101,6 +102,16 @@ namespace Ironclad.Tests.Sdk
                 var id = await this.TryFindContainer(default).ConfigureAwait(false);
                 if (id != null)
                 {
+                    if (this.Configuration.OutputDockerLogs)
+                    {
+                        using (var stream = await this.client.Containers.GetContainerLogsAsync(id, new ContainerLogsParameters {Follow = false, ShowStderr = true, ShowStdout = true}))
+                        using (var reader = new StreamReader(stream))
+                        {
+                            var logs = await reader.ReadToEndAsync();
+                            Console.WriteLine(logs);
+                        }
+                    }
+
                     await this.StopContainer(id, default).ConfigureAwait(false);
                     await this.RemoveContainer(id, default).ConfigureAwait(false);
                 }
@@ -127,14 +138,14 @@ namespace Ironclad.Tests.Sdk
 
             return containers.FirstOrDefault(
                 container =>
-                container.Names.Contains("/" + this.configuration.ContainerName, StringComparer.OrdinalIgnoreCase))?.ID;
+                    container.Names.Contains("/" + this.configuration.ContainerName, StringComparer.OrdinalIgnoreCase))?.ID;
         }
 
         private async Task<string> CreateContainer(CancellationToken token)
         {
             var portBindings = this.Configuration.ContainerPortBindings.ToDictionary(
                 binding => $"{binding.GuestTcpPort}/tcp",
-                binding => (IList<PortBinding>)new List<PortBinding>
+                binding => (IList<PortBinding>) new List<PortBinding>
                 {
                     new PortBinding
                     {
@@ -164,12 +175,12 @@ namespace Ironclad.Tests.Sdk
 
         private async Task StopContainer(string id, CancellationToken token) =>
             await this.client.Containers
-                .StopContainerAsync(id, new ContainerStopParameters { WaitBeforeKillSeconds = 5 }, token)
+                .StopContainerAsync(id, new ContainerStopParameters {WaitBeforeKillSeconds = 5}, token)
                 .ConfigureAwait(false);
 
         private async Task RemoveContainer(string id, CancellationToken token) =>
             await this.client.Containers
-                .RemoveContainerAsync(id, new ContainerRemoveParameters { Force = false }, token)
+                .RemoveContainerAsync(id, new ContainerRemoveParameters {Force = false}, token)
                 .ConfigureAwait(false);
 
         private async Task AutoCreateImage(CancellationToken token)
@@ -181,7 +192,7 @@ namespace Ironclad.Tests.Sdk
 
             var authConfig = this.configuration.RegistryCredentials == null
                 ? null
-                : new AuthConfig { Username = this.configuration.RegistryCredentials.UserName, Password = this.configuration.RegistryCredentials.Password };
+                : new AuthConfig {Username = this.configuration.RegistryCredentials.UserName, Password = this.configuration.RegistryCredentials.Password};
 
             await this.client.Images
                 .CreateImageAsync(
@@ -198,7 +209,7 @@ namespace Ironclad.Tests.Sdk
 
         private async Task<bool> ImageExists(CancellationToken token)
         {
-            var images = await this.client.Images.ListImagesAsync(new ImagesListParameters { MatchName = this.Configuration.FullyQualifiedImage }, token).ConfigureAwait(false);
+            var images = await this.client.Images.ListImagesAsync(new ImagesListParameters {MatchName = this.Configuration.FullyQualifiedImage}, token).ConfigureAwait(false);
             return images.Count != 0;
         }
 

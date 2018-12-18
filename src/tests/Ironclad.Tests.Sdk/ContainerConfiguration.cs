@@ -29,6 +29,8 @@ namespace Ironclad.Tests.Sdk
         public PortBinding[] ContainerPortBindings { get; set; } = Array.Empty<PortBinding>();
 
         public string[] ContainerEnvironmentVariables { get; set; } = Array.Empty<string>();
+        
+        public bool OutputDockerLogs { get; set; }
 
         public class PortBinding
         {

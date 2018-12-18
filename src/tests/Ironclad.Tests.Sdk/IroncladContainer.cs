@@ -11,7 +11,7 @@ namespace Ironclad.Tests.Sdk
     {
         private readonly IroncladProbe probe;
 
-        public IroncladContainer(string authority, int port, string connectionString, string dockerRegistry, NetworkCredential dockerCredentials, string dockerTag)
+        public IroncladContainer(string authority, int port, string connectionString, string dockerRegistry, NetworkCredential dockerCredentials, string dockerTag, bool outputDockerLogs)
         {
             authority = authority ?? throw new ArgumentNullException(nameof(authority));
             connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
@@ -40,6 +40,7 @@ namespace Ironclad.Tests.Sdk
                     $"API__CLIENT_ID=auth_api",
                     $"API__SECRET=secret", // self-introspection secret (not a secret)
                 },
+                OutputDockerLogs = outputDockerLogs
             };
 
             this.probe = new IroncladProbe(authority, 2, 20);
