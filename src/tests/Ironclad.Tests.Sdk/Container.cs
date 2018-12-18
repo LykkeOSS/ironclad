@@ -198,7 +198,7 @@ namespace Ironclad.Tests.Sdk
 
         private async Task<bool> ImageExists(CancellationToken token)
         {
-            var images = await this.client.Images.ListImagesAsync(new ImagesListParameters { MatchName = this.Configuration.TagQualifiedImage }, token).ConfigureAwait(false);
+            var images = await this.client.Images.ListImagesAsync(new ImagesListParameters { MatchName = this.Configuration.FullyQualifiedImage }, token).ConfigureAwait(false);
             return images.Count != 0;
         }
 
