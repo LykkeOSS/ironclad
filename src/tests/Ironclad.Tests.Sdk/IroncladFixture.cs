@@ -65,7 +65,8 @@ namespace Ironclad.Tests.Sdk
                     this.postgres.GetConnectionStringForContainer(),
                     this.settings.DockerRegistry,
                     this.settings.DockerCredentials,
-                    this.settings.DockerTag, this.settings.OutputDockerLogs);
+                    this.settings.DockerTag,
+                    this.settings.OutputDockerLogs);
             }
             else
             {
@@ -121,6 +122,8 @@ namespace Ironclad.Tests.Sdk
 
             public string Authority => $"http://localhost:{this.Port}";
 
+            public bool OutputDockerLogs { get; set; }
+
             private int port { get; set; }
 
             private bool? use_docker_image { get; set; }
@@ -130,8 +133,6 @@ namespace Ironclad.Tests.Sdk
             private bool? use_source_code { get; set; }
 
             private string postgres_tag { get; set; }
-            
-            public bool OutputDockerLogs { get; set; }
 
             private class Docker
             {
