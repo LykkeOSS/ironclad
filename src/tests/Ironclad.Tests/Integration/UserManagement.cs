@@ -11,8 +11,8 @@ namespace Ironclad.Tests.Integration
     using FluentAssertions;
     using IdentityModel.Client;
     using IdentityModel.OidcClient;
-    using Ironclad.Client;
-    using Ironclad.Tests.Sdk;
+    using Client;
+    using Sdk;
     using Xunit;
 
     public class UserManagement : AuthenticationTest
@@ -440,6 +440,193 @@ namespace Ironclad.Tests.Integration
                 options => options.Excluding(user => user.Id).Excluding(user => user.Password).Excluding(user => user.Roles).Excluding(user => user.Claims));
             actualUser.Id.Should().Be(originalUser.Id);
             actualUser.Roles.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task CanAddUserToRoles()
+        {
+            // arrange
+            var httpClient = new UsersHttpClient(this.Authority, this.Handler);
+            var model = new User
+            {
+                Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
+                Password = "password",
+                Email = "bit-bucket@test.smtp.org",
+                PhoneNumber = "123456789"
+            };
+
+            var originalUser = await httpClient.AddUserAsync(model).ConfigureAwait(false);
+
+            // act
+            await httpClient.AddToRolesAsync(originalUser.Username, new[] {"admin"});
+
+            var actualUser = await httpClient.GetUserAsync(originalUser.Username);
+
+            // assert
+            actualUser.Should().NotBeNull();
+            actualUser.Should().BeEquivalentTo(originalUser,
+                options => options.Excluding(user => user.Id).Excluding(user => user.Password).Excluding(user => user.Roles));
+            actualUser.Id.Should().Be(originalUser.Id);
+            actualUser.Roles.Should().NotBeEmpty();
+            actualUser.Roles.Should().Contain("admin");
+        }
+
+        [Fact]
+        public async Task CannotAddUserToNonExistingRole()
+        {
+            // arrange
+            var httpClient = new UsersHttpClient(this.Authority, this.Handler);
+            var model = new User
+            {
+                Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
+                Password = "password",
+                Email = "bit-bucket@test.smtp.org",
+                PhoneNumber = "123456789",
+                Roles = { "admin" }
+            };
+
+            var originalUser = await httpClient.AddUserAsync(model).ConfigureAwait(false);
+
+            // act
+            Func<Task> func = async () => await httpClient.AddToRolesAsync(originalUser.Username, new[] { "lambo_owner" }).ConfigureAwait(false);
+
+            // assert
+            func.Should().Throw<HttpException>().And.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task CanRemoveUserFromRoles()
+        {
+            // arrange
+            var httpClient = new UsersHttpClient(this.Authority, this.Handler);
+            var model = new User
+            {
+                Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
+                Password = "password",
+                Email = "bit-bucket@test.smtp.org",
+                PhoneNumber = "123456789",
+                Roles = {"admin"}
+            };
+
+            var originalUser = await httpClient.AddUserAsync(model).ConfigureAwait(false);
+
+            // act
+            await httpClient.RemoveFromRolesAsync(originalUser.Username, new[] {"admin"});
+
+            var actualUser = await httpClient.GetUserAsync(originalUser.Username).ConfigureAwait(false);
+
+            // assert
+            actualUser.Should().NotBeNull();
+            actualUser.Should().BeEquivalentTo(
+                originalUser,
+                options => options.Excluding(user => user.Id).Excluding(user => user.Password).Excluding(user => user.Roles));
+            actualUser.Id.Should().Be(originalUser.Id);
+            actualUser.Roles.Should().BeEmpty();
+        }
+
+        [Fact]
+        public void CannotRemoveDefaultAdminUserFromAdminRole()
+        {
+            // arrange
+            var httpClient = new UsersHttpClient(this.Authority, this.Handler);
+
+            // act
+            Func<Task> func = async () =>
+                await httpClient.RemoveFromRolesAsync("admin", new[] {"admin"}).ConfigureAwait(false);
+
+            // assert
+            func.Should().Throw<HttpException>().And.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task CanAddUserClaims()
+        {
+            // arrange
+            var httpClient = new UsersHttpClient(this.Authority, this.Handler);
+            var model = new User
+            {
+                Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
+                Password = "password",
+                Email = "bit-bucket@test.smtp.org",
+                PhoneNumber = "123456789"
+            };
+
+            var originalUser = await httpClient.AddUserAsync(model).ConfigureAwait(false);
+
+            // act
+            await httpClient.AddClaimsAsync(originalUser.Username,
+                new Dictionary<string, IEnumerable<object>>
+                    {{"claim1", new object[] {"1", "2", "3"}}, {"claim2", new object[] {"21", "22", "23"}}});
+
+            var actualUser = await httpClient.GetUserAsync(originalUser.Username);
+
+            // assert
+            actualUser.Should().NotBeNull();
+            actualUser.Should().BeEquivalentTo(originalUser,
+                options => options.Excluding(user => user.Id).Excluding(user => user.Password).Excluding(user => user.Claims));
+            actualUser.Id.Should().Be(originalUser.Id);
+            actualUser.Claims.Should().NotBeEmpty();
+            actualUser.Claims.Should().ContainKey("claim1");
+            actualUser.Claims.Should().ContainKey("claim2");
+        }
+
+        [Fact]
+        public async Task CannotAddUserClaimsWithInvalidClaimValues()
+        {
+            // arrange
+            var httpClient = new UsersHttpClient(this.Authority, this.Handler);
+            var model = new User
+            {
+                Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
+                Password = "password",
+                Email = "bit-bucket@test.smtp.org",
+                PhoneNumber = "123456789"
+            };
+
+            var user = await httpClient.AddUserAsync(model).ConfigureAwait(false);
+
+            // act
+            model.Claims = new Dictionary<string, object> { { string.Empty, null } };
+
+            Func<Task> func = async () =>
+                await httpClient
+                    .AddClaimsAsync(user.Username, new Dictionary<string, IEnumerable<object>> {{string.Empty, null}})
+                    .ConfigureAwait(false);
+
+            // assert
+            func.Should().Throw<HttpException>().And.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task CanRemoveUserClaim()
+        {
+            // arrange
+            var httpClient = new UsersHttpClient(this.Authority, this.Handler);
+            var model = new User
+            {
+                Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
+                Password = "password",
+                Email = "bit-bucket@test.smtp.org",
+                PhoneNumber = "123456789",
+                Claims = new Dictionary<string, object> {{"claim1", "1"}, {"claim2", "2"}}
+            };
+
+            var originalUser = await httpClient.AddUserAsync(model).ConfigureAwait(false);
+
+            // act
+            await httpClient.RemoveClaimsAsync(originalUser.Username,
+                new Dictionary<string, IEnumerable<object>> {{"claim1", new List<object> {"1"}}});
+
+            var actualUser = await httpClient.GetUserAsync(originalUser.Username);
+
+            // assert
+            actualUser.Should().NotBeNull();
+            actualUser.Should().BeEquivalentTo(originalUser,
+                options => options.Excluding(user => user.Id).Excluding(user => user.Password).Excluding(user => user.Claims));
+            actualUser.Id.Should().Be(originalUser.Id);
+            actualUser.Claims.Should().NotBeEmpty();
+            actualUser.Claims.Should().NotContainKey("claim1");
+            actualUser.Claims.Should().ContainKey("claim2");
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
+using Marten;
+
 #pragma warning disable CA1308
 
 namespace Ironclad.WebApi
@@ -12,16 +14,16 @@ namespace Ironclad.WebApi
     using System.Net;
     using System.Security.Claims;
     using System.Threading.Tasks;
+    using Application;
+    using Client;
+    using Configuration;
     using IdentityModel;
     using IdentityServer4.Extensions;
-    using Ironclad.Application;
-    using Ironclad.Client;
-    using Ironclad.Configuration;
-    using Ironclad.Services.Email;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
+    using Services.Email;
 
     [Authorize("user_admin")]
     [Route("api/[controller]")]
@@ -291,7 +293,7 @@ namespace Ironclad.WebApi
                 return this.BadRequest(new { Message = $"Cannot add claims without both a type and a value" });
             }
 
-            if (model.Claims?.Any(claim => new[] { "sub", "role", "preferred_username", "name", "email", "phone_number", "AspNet.Identity.SecurityStamp" }.Contains(claim.Key)) == true)
+            if (model.Claims?.Any(claim => ReservedClaims.Contains(claim.Key)) == true)
             {
                 return this.BadRequest(new { Message = $"Cannot change reserved claims values" });
             }
@@ -413,6 +415,197 @@ namespace Ironclad.WebApi
             }
 
             await this.userManager.DeleteAsync(user);
+
+            return this.NoContent();
+        }
+
+        [HttpGet("{username}/claims")]
+        public async Task<IActionResult> GetClaimsAsync(string username)
+        {
+            var user = await this.userManager.FindByNameAsync(username) ??
+                       await this.userManager.FindByIdAsync(username);
+
+            if (user == null)
+            {
+                return this.NotFound(new { Message = $"User '{username}' not found" });
+            }
+
+            var claimsPrincipal = await this.claimsFactory.CreateAsync(user);
+            var claims = new JwtSecurityToken(new JwtHeader(), new JwtPayload(claimsPrincipal.Claims)).Payload;
+
+            claims.Remove(AspNetIdentitySecurityStamp);
+            claims.Remove(JwtClaimTypes.Role);
+
+            return this.Ok(claims);
+        }
+
+        [HttpPost("{username}/claims")]
+        public async Task<IActionResult> AddClaimsAsync(
+            string username,
+            [FromBody] IDictionary<string, List<object>> claims)
+        {
+            if (claims.Keys.Any(string.IsNullOrWhiteSpace))
+            {
+                return this.BadRequest(new { Message = "Cannot add empty claim" });
+            }
+
+            if (claims.Values.Any(x => x == null || x.IsEmpty()))
+            {
+                return this.BadRequest(new { Message = "Cannot add empty claim value" });
+            }
+
+            var user = await this.userManager.FindByNameAsync(username) ??
+                       await this.userManager.FindByIdAsync(username);
+
+            if (user == null)
+            {
+                return this.NotFound(new { Message = $"User '{username}' not found" });
+            }
+
+            var claimsPrincipal = await this.claimsFactory.CreateAsync(user);
+
+            var filteredClaims = claims.Keys.Except(ReservedClaims)
+                .SelectMany(key => claims[key].Select(value => new Claim(key.ToLowerInvariant(), value.ToString())));
+
+            foreach (var claim in filteredClaims)
+            {
+                if (claimsPrincipal.HasClaim(claim.Type, claim.Value))
+                {
+                    continue;
+                }
+
+                var identityResult = await this.userManager.AddClaimAsync(user, claim);
+
+                if (!identityResult.Succeeded)
+                {
+                    return this.StatusCode(
+                        (int)HttpStatusCode.InternalServerError,
+                        new { Message = identityResult.ToString() });
+                }
+            }
+
+            return this.NoContent();
+        }
+
+        [HttpDelete("{username}/claims")]
+        public async Task<IActionResult> RemoveClaimsAsync(
+            string username,
+            [FromBody] IDictionary<string, List<object>> claims)
+        {
+            if (claims.Keys.Any(string.IsNullOrWhiteSpace))
+            {
+                return this.BadRequest(new { Message = "Cannot remove empty claim" });
+            }
+
+            if (claims.Values.Any(x => x == null || x.IsEmpty()))
+            {
+                return this.BadRequest(new { Message = "Cannot remove empty claim value" });
+            }
+
+            var user = await this.userManager.FindByNameAsync(username) ??
+                       await this.userManager.FindByIdAsync(username);
+
+            if (user == null)
+            {
+                return this.NotFound(new { Message = $"User '{username}' not found" });
+            }
+
+            var filteredClaims = claims.Keys.Except(ReservedClaims)
+                .SelectMany(key => claims[key].Select(value => new Claim(key.ToLowerInvariant(), value.ToString())));
+
+            var identityResult = await this.userManager.RemoveClaimsAsync(user, filteredClaims);
+
+            if (!identityResult.Succeeded)
+            {
+                return this.StatusCode(
+                    (int)HttpStatusCode.InternalServerError,
+                    new { Message = identityResult.ToString() });
+            }
+
+            return this.NoContent();
+        }
+
+        [HttpGet("{username}/roles")]
+        public async Task<IActionResult> GetRolesAsync(string username)
+        {
+            var user = await this.userManager.FindByNameAsync(username) ??
+                       await this.userManager.FindByIdAsync(username);
+
+            if (user == null)
+            {
+                return this.NotFound(new { Message = $"User '{username}' not found" });
+            }
+
+            var roles = await this.userManager.GetRolesAsync(user);
+
+            return this.Ok(roles);
+        }
+
+        [HttpPost("{username}/roles")]
+        public async Task<IActionResult> AddToRolesAsync(string username, [FromBody] List<string> roles)
+        {
+            if (roles.IsEmpty() || roles.Any(string.IsNullOrWhiteSpace))
+            {
+                return this.BadRequest(new { Message = "Cannot add user to empty role" });
+            }
+
+            foreach (var role in roles)
+            {
+                if (!await this.roleManager.RoleExistsAsync(role))
+                {
+                    return this.BadRequest(new { Message = $"The role {role} does not exist" });
+                }
+            }
+
+            var user = await this.userManager.FindByNameAsync(username) ??
+                       await this.userManager.FindByIdAsync(username);
+
+            if (user == null)
+            {
+                return this.NotFound(new { Message = $"User '{username}' not found" });
+            }
+
+            var identityResult = await this.userManager.AddToRolesAsync(user, roles);
+
+            if (!identityResult.Succeeded)
+            {
+                return this.StatusCode(
+                    (int)HttpStatusCode.InternalServerError,
+                    new { Message = identityResult.ToString() });
+            }
+
+            return this.NoContent();
+        }
+
+        [HttpDelete("{username}/roles")]
+        public async Task<IActionResult> RemoveFromRolesAsync(string username, [FromBody] List<string> roles)
+        {
+            if (roles.IsEmpty() || roles.Any(string.IsNullOrWhiteSpace))
+            {
+                return this.BadRequest(new { Message = "Cannot remove user from empty role" });
+            }
+
+            var user = await this.userManager.FindByNameAsync(username) ??
+                       await this.userManager.FindByIdAsync(username);
+
+            if (user == null)
+            {
+                return this.NotFound(new { Message = $"User '{username}' not found" });
+            }
+
+            if (user.Id == Config.DefaultAdminUserId && roles.Contains("admin"))
+            {
+                return this.BadRequest(new { Message = $"Cannot remove the role 'admin' from the default admin user" });
+            }
+
+            var identityResult = await this.userManager.RemoveFromRolesAsync(user, roles);
+
+            if (!identityResult.Succeeded)
+            {
+                return this.StatusCode(
+                    (int)HttpStatusCode.InternalServerError,
+                    new { Message = identityResult.ToString() });
+            }
 
             return this.NoContent();
         }

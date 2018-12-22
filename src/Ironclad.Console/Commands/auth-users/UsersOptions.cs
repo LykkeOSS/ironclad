@@ -3,7 +3,7 @@
 
 namespace Ironclad.Console.Commands
 {
-    using Ironclad.Client;
+    using Client;
     using McMaster.Extensions.CommandLineUtils;
 
     // NOTE (Cameron): This command is informational only and cannot be executed (only 'show help' works) so inheriting ICommand is unnecessary.
@@ -20,11 +20,11 @@ namespace Ironclad.Console.Commands
             app.Command("remove", command => RemoveCommand.Configure(command, options, GetRemoveCommandOptions()));
             app.Command("show", command => ShowCommand.Configure(command, options, GetShowCommandOptions()));
             app.Command("modify", command => ModifyUserCommand.Configure(command, options));
-            app.Command("roles", command => AssignUserRolesCommand.Configure(command, options));
-            app.Command("claims", command => AssignUserClaimsCommand.Configure(command, options));
+            app.Command("roles", command => ModifyUserRolesOptions.Configure(command, options));
+            app.Command("claims", command => ModifyUserClaimsOptions.Configure(command, options));
 
             // action (for this command)
-            app.OnExecute(() => app.ShowVersionAndHelp());
+            app.OnExecute(app.ShowVersionAndHelp);
         }
 
         private static RemoveCommandOptions GetRemoveCommandOptions() =>

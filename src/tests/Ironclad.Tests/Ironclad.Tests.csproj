@@ -22,11 +22,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Unit\" />
+    <AdditionalFiles Include="../../stylecop.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <AdditionalFiles Include="../../stylecop.json" />
+    <Folder Include="Unit\" />
   </ItemGroup>
 
   <ItemGroup>

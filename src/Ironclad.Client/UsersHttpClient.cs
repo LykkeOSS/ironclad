@@ -4,6 +4,8 @@
 namespace Ironclad.Client
 {
     using System;
+    using System.Collections.Generic;
+    using System.Globalization;
     using System.Net;
     using System.Net.Http;
     using System.Text;
@@ -17,6 +19,8 @@ namespace Ironclad.Client
     public sealed class UsersHttpClient : HttpClientBase, IUsersClient
     {
         private const string ApiPath = "/api/users";
+        private const string ApiClaimsPathFmt = "/api/users/{0}/claims";
+        private const string ApiRolesPathFmt = "/api/users/{0}/roles";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UsersHttpClient"/> class.
@@ -111,6 +115,72 @@ namespace Ironclad.Client
             var url = this.RelativeUrl($"{ApiPath}/{WebUtility.UrlEncode(currentUsername ?? NotNull(user?.Username, "user.Username"))}");
             await this.SendAsync<User>(HttpMethod.Put, url, user, cancellationToken).ConfigureAwait(false);
             return await this.GetUserAsync(user.Username, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public Task<IDictionary<string, object>> GetClaimsAsync(string username, CancellationToken cancellationToken = default)
+        {
+            var url = this.RelativeUrl(string.Format(
+                CultureInfo.InvariantCulture,
+                ApiClaimsPathFmt,
+                WebUtility.UrlEncode(NotNull(username, nameof(username)))));
+
+            return this.GetAsync<IDictionary<string, object>>(url, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task AddClaimsAsync(string username, IDictionary<string, IEnumerable<object>> claims, CancellationToken cancellationToken = default)
+        {
+            var url = this.RelativeUrl(string.Format(
+                CultureInfo.InvariantCulture,
+                ApiClaimsPathFmt,
+                WebUtility.UrlEncode(NotNull(username, nameof(username)))));
+
+            return this.SendAsync(HttpMethod.Post, url, claims, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task RemoveClaimsAsync(string username, IDictionary<string, IEnumerable<object>> claims, CancellationToken cancellationToken = default)
+        {
+            var url = this.RelativeUrl(string.Format(
+                CultureInfo.InvariantCulture,
+                ApiClaimsPathFmt,
+                WebUtility.UrlEncode(NotNull(username, nameof(username)))));
+
+            return this.SendAsync(HttpMethod.Delete, url, claims, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<IEnumerable<string>> GetRolesAsync(string username, CancellationToken cancellationToken = default)
+        {
+            var url = this.RelativeUrl(string.Format(
+                CultureInfo.InvariantCulture,
+                ApiRolesPathFmt,
+                WebUtility.UrlEncode(NotNull(username, nameof(username)))));
+
+            return this.GetAsync<IEnumerable<string>>(url, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task AddToRolesAsync(string username, IEnumerable<string> roles, CancellationToken cancellationToken = default)
+        {
+            var url = this.RelativeUrl(string.Format(
+                CultureInfo.InvariantCulture,
+                ApiRolesPathFmt,
+                WebUtility.UrlEncode(NotNull(username, nameof(username)))));
+
+            return this.SendAsync(HttpMethod.Post, url, roles, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task RemoveFromRolesAsync(string username, IEnumerable<string> roles, CancellationToken cancellationToken = default)
+        {
+            var url = this.RelativeUrl(string.Format(
+                CultureInfo.InvariantCulture,
+                ApiRolesPathFmt,
+                WebUtility.UrlEncode(NotNull(username, nameof(username)))));
+
+            return this.SendAsync(HttpMethod.Delete, url, roles, cancellationToken);
         }
 
 #pragma warning disable CA1812
