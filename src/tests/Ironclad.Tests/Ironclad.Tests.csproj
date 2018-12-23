@@ -22,14 +22,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Unit\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <AdditionalFiles Include="../../stylecop.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Ironclad.Console\Ironclad.Console.csproj" />
     <ProjectReference Include="..\Ironclad.Tests.Sdk\Ironclad.Tests.Sdk.csproj" />
   </ItemGroup>
 

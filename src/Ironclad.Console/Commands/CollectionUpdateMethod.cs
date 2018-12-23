@@ -6,7 +6,7 @@ namespace Ironclad.Console.Commands
     using System.Collections.Generic;
     using System.Linq;
 
-    internal class CollectionUpdateMethod<T>
+    public class CollectionUpdateMethod<T>
     {
         private bool addOption;
         private bool removeOption;
