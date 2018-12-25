@@ -13,10 +13,6 @@ namespace Ironclad.Console.Commands
         private string username;
         private List<string> roles;
 
-        private AddUserRolesCommand()
-        {
-        }
-
         public static void Configure(CommandLineApplication app, CommandLineOptions options)
         {
             // description
