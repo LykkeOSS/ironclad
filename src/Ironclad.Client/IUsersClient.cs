@@ -3,6 +3,7 @@
 
 namespace Ironclad.Client
 {
+    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -53,5 +54,23 @@ namespace Ironclad.Client
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The modified user.</returns>
         Task<User> ModifyUserAsync(User user, string currentUsername = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Adds new roles to the user roles list.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <param name="roles">The list of roles.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The modified user.</returns>
+        Task<User> AddRolesAsync(User user, IEnumerable<string> roles, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Removes roles from the user roles list
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <param name="roles">The list of roles.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The modified user.</returns>
+        Task<User> RemoveRolesAsync(User user, IEnumerable<string> roles, CancellationToken cancellationToken = default);
     }
 }

@@ -4,6 +4,8 @@
 namespace Ironclad.Client
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Text;
@@ -111,6 +113,34 @@ namespace Ironclad.Client
             var url = this.RelativeUrl($"{ApiPath}/{WebUtility.UrlEncode(currentUsername ?? NotNull(user?.Username, "user.Username"))}");
             await this.SendAsync<User>(HttpMethod.Put, url, user, cancellationToken).ConfigureAwait(false);
             return await this.GetUserAsync(user.Username, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public Task<User> AddRolesAsync(User user, IEnumerable<string> roles, CancellationToken cancellationToken = default)
+        {
+            return this.ModifyRolesAsync(user.Username, user.Roles.Union(roles).ToList(), cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<User> RemoveRolesAsync(User user, IEnumerable<string> roles, CancellationToken cancellationToken = default)
+        {
+            return this.ModifyRolesAsync(user.Username, user.Roles.Except(roles).ToList(), cancellationToken);
+        }
+
+        private async Task<User> ModifyRolesAsync(string username, ICollection<string> roles, CancellationToken cancellationToken = default)
+        {
+            var url = this.RelativeUrl($"{ApiPath}/{WebUtility.UrlEncode(NotNull(username, nameof(username)))}");
+
+            var update = new User
+            {
+                Username = username,
+                Roles = roles,
+                Claims = null
+            };
+
+            await this.SendAsync(HttpMethod.Put, url, update, cancellationToken).ConfigureAwait(false);
+
+            return await this.GetUserAsync(username, cancellationToken).ConfigureAwait(false);
         }
 
 #pragma warning disable CA1812
