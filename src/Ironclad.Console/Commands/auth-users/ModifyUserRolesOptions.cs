@@ -7,7 +7,7 @@ namespace Ironclad.Console.Commands
 
     internal static class ModifyUserRolesOptions
     {
-        public static void Configure(CommandLineApplication app, CommandLineOptions options, IConsole console)
+        public static void Configure(CommandLineApplication app, CommandLineOptions options)
         {
             // description
             app.Description = "Modify user roles";

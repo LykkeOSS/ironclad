@@ -65,12 +65,30 @@ namespace Ironclad.Client
         Task<User> AddRolesAsync(User user, IEnumerable<string> roles, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Removes roles from the user roles list
+        /// Removes roles from the user roles list.
         /// </summary>
         /// <param name="user">The user.</param>
         /// <param name="roles">The list of roles.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The modified user.</returns>
         Task<User> RemoveRolesAsync(User user, IEnumerable<string> roles, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Adds new or replaces existing claims in the user claims.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <param name="claims">The list of claims with values.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The modified user.</returns>
+        Task<User> AddClaimsAsync(User user, Dictionary<string, object> claims, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Removes claims from the user claims list.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <param name="claims">The list of claims.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The modified user.</returns>
+        Task<User> RemoveClaimsAsync(User user, IEnumerable<string> claims, CancellationToken cancellationToken = default);
     }
 }

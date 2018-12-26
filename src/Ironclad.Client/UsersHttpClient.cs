@@ -127,7 +127,53 @@ namespace Ironclad.Client
             return this.ModifyRolesAsync(user.Username, user.Roles.Except(roles).ToList(), cancellationToken);
         }
 
-        private async Task<User> ModifyRolesAsync(string username, ICollection<string> roles, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public async Task<User> AddClaimsAsync(
+            User user,
+            Dictionary<string, object> claims,
+            CancellationToken cancellationToken = default)
+        {
+            var newClaims = user.Claims.Keys.Union(claims.Keys)
+                .ToDictionary(key => key, key => claims.ContainsKey(key) ? claims[key] : user.Claims[key]);
+
+            return await this.ModifyClaimsAsync(user.Username, newClaims, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public async Task<User> RemoveClaimsAsync(
+            User user,
+            IEnumerable<string> claims,
+            CancellationToken cancellationToken = default)
+        {
+            var newClaims = user.Claims.Keys.Except(claims)
+                .ToDictionary(key => key, key => user.Claims[key]);
+
+            return await this.ModifyClaimsAsync(user.Username, newClaims, cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task<User> ModifyClaimsAsync(
+            string username,
+            IDictionary<string, object> claims,
+            CancellationToken cancellationToken = default)
+        {
+            var url = this.RelativeUrl($"{ApiPath}/{WebUtility.UrlEncode(NotNull(username, nameof(username)))}");
+
+            var update = new User
+            {
+                Username = username,
+                Roles = null,
+                Claims = claims
+            };
+
+            await this.SendAsync(HttpMethod.Put, url, update, cancellationToken).ConfigureAwait(false);
+
+            return await this.GetUserAsync(username, cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task<User> ModifyRolesAsync(
+            string username,
+            ICollection<string> roles,
+            CancellationToken cancellationToken = default)
         {
             var url = this.RelativeUrl($"{ApiPath}/{WebUtility.UrlEncode(NotNull(username, nameof(username)))}");
 
