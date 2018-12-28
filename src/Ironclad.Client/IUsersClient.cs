@@ -56,39 +56,55 @@ namespace Ironclad.Client
         Task<User> ModifyUserAsync(User user, string currentUsername = null, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Adds new roles to the user roles list.
+        /// Get user claims
         /// </summary>
-        /// <param name="user">The user.</param>
-        /// <param name="roles">The list of roles.</param>
+        /// <param name="username">The username.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The modified user.</returns>
-        Task<User> AddRolesAsync(User user, IEnumerable<string> roles, CancellationToken cancellationToken = default);
+        /// <returns>The list of claims.</returns>
+        Task<IDictionary<string, object>> GetClaimsAsync(string username, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Removes roles from the user roles list.
+        /// Adds new claims to the user claims list.
         /// </summary>
-        /// <param name="user">The user.</param>
-        /// <param name="roles">The list of roles.</param>
+        /// <param name="username">The username.</param>
+        /// <param name="claims">The list of claims to be added</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The modified user.</returns>
-        Task<User> RemoveRolesAsync(User user, IEnumerable<string> roles, CancellationToken cancellationToken = default);
+        /// <returns>A task object representing the asynchronous operation.</returns>
+        Task AddClaimsAsync(string username, IDictionary<string, IList<object>> claims, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Adds new or replaces existing claims in the user claims.
+        /// Remove claims from the user claims list.
         /// </summary>
-        /// <param name="user">The user.</param>
-        /// <param name="claims">The list of claims with values.</param>
+        /// <param name="username">The username.</param>
+        /// <param name="claims">The list of claims to be removed.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The modified user.</returns>
-        Task<User> AddClaimsAsync(User user, Dictionary<string, object> claims, CancellationToken cancellationToken = default);
+        /// <returns>A task object representing the asynchronous operation.</returns>
+        Task RemoveClaimsAsync(string username, IDictionary<string, IList<object>> claims, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Removes claims from the user claims list.
+        /// Get user roles list.
         /// </summary>
-        /// <param name="user">The user.</param>
-        /// <param name="claims">The list of claims.</param>
+        /// <param name="username">The username.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The modified user.</returns>
-        Task<User> RemoveClaimsAsync(User user, IEnumerable<string> claims, CancellationToken cancellationToken = default);
+        /// <returns>The list of roles.</returns>
+        Task<IEnumerable<string>> GetRolesAsync(string username, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Add user to roles.
+        /// </summary>
+        /// <param name="username">The username.</param>
+        /// <param name="roles">The roles list to add user to.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A task object representing the asynchronous operation.</returns>
+        Task AddToRolesAsync(string username, IEnumerable<string> roles, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Remove roles from user.
+        /// </summary>
+        /// <param name="username">The username.</param>
+        /// <param name="roles">The roles list to remove user from.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A task object representing the asynchronous operation.</returns>
+        Task RemoveFromRolesAsync(string username, IEnumerable<string> roles, CancellationToken cancellationToken = default);
     }
 }

@@ -1,14 +1,18 @@
-﻿namespace Ironclad.Console.Commands
+﻿// Copyright (c) Lykke Corp.
+// See the LICENSE file in the project root for more information.
+
+namespace Ironclad.Console.Commands
 {
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using McMaster.Extensions.CommandLineUtils;
+    using Sdk;
 
     internal class RemoveUserClaimsCommand : ICommand
     {
         private string username;
-        private List<string> claims;
+        private Dictionary<string, IList<object>> claims;
 
         public static void Configure(CommandLineApplication app, CommandLineOptions options)
         {
@@ -20,7 +24,7 @@
             var argumentUsername = app.Argument("username", "The username");
             var argumentClaims = app.Argument(
                 "claims",
-                "One or more claims to remove from the user's account",
+                "One or more claims to remove from the user's account (format: claim=value)",
                 true);
 
             app.OnExecute(() =>
@@ -31,16 +35,27 @@
                     return;
                 }
 
+                var argumentClaimsSplit = argumentClaims.Values
+                    .Select(x => x.ToKeyValuePair())
+                    .ToList();
+
+                if (argumentClaimsSplit.Any(x => string.IsNullOrWhiteSpace(x.Key) || x.Value == null))
+                {
+                    app.ShowHelp();
+                    return;
+                }
+
                 options.Command = new RemoveUserClaimsCommand
-                    { username = argumentUsername.Value, claims = argumentClaims.Values };
+                {
+                    username = argumentUsername.Value,
+                    claims = new Dictionary<string, IList<object>>(argumentClaimsSplit.ToClaims())
+                };
             });
         }
 
         public async Task ExecuteAsync(CommandContext context)
         {
-            var user = await context.UsersClient.GetUserAsync(this.username).ConfigureAwait(false);
-
-            await context.UsersClient.RemoveClaimsAsync(user, this.claims).ConfigureAwait(false);
+            await context.UsersClient.RemoveClaimsAsync(this.username, this.claims).ConfigureAwait(false);
         }
     }
 }

@@ -41,9 +41,7 @@ namespace Ironclad.Console.Commands
 
         public async Task ExecuteAsync(CommandContext context)
         {
-            var user = await context.UsersClient.GetUserAsync(this.username).ConfigureAwait(false);
-
-            await context.UsersClient.RemoveRolesAsync(user, this.roles).ConfigureAwait(false);
+            await context.UsersClient.RemoveFromRolesAsync(this.username, this.roles).ConfigureAwait(false);
         }
     }
 }

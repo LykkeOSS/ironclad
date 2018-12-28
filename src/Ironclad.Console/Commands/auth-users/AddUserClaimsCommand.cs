@@ -1,16 +1,18 @@
-﻿namespace Ironclad.Console.Commands
+﻿// Copyright (c) Lykke Corp.
+// See the LICENSE file in the project root for more information.
+
+namespace Ironclad.Console.Commands
 {
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using McMaster.Extensions.CommandLineUtils;
+    using Sdk;
 
     internal class AddUserClaimsCommand : ICommand
     {
-        private const char ClaimValueSeparator = '=';
-
         private string username;
-        private Dictionary<string, object> claims;
+        private Dictionary<string, IList<object>> claims;
 
         public static void Configure(CommandLineApplication app, CommandLineOptions options)
         {
@@ -33,10 +35,8 @@
                     return;
                 }
 
-                var argumentClaimsSplit = argumentClaims.Values.Select(x =>
-                    new KeyValuePair<string, object>(
-                        x.Split(ClaimValueSeparator).First(),
-                        x.Split(ClaimValueSeparator).Last()))
+                var argumentClaimsSplit = argumentClaims.Values
+                    .Select(x => x.ToKeyValuePair())
                     .ToList();
 
                 if (argumentClaimsSplit.Any(x => string.IsNullOrWhiteSpace(x.Key) || x.Value == null))
@@ -46,15 +46,16 @@
                 }
 
                 options.Command = new AddUserClaimsCommand
-                    { username = argumentUsername.Value, claims = new Dictionary<string, object>(argumentClaimsSplit) };
+                {
+                    username = argumentUsername.Value,
+                    claims = new Dictionary<string, IList<object>>(argumentClaimsSplit.ToClaims())
+                };
             });
         }
 
         public async Task ExecuteAsync(CommandContext context)
         {
-            var user = await context.UsersClient.GetUserAsync(this.username).ConfigureAwait(false);
-
-            await context.UsersClient.AddClaimsAsync(user, this.claims).ConfigureAwait(false);
+            await context.UsersClient.AddClaimsAsync(this.username, this.claims).ConfigureAwait(false);
         }
     }
 }
