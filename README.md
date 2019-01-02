@@ -2,6 +2,11 @@
 
 Secure ALL the things!
 
+| branch | build status |
+|---|---|
+| master |  [![Build Status](https://travis-ci.com/LykkeOSS/ironclad.svg?branch=master)](https://travis-ci.com/LykkeOSS/ironclad) |
+| dev | [![Build Status](https://travis-ci.com/LykkeOSS/ironclad.svg?branch=dev)](https://travis-ci.com/LykkeOSS/ironclad) |
+
 ### Prerequisites
 
 This project requires a running instance of [Postgres](https://www.postgresql.org/) and the connection string to be configured (see configuration section below).  
