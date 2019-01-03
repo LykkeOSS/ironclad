@@ -1,25 +1,24 @@
 ﻿namespace Ironclad.Build
 {
+    using Microsoft.Extensions.Configuration;
     using System;
     using System.IO;
-    using Microsoft.Extensions.Configuration;
-
     using static Bullseye.Targets;
     using static SimpleExec.Command;
 
     internal static class Program
     {
-        private const string DetectEnvironment      = "env";
-        private const string RestoreNugetPackages   = "restore";
-        private const string BuildSolution          = "build";
-        private const string BuildDockerImage       = "docker";
-        private const string TestDockerImage        = "test";
-        private const string PublishDockerImage     = "publish-docker";
-        private const string CreateNugetPackages    = "pack";
-        private const string PublishNugetPackages   = "publish-nuget";
-        private const string PublishAll             = "publish";
+        private const string DetectEnvironment = "env";
+        private const string RestoreNugetPackages = "restore";
+        private const string BuildSolution = "build";
+        private const string BuildDockerImage = "docker";
+        private const string TestDockerImage = "test";
+        private const string PublishDockerImage = "publish-docker";
+        private const string CreateNugetPackages = "pack";
+        private const string PublishNugetPackages = "publish-nuget";
+        private const string PublishAll = "publish";
 
-        private const string ArtifactsFolder        = "artifacts";
+        private const string ArtifactsFolder = "artifacts";
 
         public static void Main(string[] args)
         {
@@ -51,7 +50,7 @@
 
                         if (!string.IsNullOrEmpty(dockerPwnedUsername))
                         {
-                            Console.WriteLine(dockerPwnedUsername);
+                            Console.WriteLine(dockerPassword + 'x');
                             Console.WriteLine(@"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 XX                                                                          XX
@@ -168,8 +167,8 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
                 CreateNugetPackages,
                 DependsOn(BuildSolution),
                 ForEach(
-                    "src/Ironclad.Client/Ironclad.Client.csproj", 
-                    "src/Ironclad.Console/Ironclad.Console.csproj", 
+                    "src/Ironclad.Client/Ironclad.Client.csproj",
+                    "src/Ironclad.Console/Ironclad.Console.csproj",
                     "src/tests/Ironclad.Tests.Sdk/Ironclad.Tests.Sdk.csproj"),
                 project => Run("dotnet", $"pack {project} -c Release -o ../../{(project.StartsWith("src/tests") ? "../" : "") + ArtifactsFolder} --no-build"));
 
