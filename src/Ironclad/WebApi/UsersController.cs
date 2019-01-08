@@ -593,6 +593,11 @@ namespace Ironclad.WebApi
                 return this.NotFound(new { Message = $"User '{username}' not found" });
             }
 
+            if (user.Id == Config.DefaultAdminUserId && roles.Contains("admin"))
+            {
+                return this.BadRequest(new { Message = $"Cannot remove the role 'admin' from the default admin user" });
+            }
+
             var identityResult = await this.userManager.RemoveFromRolesAsync(user, roles);
 
             if (!identityResult.Succeeded)
