@@ -549,6 +549,14 @@ namespace Ironclad.WebApi
                 return this.BadRequest(new { Message = "Cannot add user to empty role" });
             }
 
+            foreach (var role in roles)
+            {
+                if (!await this.roleManager.RoleExistsAsync(role))
+                {
+                    return this.BadRequest(new { Message = $"The role {role} does not exist" });
+                }
+            }
+
             var user = await this.userManager.FindByNameAsync(username) ??
                        await this.userManager.FindByIdAsync(username);
 
