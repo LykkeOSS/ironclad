@@ -441,5 +441,34 @@ namespace Ironclad.Tests.Integration
             actualUser.Id.Should().Be(originalUser.Id);
             actualUser.Roles.Should().BeEmpty();
         }
+
+        [Fact]
+        public async Task CanAddUserToRoles()
+        {
+            // arrange
+            var httpClient = new UsersHttpClient(this.Authority, this.Handler);
+            var model = new User
+            {
+                Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
+                Password = "password",
+                Email = "bit-bucket@test.smtp.org",
+                PhoneNumber = "123456789"
+            };
+
+            var originalUser = await httpClient.AddUserAsync(model).ConfigureAwait(false);
+
+            // act
+            await httpClient.AddToRolesAsync(originalUser.Username, new[] {"admin"});
+
+            var actualUser = await httpClient.GetUserAsync(originalUser.Username);
+
+            // assert
+            actualUser.Should().NotBeNull();
+            actualUser.Should().BeEquivalentTo(originalUser,
+                options => options.Excluding(user => user.Id).Excluding(user => user.Password).Excluding(user => user.Roles));
+            actualUser.Id.Should().Be(originalUser.Id);
+            actualUser.Roles.Should().NotBeEmpty();
+            actualUser.Roles.Should().Contain("admin");
+        }
     }
 }
