@@ -70,7 +70,7 @@ namespace Ironclad.Client
         /// <param name="claims">The list of claims to be added</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task object representing the asynchronous operation.</returns>
-        Task AddClaimsAsync(string username, IDictionary<string, IList<object>> claims, CancellationToken cancellationToken = default);
+        Task AddClaimsAsync(string username, IDictionary<string, IEnumerable<object>> claims, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Remove claims from the user claims list.
@@ -79,7 +79,7 @@ namespace Ironclad.Client
         /// <param name="claims">The list of claims to be removed.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task object representing the asynchronous operation.</returns>
-        Task RemoveClaimsAsync(string username, IDictionary<string, IList<object>> claims, CancellationToken cancellationToken = default);
+        Task RemoveClaimsAsync(string username, IDictionary<string, IEnumerable<object>> claims, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get user roles list.

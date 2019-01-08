@@ -555,7 +555,7 @@ namespace Ironclad.Tests.Integration
 
             // act
             await httpClient.AddClaimsAsync(originalUser.Username,
-                new Dictionary<string, IList<object>>
+                new Dictionary<string, IEnumerable<object>>
                     {{"claim1", new object[] {"1", "2", "3"}}, {"claim2", new object[] {"21", "22", "23"}}});
 
             var actualUser = await httpClient.GetUserAsync(originalUser.Username);
@@ -590,7 +590,7 @@ namespace Ironclad.Tests.Integration
 
             Func<Task> func = async () =>
                 await httpClient
-                    .AddClaimsAsync(user.Username, new Dictionary<string, IList<object>> {{string.Empty, null}})
+                    .AddClaimsAsync(user.Username, new Dictionary<string, IEnumerable<object>> {{string.Empty, null}})
                     .ConfigureAwait(false);
 
             // assert
@@ -615,7 +615,7 @@ namespace Ironclad.Tests.Integration
 
             // act
             await httpClient.RemoveClaimsAsync(originalUser.Username,
-                new Dictionary<string, IList<object>> {{"claim1", new List<object> {"1"}}});
+                new Dictionary<string, IEnumerable<object>> {{"claim1", new List<object> {"1"}}});
 
             var actualUser = await httpClient.GetUserAsync(originalUser.Username);
 

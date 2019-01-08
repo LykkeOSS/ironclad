@@ -129,7 +129,7 @@ namespace Ironclad.Client
         }
 
         /// <inheritdoc />
-        public Task AddClaimsAsync(string username, IDictionary<string, IList<object>> claims, CancellationToken cancellationToken = default)
+        public Task AddClaimsAsync(string username, IDictionary<string, IEnumerable<object>> claims, CancellationToken cancellationToken = default)
         {
             var url = this.RelativeUrl(string.Format(
                 CultureInfo.InvariantCulture,
@@ -140,7 +140,7 @@ namespace Ironclad.Client
         }
 
         /// <inheritdoc />
-        public Task RemoveClaimsAsync(string username, IDictionary<string, IList<object>> claims, CancellationToken cancellationToken = default)
+        public Task RemoveClaimsAsync(string username, IDictionary<string, IEnumerable<object>> claims, CancellationToken cancellationToken = default)
         {
             var url = this.RelativeUrl(string.Format(
                 CultureInfo.InvariantCulture,

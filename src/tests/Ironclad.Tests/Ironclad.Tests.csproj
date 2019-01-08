@@ -26,7 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Ironclad.Console\Ironclad.Console.csproj" />
+    <Folder Include="Unit\" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Ironclad.Tests.Sdk\Ironclad.Tests.Sdk.csproj" />
   </ItemGroup>
 

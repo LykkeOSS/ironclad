@@ -16,14 +16,14 @@ namespace Ironclad.Console.Commands
         public static void Configure(CommandLineApplication app, CommandLineOptions options)
         {
             // description
-            app.Description = "Remove roles from user roles list";
+            app.Description = "Remove roles from the user";
             app.HelpOption();
 
             // arguments
             var argumentUsername = app.Argument("username", "The username");
             var argumentRoles = app.Argument(
                 "roles",
-                "One or more roles to remove from the user's account",
+                "One or more roles to remove from the user",
                 true);
 
             app.OnExecute(() =>

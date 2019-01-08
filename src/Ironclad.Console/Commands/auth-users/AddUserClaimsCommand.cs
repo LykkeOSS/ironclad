@@ -12,12 +12,12 @@ namespace Ironclad.Console.Commands
     internal class AddUserClaimsCommand : ICommand
     {
         private string username;
-        private Dictionary<string, IList<object>> claims;
+        private Dictionary<string, IEnumerable<object>> claims;
 
         public static void Configure(CommandLineApplication app, CommandLineOptions options)
         {
             // description
-            app.Description = "Add claims to user claims list";
+            app.Description = "Add claims to the user";
             app.HelpOption();
 
             // arguments
@@ -48,7 +48,7 @@ namespace Ironclad.Console.Commands
                 options.Command = new AddUserClaimsCommand
                 {
                     username = argumentUsername.Value,
-                    claims = new Dictionary<string, IList<object>>(argumentClaimsSplit.ToClaims())
+                    claims = new Dictionary<string, IEnumerable<object>>(argumentClaimsSplit.ToClaims())
                 };
             });
         }

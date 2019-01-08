@@ -7,7 +7,7 @@ namespace Ironclad.Console.Sdk
     using System.Collections.Generic;
     using System.Linq;
 
-    public static class ClaimsHelperExtensions
+    internal static class ClaimsHelperExtensions
     {
         private const char ClaimValueSeparator = '=';
 
@@ -25,12 +25,12 @@ namespace Ironclad.Console.Sdk
                 split.Last());
         }
 
-        public static IEnumerable<KeyValuePair<string, IList<object>>> ToClaims(
+        public static IEnumerable<KeyValuePair<string, IEnumerable<object>>> ToClaims(
             this IEnumerable<KeyValuePair<string, object>> src)
         {
             return src
                 .GroupBy(x => x.Key)
-                .Select(g => new KeyValuePair<string, IList<object>>(
+                .Select(g => new KeyValuePair<string, IEnumerable<object>>(
                     g.Key,
                     g.Select(x => x.Value).ToList()));
         }

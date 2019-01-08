@@ -12,19 +12,19 @@ namespace Ironclad.Console.Commands
     internal class RemoveUserClaimsCommand : ICommand
     {
         private string username;
-        private Dictionary<string, IList<object>> claims;
+        private Dictionary<string, IEnumerable<object>> claims;
 
         public static void Configure(CommandLineApplication app, CommandLineOptions options)
         {
             // description
-            app.Description = "Remove claims from user roles list";
+            app.Description = "Remove claims from the user";
             app.HelpOption();
 
             // arguments
             var argumentUsername = app.Argument("username", "The username");
             var argumentClaims = app.Argument(
                 "claims",
-                "One or more claims to remove from the user's account (format: claim=value)",
+                "One or more claims to remove from the user (format: claim=value)",
                 true);
 
             app.OnExecute(() =>
@@ -48,7 +48,7 @@ namespace Ironclad.Console.Commands
                 options.Command = new RemoveUserClaimsCommand
                 {
                     username = argumentUsername.Value,
-                    claims = new Dictionary<string, IList<object>>(argumentClaimsSplit.ToClaims())
+                    claims = new Dictionary<string, IEnumerable<object>>(argumentClaimsSplit.ToClaims())
                 };
             });
         }
