@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
+using Marten;
+
 #pragma warning disable CA1308
 
 namespace Ironclad.WebApi
@@ -442,6 +444,16 @@ namespace Ironclad.WebApi
             string username,
             [FromBody] IDictionary<string, List<object>> claims)
         {
+            if (claims.Keys.Any(string.IsNullOrWhiteSpace))
+            {
+                return this.BadRequest(new { Message = "Cannot add empty claim" });
+            }
+
+            if (claims.Values.Any(x => x == null || x.IsEmpty()))
+            {
+                return this.BadRequest(new { Message = "Cannot add empty claim value" });
+            }
+
             var user = await this.userManager.FindByNameAsync(username) ??
                        await this.userManager.FindByIdAsync(username);
 
@@ -480,6 +492,16 @@ namespace Ironclad.WebApi
             string username,
             [FromBody] IDictionary<string, List<object>> claims)
         {
+            if (claims.Keys.Any(string.IsNullOrWhiteSpace))
+            {
+                return this.BadRequest(new { Message = "Cannot remove empty claim" });
+            }
+
+            if (claims.Values.Any(x => x == null || x.IsEmpty()))
+            {
+                return this.BadRequest(new { Message = "Cannot remove empty claim value" });
+            }
+
             var user = await this.userManager.FindByNameAsync(username) ??
                        await this.userManager.FindByIdAsync(username);
 
@@ -522,6 +544,11 @@ namespace Ironclad.WebApi
         [HttpPost("{username}/roles")]
         public async Task<IActionResult> AddToRolesAsync(string username, [FromBody] List<string> roles)
         {
+            if (roles.IsEmpty() || roles.Any(string.IsNullOrWhiteSpace))
+            {
+                return this.BadRequest(new { Message = "Cannot add user to empty role" });
+            }
+
             var user = await this.userManager.FindByNameAsync(username) ??
                        await this.userManager.FindByIdAsync(username);
 
@@ -545,6 +572,11 @@ namespace Ironclad.WebApi
         [HttpDelete("{username}/roles")]
         public async Task<IActionResult> RemoveFromRolesAsync(string username, [FromBody] List<string> roles)
         {
+            if (roles.IsEmpty() || roles.Any(string.IsNullOrWhiteSpace))
+            {
+                return this.BadRequest(new { Message = "Cannot remove user from empty role" });
+            }
+
             var user = await this.userManager.FindByNameAsync(username) ??
                        await this.userManager.FindByIdAsync(username);
 
