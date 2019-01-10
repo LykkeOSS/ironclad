@@ -19,8 +19,8 @@ namespace Ironclad.Client
     public sealed class UsersHttpClient : HttpClientBase, IUsersClient
     {
         private const string ApiPath = "/api/users";
-        private const string ApiClaimsPathFmt = "/api/users/{0}/claims";
-        private const string ApiRolesPathFmt = "/api/users/{0}/roles";
+        private const string ApiClaimsPath = "/api/users/{0}/claims";
+        private const string ApiRolesPath = "/api/users/{0}/roles";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UsersHttpClient"/> class.
@@ -32,14 +32,7 @@ namespace Ironclad.Client
         {
         }
 
-        /// <summary>
-        /// Get the user summaries (or a subset thereof).
-        /// </summary>
-        /// <param name="startsWith">The start of the username.</param>
-        /// <param name="start">The zero-based start ordinal of the user set to return.</param>
-        /// <param name="size">The total size of the user set.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The user summaries.</returns>
+        /// <inheritdoc />
         public Task<ResourceSet<UserSummary>> GetUserSummariesAsync(
             string startsWith = default,
             int start = 0,
@@ -49,21 +42,11 @@ namespace Ironclad.Client
                 this.RelativeUrl($"{ApiPath}?username={WebUtility.UrlEncode(startsWith)}&skip={NotNegative(start, nameof(start))}&take={NotNegative(size, nameof(size))}"),
                 cancellationToken);
 
-        /// <summary>
-        /// Gets the user.
-        /// </summary>
-        /// <param name="username">The username.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The user.</returns>
+        /// <inheritdoc />
         public Task<User> GetUserAsync(string username, CancellationToken cancellationToken = default) =>
             this.GetAsync<User>(this.RelativeUrl($"{ApiPath}/{WebUtility.UrlEncode(NotNull(username, nameof(username)))}"), cancellationToken);
 
-        /// <summary>
-        /// Adds the specified user.
-        /// </summary>
-        /// <param name="user">The user.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The new user.</returns>
+        /// <inheritdoc />
         public async Task<User> AddUserAsync(User user, CancellationToken cancellationToken = default)
         {
             var registrationLink = default(string);
@@ -94,96 +77,87 @@ namespace Ironclad.Client
             return user;
         }
 
-        /// <summary>
-        /// Removes the specified user.
-        /// </summary>
-        /// <param name="username">The username.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A task object representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public Task RemoveUserAsync(string username, CancellationToken cancellationToken = default) =>
             this.DeleteAsync(this.RelativeUrl($"{ApiPath}/{WebUtility.UrlEncode(NotNull(username, nameof(username)))}"), cancellationToken);
 
-        /// <summary>
-        /// Modifies the specified user.
-        /// </summary>
-        /// <param name="user">The user.</param>
-        /// <param name="currentUsername">The current username (if different from the specified user username).</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The modified user.</returns>
+        /// <inheritdoc />
         public async Task<User> ModifyUserAsync(User user, string currentUsername = null, CancellationToken cancellationToken = default)
         {
             var url = this.RelativeUrl($"{ApiPath}/{WebUtility.UrlEncode(currentUsername ?? NotNull(user?.Username, "user.Username"))}");
-            await this.SendAsync<User>(HttpMethod.Put, url, user, cancellationToken).ConfigureAwait(false);
+            await this.SendAsync(HttpMethod.Put, url, user, cancellationToken).ConfigureAwait(false);
             return await this.GetUserAsync(user.Username, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public Task<IDictionary<string, object>> GetClaimsAsync(string username, CancellationToken cancellationToken = default)
-        {
-            var url = this.RelativeUrl(string.Format(
-                CultureInfo.InvariantCulture,
-                ApiClaimsPathFmt,
-                WebUtility.UrlEncode(NotNull(username, nameof(username)))));
-
-            return this.GetAsync<IDictionary<string, object>>(url, cancellationToken);
-        }
+        public Task<IDictionary<string, object>> GetClaimsAsync(string username, CancellationToken cancellationToken = default) =>
+            this.GetAsync<IDictionary<string, object>>(
+                this.RelativeUrl(string.Format(CultureInfo.InvariantCulture, ApiClaimsPath, WebUtility.UrlEncode(NotNull(username, nameof(username))))),
+                cancellationToken);
 
         /// <inheritdoc />
-        public Task AddClaimsAsync(string username, IDictionary<string, IEnumerable<object>> claims, CancellationToken cancellationToken = default)
-        {
-            var url = this.RelativeUrl(string.Format(
-                CultureInfo.InvariantCulture,
-                ApiClaimsPathFmt,
-                WebUtility.UrlEncode(NotNull(username, nameof(username)))));
-
-            return this.SendAsync(HttpMethod.Post, url, claims, cancellationToken);
-        }
+        public Task AddClaimsAsync(string username, IEnumerable<KeyValuePair<string, object>> claims, CancellationToken cancellationToken = default) =>
+            this.SendAsync(
+                HttpMethod.Post,
+                this.RelativeUrl(string.Format(CultureInfo.InvariantCulture, ApiClaimsPath, WebUtility.UrlEncode(NotNull(username, nameof(username))))),
+                Convert(claims),
+                cancellationToken);
 
         /// <inheritdoc />
-        public Task RemoveClaimsAsync(string username, IDictionary<string, IEnumerable<object>> claims, CancellationToken cancellationToken = default)
-        {
-            var url = this.RelativeUrl(string.Format(
-                CultureInfo.InvariantCulture,
-                ApiClaimsPathFmt,
-                WebUtility.UrlEncode(NotNull(username, nameof(username)))));
-
-            return this.SendAsync(HttpMethod.Delete, url, claims, cancellationToken);
-        }
+        public Task RemoveClaimsAsync(string username, IEnumerable<KeyValuePair<string, object>> claims, CancellationToken cancellationToken = default) =>
+            this.SendAsync(
+                HttpMethod.Delete,
+                this.RelativeUrl(string.Format(CultureInfo.InvariantCulture, ApiClaimsPath, WebUtility.UrlEncode(NotNull(username, nameof(username))))),
+                Convert(claims),
+                cancellationToken);
 
         /// <inheritdoc />
-        public Task<IEnumerable<string>> GetRolesAsync(string username, CancellationToken cancellationToken = default)
-        {
-            var url = this.RelativeUrl(string.Format(
-                CultureInfo.InvariantCulture,
-                ApiRolesPathFmt,
-                WebUtility.UrlEncode(NotNull(username, nameof(username)))));
-
-            return this.GetAsync<IEnumerable<string>>(url, cancellationToken);
-        }
+        public Task<IEnumerable<string>> GetRolesAsync(string username, CancellationToken cancellationToken = default) =>
+            this.GetAsync<IEnumerable<string>>(
+                this.RelativeUrl(string.Format(CultureInfo.InvariantCulture, ApiRolesPath, WebUtility.UrlEncode(NotNull(username, nameof(username))))), cancellationToken);
 
         /// <inheritdoc />
-        public Task AddToRolesAsync(string username, IEnumerable<string> roles, CancellationToken cancellationToken = default)
-        {
-            var url = this.RelativeUrl(string.Format(
-                CultureInfo.InvariantCulture,
-                ApiRolesPathFmt,
-                WebUtility.UrlEncode(NotNull(username, nameof(username)))));
-
-            return this.SendAsync(HttpMethod.Post, url, roles, cancellationToken);
-        }
+        public Task AddRolesAsync(string username, IEnumerable<string> roles, CancellationToken cancellationToken = default) =>
+            this.SendAsync(
+                HttpMethod.Post,
+                this.RelativeUrl(string.Format(CultureInfo.InvariantCulture, ApiRolesPath, WebUtility.UrlEncode(NotNull(username, nameof(username))))),
+                roles,
+                cancellationToken);
 
         /// <inheritdoc />
-        public Task RemoveFromRolesAsync(string username, IEnumerable<string> roles, CancellationToken cancellationToken = default)
-        {
-            var url = this.RelativeUrl(string.Format(
-                CultureInfo.InvariantCulture,
-                ApiRolesPathFmt,
-                WebUtility.UrlEncode(NotNull(username, nameof(username)))));
+        public Task RemoveRolesAsync(string username, IEnumerable<string> roles, CancellationToken cancellationToken = default) =>
+            this.SendAsync(
+                HttpMethod.Delete,
+                this.RelativeUrl(string.Format(CultureInfo.InvariantCulture, ApiRolesPath, WebUtility.UrlEncode(NotNull(username, nameof(username))))),
+                roles,
+                cancellationToken);
 
-            return this.SendAsync(HttpMethod.Delete, url, roles, cancellationToken);
+        private static IDictionary<string, object> Convert(IEnumerable<KeyValuePair<string, object>> claims)
+        {
+            var dictionary = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            foreach (var claim in claims)
+            {
+                if (dictionary.TryGetValue(claim.Key, out var value))
+                {
+                    if (value is List<object> list)
+                    {
+                        list.Add(claim.Value);
+                    }
+                    else
+                    {
+                        dictionary[claim.Key] = new List<object> { value, claim.Value };
+                    }
+                }
+                else
+                {
+                    dictionary.Add(claim.Key, claim.Value);
+                }
+            }
+
+            return dictionary;
         }
 
-#pragma warning disable CA1812
+        #pragma warning disable CA1812
         internal class UserResponse
         {
             public string RegistrationLink { get; set; }

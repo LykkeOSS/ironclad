@@ -7,12 +7,11 @@ namespace Ironclad.Console.Commands
     using System.Linq;
     using System.Threading.Tasks;
     using McMaster.Extensions.CommandLineUtils;
-    using Sdk;
 
     internal class AddUserClaimsCommand : ICommand
     {
         private string username;
-        private Dictionary<string, IEnumerable<object>> claims;
+        private List<KeyValuePair<string, object>> claims;
 
         public static void Configure(CommandLineApplication app, CommandLineOptions options)
         {
@@ -22,10 +21,7 @@ namespace Ironclad.Console.Commands
 
             // arguments
             var argumentUsername = app.Argument("username", "The username");
-            var argumentClaims = app.Argument(
-                "claims",
-                "One or more claims to assign to the user (format: claim=value)",
-                true);
+            var argumentClaims = app.Argument("claims", "One or more claims to assign to the user (format: claim=value)", true);
 
             app.OnExecute(() =>
             {
@@ -35,11 +31,8 @@ namespace Ironclad.Console.Commands
                     return;
                 }
 
-                var argumentClaimsSplit = argumentClaims.Values
-                    .Select(x => x.ToKeyValuePair())
-                    .ToList();
-
-                if (argumentClaimsSplit.Any(x => string.IsNullOrWhiteSpace(x.Key) || x.Value == null))
+                var claims = argumentClaims.Values.Select(value => new KeyValuePair<string, object>(value.Split('=').First(), value.Split('=').Last())).ToList();
+                if (claims.Any(kvp => string.IsNullOrWhiteSpace(kvp.Key) || kvp.Value == null))
                 {
                     app.ShowHelp();
                     return;
@@ -48,14 +41,11 @@ namespace Ironclad.Console.Commands
                 options.Command = new AddUserClaimsCommand
                 {
                     username = argumentUsername.Value,
-                    claims = new Dictionary<string, IEnumerable<object>>(argumentClaimsSplit.ToClaims())
+                    claims = claims,
                 };
             });
         }
 
-        public async Task ExecuteAsync(CommandContext context)
-        {
-            await context.UsersClient.AddClaimsAsync(this.username, this.claims).ConfigureAwait(false);
-        }
+        public async Task ExecuteAsync(CommandContext context) => await context.UsersClient.AddClaimsAsync(this.username, this.claims).ConfigureAwait(false);
     }
 }

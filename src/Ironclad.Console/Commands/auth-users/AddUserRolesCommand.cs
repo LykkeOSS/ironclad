@@ -21,10 +21,7 @@ namespace Ironclad.Console.Commands
 
             // arguments
             var argumentUsername = app.Argument("username", "The username");
-            var argumentRoles = app.Argument(
-                "roles",
-                "One or more roles to assign to the user",
-                true);
+            var argumentRoles = app.Argument("roles", "One or more roles to assign to the user", true);
 
             app.OnExecute(() =>
             {
@@ -34,14 +31,10 @@ namespace Ironclad.Console.Commands
                     return;
                 }
 
-                options.Command = new AddUserRolesCommand
-                    { username = argumentUsername.Value, roles = argumentRoles.Values };
+                options.Command = new AddUserRolesCommand { username = argumentUsername.Value, roles = argumentRoles.Values };
             });
         }
 
-        public async Task ExecuteAsync(CommandContext context)
-        {
-            await context.UsersClient.AddToRolesAsync(this.username, this.roles).ConfigureAwait(false);
-        }
+        public async Task ExecuteAsync(CommandContext context) => await context.UsersClient.AddRolesAsync(this.username, this.roles).ConfigureAwait(false);
     }
 }

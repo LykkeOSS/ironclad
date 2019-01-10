@@ -27,14 +27,7 @@ namespace Ironclad.Client
         {
         }
 
-        /// <summary>
-        /// Gets the roles (or a subset thereof).
-        /// </summary>
-        /// <param name="startsWith">The start of the role name.</param>
-        /// <param name="start">The zero-based start ordinal of the role set to return.</param>
-        /// <param name="size">The total size of the role set.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The roles.</returns>
+        /// <inheritdoc />
         public async Task<ResourceSet<string>> GetRolesAsync(string startsWith = default, int start = 0, int size = 20, CancellationToken cancellationToken = default)
         {
             var resourceSet = await this.GetAsync<ResourceSet<Role>>(
@@ -45,12 +38,7 @@ namespace Ironclad.Client
             return new ResourceSet<string>(resourceSet.Start, resourceSet.TotalSize, resourceSet.Select(role => role.Name));
         }
 
-        /// <summary>
-        /// Checks the role exists.
-        /// </summary>
-        /// <param name="role">The role.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Returns <c>true</c> if the role exists; otherwise, <c>false</c>.</returns>
+        /// <inheritdoc />
         public async Task<bool> RoleExistsAsync(string role, CancellationToken cancellationToken = default)
         {
             var url = this.RelativeUrl($"/api/roles/{WebUtility.UrlEncode(NotNull(role, nameof(role)))}");
@@ -75,21 +63,11 @@ namespace Ironclad.Client
             }
         }
 
-        /// <summary>
-        /// Adds the specified role.
-        /// </summary>
-        /// <param name="role">The role.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A task object representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public Task AddRoleAsync(string role, CancellationToken cancellationToken = default) =>
-            this.SendAsync<Role>(HttpMethod.Post, this.RelativeUrl(ApiPath), new Role { Name = NotNull(role, nameof(role)) }, cancellationToken);
+            this.SendAsync(HttpMethod.Post, this.RelativeUrl(ApiPath), new Role { Name = NotNull(role, nameof(role)) }, cancellationToken);
 
-        /// <summary>
-        /// Removes the specified role.
-        /// </summary>
-        /// <param name="role">The role.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A task object representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public Task RemoveRoleAsync(string role, CancellationToken cancellationToken = default) =>
             this.DeleteAsync(this.RelativeUrl($"{ApiPath}/{WebUtility.UrlEncode(NotNull(role, nameof(role)))}"), cancellationToken);
     }

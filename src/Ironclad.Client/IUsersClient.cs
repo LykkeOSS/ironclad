@@ -56,7 +56,7 @@ namespace Ironclad.Client
         Task<User> ModifyUserAsync(User user, string currentUsername = null, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Get user claims
+        /// Gets claims for the specified user.
         /// </summary>
         /// <param name="username">The username.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
@@ -64,25 +64,25 @@ namespace Ironclad.Client
         Task<IDictionary<string, object>> GetClaimsAsync(string username, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Adds new claims to the user claims list.
+        /// Adds claims to the specified user.
         /// </summary>
         /// <param name="username">The username.</param>
-        /// <param name="claims">The list of claims to be added</param>
+        /// <param name="claims">The list of claims to be added.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task object representing the asynchronous operation.</returns>
-        Task AddClaimsAsync(string username, IDictionary<string, IEnumerable<object>> claims, CancellationToken cancellationToken = default);
+        Task AddClaimsAsync(string username, IEnumerable<KeyValuePair<string, object>> claims, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Remove claims from the user claims list.
+        /// Removes claims from the specified user.
         /// </summary>
         /// <param name="username">The username.</param>
         /// <param name="claims">The list of claims to be removed.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task object representing the asynchronous operation.</returns>
-        Task RemoveClaimsAsync(string username, IDictionary<string, IEnumerable<object>> claims, CancellationToken cancellationToken = default);
+        Task RemoveClaimsAsync(string username, IEnumerable<KeyValuePair<string, object>> claims, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Get user roles list.
+        /// Gets roles for the specified user.
         /// </summary>
         /// <param name="username">The username.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
@@ -90,21 +90,21 @@ namespace Ironclad.Client
         Task<IEnumerable<string>> GetRolesAsync(string username, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Add user to roles.
+        /// Add roles to the specified user.
         /// </summary>
         /// <param name="username">The username.</param>
-        /// <param name="roles">The roles list to add user to.</param>
+        /// <param name="roles">The list of roles to be added.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task object representing the asynchronous operation.</returns>
-        Task AddToRolesAsync(string username, IEnumerable<string> roles, CancellationToken cancellationToken = default);
+        Task AddRolesAsync(string username, IEnumerable<string> roles, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Remove roles from user.
+        /// Removes roles from the specified user.
         /// </summary>
         /// <param name="username">The username.</param>
-        /// <param name="roles">The roles list to remove user from.</param>
+        /// <param name="roles">The list of roles to be removed.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task object representing the asynchronous operation.</returns>
-        Task RemoveFromRolesAsync(string username, IEnumerable<string> roles, CancellationToken cancellationToken = default);
+        Task RemoveRolesAsync(string username, IEnumerable<string> roles, CancellationToken cancellationToken = default);
     }
 }

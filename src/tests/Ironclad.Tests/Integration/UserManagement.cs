@@ -458,7 +458,7 @@ namespace Ironclad.Tests.Integration
             var originalUser = await httpClient.AddUserAsync(model).ConfigureAwait(false);
 
             // act
-            await httpClient.AddToRolesAsync(originalUser.Username, new[] {"admin"});
+            await httpClient.AddRolesAsync(originalUser.Username, new[] {"admin"});
 
             var actualUser = await httpClient.GetUserAsync(originalUser.Username);
 
@@ -488,7 +488,7 @@ namespace Ironclad.Tests.Integration
             var originalUser = await httpClient.AddUserAsync(model).ConfigureAwait(false);
 
             // act
-            Func<Task> func = async () => await httpClient.AddToRolesAsync(originalUser.Username, new[] { "lambo_owner" }).ConfigureAwait(false);
+            Func<Task> func = async () => await httpClient.AddRolesAsync(originalUser.Username, new[] { "lambo_owner" }).ConfigureAwait(false);
 
             // assert
             func.Should().Throw<HttpException>().And.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -511,7 +511,7 @@ namespace Ironclad.Tests.Integration
             var originalUser = await httpClient.AddUserAsync(model).ConfigureAwait(false);
 
             // act
-            await httpClient.RemoveFromRolesAsync(originalUser.Username, new[] {"admin"});
+            await httpClient.RemoveRolesAsync(originalUser.Username, new[] {"admin"});
 
             var actualUser = await httpClient.GetUserAsync(originalUser.Username).ConfigureAwait(false);
 
@@ -532,7 +532,7 @@ namespace Ironclad.Tests.Integration
 
             // act
             Func<Task> func = async () =>
-                await httpClient.RemoveFromRolesAsync("admin", new[] {"admin"}).ConfigureAwait(false);
+                await httpClient.RemoveRolesAsync("admin", new[] {"admin"}).ConfigureAwait(false);
 
             // assert
             func.Should().Throw<HttpException>().And.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -555,15 +555,17 @@ namespace Ironclad.Tests.Integration
 
             // act
             await httpClient.AddClaimsAsync(originalUser.Username,
-                new Dictionary<string, IEnumerable<object>>
-                    {{"claim1", new object[] {"1", "2", "3"}}, {"claim2", new object[] {"21", "22", "23"}}});
+                new Dictionary<string, object>
+                {
+                    { "claim1", new object[] {"1", "2", "3"} },
+                    { "claim2", new object[] {"21", "22", "23"} }
+                });
 
             var actualUser = await httpClient.GetUserAsync(originalUser.Username);
 
             // assert
             actualUser.Should().NotBeNull();
-            actualUser.Should().BeEquivalentTo(originalUser,
-                options => options.Excluding(user => user.Id).Excluding(user => user.Password).Excluding(user => user.Claims));
+            actualUser.Should().BeEquivalentTo(originalUser, options => options.Excluding(user => user.Id).Excluding(user => user.Password).Excluding(user => user.Claims));
             actualUser.Id.Should().Be(originalUser.Id);
             actualUser.Claims.Should().NotBeEmpty();
             actualUser.Claims.Should().ContainKey("claim1");
@@ -590,7 +592,7 @@ namespace Ironclad.Tests.Integration
 
             Func<Task> func = async () =>
                 await httpClient
-                    .AddClaimsAsync(user.Username, new Dictionary<string, IEnumerable<object>> {{string.Empty, null}})
+                    .AddClaimsAsync(user.Username, new Dictionary<string, object> { {string.Empty, null} })
                     .ConfigureAwait(false);
 
             // assert
@@ -608,21 +610,19 @@ namespace Ironclad.Tests.Integration
                 Password = "password",
                 Email = "bit-bucket@test.smtp.org",
                 PhoneNumber = "123456789",
-                Claims = new Dictionary<string, object> {{"claim1", "1"}, {"claim2", "2"}}
+                Claims = new Dictionary<string, object> { {"claim1", "1"}, {"claim2", "2"} }
             };
 
             var originalUser = await httpClient.AddUserAsync(model).ConfigureAwait(false);
 
             // act
-            await httpClient.RemoveClaimsAsync(originalUser.Username,
-                new Dictionary<string, IEnumerable<object>> {{"claim1", new List<object> {"1"}}});
+            await httpClient.RemoveClaimsAsync(originalUser.Username, new Dictionary<string, object> { {"claim1", new List<object> {"1"} } });
 
             var actualUser = await httpClient.GetUserAsync(originalUser.Username);
 
             // assert
             actualUser.Should().NotBeNull();
-            actualUser.Should().BeEquivalentTo(originalUser,
-                options => options.Excluding(user => user.Id).Excluding(user => user.Password).Excluding(user => user.Claims));
+            actualUser.Should().BeEquivalentTo(originalUser, options => options.Excluding(user => user.Id).Excluding(user => user.Password).Excluding(user => user.Claims));
             actualUser.Id.Should().Be(originalUser.Id);
             actualUser.Claims.Should().NotBeEmpty();
             actualUser.Claims.Should().NotContainKey("claim1");

@@ -20,8 +20,8 @@ namespace Ironclad.Console.Commands
             app.Command("remove", command => RemoveCommand.Configure(command, options, GetRemoveCommandOptions()));
             app.Command("show", command => ShowCommand.Configure(command, options, GetShowCommandOptions()));
             app.Command("modify", command => ModifyUserCommand.Configure(command, options));
-            app.Command("roles", command => ModifyUserRolesOptions.Configure(command, options));
-            app.Command("claims", command => ModifyUserClaimsOptions.Configure(command, options));
+            app.Command("roles", command => RolesOptions(command, options));
+            app.Command("claims", command => ClaimsOptions(command, options));
 
             // action (for this command)
             app.OnExecute(app.ShowVersionAndHelp);
@@ -51,5 +51,31 @@ namespace Ironclad.Console.Commands
                         ("email", user => user.Email),
                         ("sub", user => user.Id)),
             };
+
+        private static void RolesOptions(CommandLineApplication app, CommandLineOptions options)
+        {
+            // description
+            app.Description = "Modify user roles";
+            app.HelpOption();
+
+            // commands
+            app.Command("add", command => AddUserRolesCommand.Configure(command, options));
+            app.Command("remove", command => RemoveUserRolesCommand.Configure(command, options));
+
+            app.OnExecute(app.ShowVersionAndHelp);
+        }
+
+        private static void ClaimsOptions(CommandLineApplication app, CommandLineOptions options)
+        {
+            // description
+            app.Description = "Modify user claims";
+            app.HelpOption();
+
+            // commands
+            app.Command("add", command => AddUserClaimsCommand.Configure(command, options));
+            app.Command("remove", command => RemoveUserClaimsCommand.Configure(command, options));
+
+            app.OnExecute(app.ShowVersionAndHelp);
+        }
     }
 }
