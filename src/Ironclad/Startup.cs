@@ -38,19 +38,19 @@ namespace Ironclad
         {
             this.logger = logger;
             this.loggerFactory = loggerFactory;
-            settings = configuration.Get<Settings>(options => options.BindNonPublicProperties = true);
-            websiteSettings = configuration.GetSection("website").Get<WebsiteSettings>(options => options.BindNonPublicProperties = true) ?? new WebsiteSettings();
-            settings.Validate();
+            this.settings = configuration.Get<Settings>(options => options.BindNonPublicProperties = true);
+            this.websiteSettings = configuration.GetSection("website").Get<WebsiteSettings>(options => options.BindNonPublicProperties = true) ?? new WebsiteSettings();
+            this.settings.Validate();
 
             // HACK (Cameron): Should not be necessary. But is. Needs refactoring.
-            websiteSettings.RestrictedDomains = settings.Idp?.RestrictedDomains ?? Array.Empty<string>();
+            this.websiteSettings.RestrictedDomains = this.settings.Idp?.RestrictedDomains ?? Array.Empty<string>();
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton(websiteSettings);
+            services.AddSingleton(this.websiteSettings);
 
-            services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(settings.Server.Database));
+            services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(this.settings.Server.Database));
 
             services.AddIdentity<ApplicationUser, IdentityRole>(
                 options =>
@@ -77,9 +77,9 @@ namespace Ironclad
                         options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                     });
 
-            services.AddIdentityServer(options => options.IssuerUri = settings.Server.IssuerUri)
-                .AddSigningCredentialFromSettings(settings, loggerFactory)
-                .AddConfigurationStore(settings.Server.Database)
+            services.AddIdentityServer(options => options.IssuerUri = this.settings.Server.IssuerUri)
+                .AddSigningCredentialFromSettings(this.settings, this.loggerFactory)
+                .AddConfigurationStore(this.settings.Server.Database)
                 .AddOperationalStore()
                 .AddAppAuthRedirectUriValidator()
                 .AddAspNetIdentity<ApplicationUser>();
@@ -89,55 +89,55 @@ namespace Ironclad
                     "token",
                     options =>
                     {
-                        options.Authority = settings.Api.Authority;
-                        options.Audience = settings.Api.Audience;
+                        options.Authority = this.settings.Api.Authority;
+                        options.Audience = this.settings.Api.Audience;
                         options.RequireHttpsMetadata = false;
                     },
                     options =>
                     {
-                        options.Authority = settings.Api.Authority;
-                        options.ClientId = settings.Api.ClientId;
-                        options.ClientSecret = settings.Api.Secret;
+                        options.Authority = this.settings.Api.Authority;
+                        options.ClientId = this.settings.Api.ClientId;
+                        options.ClientSecret = this.settings.Api.Secret;
                         options.DiscoveryPolicy = new DiscoveryPolicy { ValidateIssuerName = false };
                         options.EnableCaching = true;
                         options.CacheDuration = new TimeSpan(0, 1, 0);
                     })
                 .AddExternalIdentityProviders();
 
-            if (settings.Idp?.Google.IsValid() == true)
+            if (this.settings.Idp?.Google.IsValid() == true)
             {
-                logger.LogInformation("Configuring Google identity provider");
+                this.logger.LogInformation("Configuring Google identity provider");
                 authenticationServices.AddGoogle(
                     options =>
                     {
-                        options.ClientId = settings.Idp.Google.ClientId;
-                        options.ClientSecret = settings.Idp.Google.Secret;
+                        options.ClientId = this.settings.Idp.Google.ClientId;
+                        options.ClientSecret = this.settings.Idp.Google.Secret;
                     });
             }
 
             // TODO (Cameron): This is a bit messy. I think ultimately this should be configurable inside the application itself.
-            if (settings.Mail?.IsValid() == true)
+            if (this.settings.Mail?.IsValid() == true)
             {
                 services.AddSingleton<IEmailSender>(
                     new EmailSender(
-                        settings.Mail.Sender,
-                        settings.Mail.Host,
-                        settings.Mail.Port,
-                        settings.Mail.EnableSsl,
-                        settings.Mail.Username,
-                        settings.Mail.Password));
+                        this.settings.Mail.Sender,
+                        this.settings.Mail.Host,
+                        this.settings.Mail.Port,
+                        this.settings.Mail.EnableSsl,
+                        this.settings.Mail.Username,
+                        this.settings.Mail.Password));
             }
             else
             {
-                logger.LogWarning("No credentials specified for SMTP. Email will be disabled.");
+                this.logger.LogWarning("No credentials specified for SMTP. Email will be disabled.");
                 services.AddSingleton<IEmailSender>(new NullEmailSender());
             }
 
-            if (settings.Server?.DataProtection?.IsValid() == true)
+            if (this.settings.Server?.DataProtection?.IsValid() == true)
             {
                 services.AddDataProtection()
-                    .PersistKeysToAzureBlobStorage(new Uri(settings.Server.DataProtection.KeyfileUri))
-                    .ProtectKeysWithAzureKeyVault(settings.Azure.KeyVault.Client, settings.Server.DataProtection.KeyId);
+                    .PersistKeysToAzureBlobStorage(new Uri(this.settings.Server.DataProtection.KeyfileUri))
+                    .ProtectKeysWithAzureKeyVault(this.settings.Azure.KeyVault.Client, this.settings.Server.DataProtection.KeyId);
             }
 
             services.AddSingleton<IAuthorizationHandler, ScopeHandler>();
@@ -159,7 +159,7 @@ namespace Ironclad
                 app.UseDatabaseErrorPage();
             }
 
-            if (settings.Server.RespectXForwardedForHeaders)
+            if (this.settings.Server.RespectXForwardedForHeaders)
             {
                 var forwardedHeadersOptions = new ForwardedHeadersOptions
                 {
@@ -182,7 +182,7 @@ namespace Ironclad
             app.UseStaticFiles();
             app.UseIdentityServer();
             app.UseMvcWithDefaultRoute();
-            app.InitializeDatabase().SeedDatabase(settings.Api.Secret);
+            app.InitializeDatabase().SeedDatabase(this.settings.Api.Secret);
         }
     }
 }
