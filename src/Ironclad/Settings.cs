@@ -14,6 +14,7 @@ namespace Ironclad
     using System.Text;
     using Microsoft.Azure.KeyVault;
     using Microsoft.Azure.Services.AppAuthentication;
+    using Microsoft.Extensions.Configuration;
 
     // TODO (Cameron): This class is a huge mess - for many reasons. Something needs to be done...
     public sealed class Settings
@@ -89,6 +90,63 @@ namespace Ironclad
                     $@"Validation of configuration settings failed.{builder.ToString()}
 Please see https://gist.github.com/cameronfletcher/58673a468c8ebbbf91b81e706063ba56 for more information.");
             }
+        }
+
+        // NOTE (Cameron): OMG, Azure Key Vault!
+        public Settings Fix(IConfiguration configuration)
+        {
+            var apiClientId = configuration["api:client-id"];
+            if (!string.IsNullOrEmpty(apiClientId))
+            {
+                this.Api.client_id = apiClientId;
+            }
+
+            var idpGoogleClientId = configuration["idp:google:client-id"];
+            if (!string.IsNullOrEmpty(idpGoogleClientId))
+            {
+                if (this.Idp == null)
+                {
+                    this.Idp = new IdpSettings { Google = new IdpSettings.GoogleSettings() };
+                }
+                else if (this.Idp.Google == null)
+                {
+                    this.Idp.Google = new IdpSettings.GoogleSettings();
+                }
+
+                this.Idp.Google.client_id = idpGoogleClientId;
+            }
+
+            var serverDataProtectionKeyId = configuration["server:data-protection:key-id"];
+            if (!string.IsNullOrEmpty(serverDataProtectionKeyId))
+            {
+                if (this.Server == null)
+                {
+                    this.Server = new ServerSettings { data_protection = new ServerSettings.DataProtectionSettings() };
+                }
+                else if (this.Server.DataProtection == null)
+                {
+                    this.Server.data_protection = new ServerSettings.DataProtectionSettings();
+                }
+
+                this.Server.DataProtection.key_id = serverDataProtectionKeyId;
+            }
+
+            var serverDataProtectionKeyfileUri = configuration["server:data-protection:keyfile-uri"];
+            if (!string.IsNullOrEmpty(serverDataProtectionKeyfileUri))
+            {
+                if (this.Server == null)
+                {
+                    this.Server = new ServerSettings { data_protection = new ServerSettings.DataProtectionSettings() };
+                }
+                else if (this.Server.DataProtection == null)
+                {
+                    this.Server.data_protection = new ServerSettings.DataProtectionSettings();
+                }
+
+                this.Server.DataProtection.keyfile_uri = serverDataProtectionKeyfileUri;
+            }
+
+            return this;
         }
 
         public sealed class ServerSettings
@@ -188,7 +246,7 @@ Please see https://gist.github.com/cameronfletcher/58673a468c8ebbbf91b81e706063b
 
             public string Secret { get; set; }
 
-            private string client_id { get; set; }
+            internal string client_id { get; set; }
 
             public bool IsValid() => !this.GetValidationErrors().Any();
 
@@ -230,7 +288,7 @@ Please see https://gist.github.com/cameronfletcher/58673a468c8ebbbf91b81e706063b
 
                 public string Secret { get; set; }
 
-                private string client_id { get; set; }
+                internal string client_id { get; set; }
 
                 public bool IsValid() => !this.GetValidationErrors().Any();
 
