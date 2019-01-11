@@ -44,13 +44,9 @@ Please see https://gist.github.com/cameronfletcher/58673a468c8ebbbf91b81e706063b
             return builder.AddAzureKeyVault(settings.Endpoint, settings.Client, new UnderscoreKeyVaultSecretManager());
         }
 
-        internal class UnderscoreKeyVaultSecretManager : IKeyVaultSecretManager
+        private class UnderscoreKeyVaultSecretManager : IKeyVaultSecretManager
         {
-            public bool Load(SecretItem secret)
-            {
-                // Load all
-                return true;
-            }
+            public bool Load(SecretItem secret) => true;
 
             public string GetKey(SecretBundle secret)
             {
