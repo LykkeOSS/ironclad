@@ -4,14 +4,13 @@
 namespace Ironclad
 {
     using System;
+    using System.Linq;
+    using Application;
+    using Authorization;
+    using Data;
     using IdentityModel.Client;
     using IdentityServer4.AccessTokenValidation;
     using IdentityServer4.Postgresql.Extensions;
-    using Ironclad.Application;
-    using Ironclad.Authorization;
-    using Ironclad.Data;
-    using Ironclad.Models;
-    using Ironclad.Services.Email;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.DataProtection;
@@ -22,9 +21,11 @@ namespace Ironclad
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+    using Models;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
     using Newtonsoft.Json.Serialization;
+    using Services.Email;
 
     public class Startup
     {
@@ -37,21 +38,19 @@ namespace Ironclad
         {
             this.logger = logger;
             this.loggerFactory = loggerFactory;
-            this.settings = configuration.Get<Settings>(options => options.BindNonPublicProperties = true);
-            this.websiteSettings = configuration.GetSection("website").Get<WebsiteSettings>(options => options.BindNonPublicProperties = true) ?? new WebsiteSettings();
-            this.settings.Validate();
+            settings = configuration.Get<Settings>(options => options.BindNonPublicProperties = true);
+            websiteSettings = configuration.GetSection("website").Get<WebsiteSettings>(options => options.BindNonPublicProperties = true) ?? new WebsiteSettings();
+            settings.Validate();
 
             // HACK (Cameron): Should not be necessary. But is. Needs refactoring.
-            this.websiteSettings.RestrictedDomains = this.settings.Idp?.RestrictedDomains ?? Array.Empty<string>();
+            websiteSettings.RestrictedDomains = settings.Idp?.RestrictedDomains ?? Array.Empty<string>();
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var migrationsAssembly = typeof(Startup).GetType().Assembly.GetName().Name;
+            services.AddSingleton(websiteSettings);
 
-            services.AddSingleton(this.websiteSettings);
-
-            services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(this.settings.Server.Database));
+            services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(settings.Server.Database));
 
             services.AddIdentity<ApplicationUser, IdentityRole>(
                 options =>
@@ -78,9 +77,9 @@ namespace Ironclad
                         options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                     });
 
-            services.AddIdentityServer(options => options.IssuerUri = this.settings.Server.IssuerUri)
-                .AddSigningCredentialFromSettings(this.settings, this.loggerFactory)
-                .AddConfigurationStore(this.settings.Server.Database)
+            services.AddIdentityServer(options => options.IssuerUri = settings.Server.IssuerUri)
+                .AddSigningCredentialFromSettings(settings, loggerFactory)
+                .AddConfigurationStore(settings.Server.Database)
                 .AddOperationalStore()
                 .AddAppAuthRedirectUriValidator()
                 .AddAspNetIdentity<ApplicationUser>();
@@ -90,55 +89,55 @@ namespace Ironclad
                     "token",
                     options =>
                     {
-                        options.Authority = this.settings.Api.Authority;
-                        options.Audience = this.settings.Api.Audience;
+                        options.Authority = settings.Api.Authority;
+                        options.Audience = settings.Api.Audience;
                         options.RequireHttpsMetadata = false;
                     },
                     options =>
                     {
-                        options.Authority = this.settings.Api.Authority;
-                        options.ClientId = this.settings.Api.ClientId;
-                        options.ClientSecret = this.settings.Api.Secret;
+                        options.Authority = settings.Api.Authority;
+                        options.ClientId = settings.Api.ClientId;
+                        options.ClientSecret = settings.Api.Secret;
                         options.DiscoveryPolicy = new DiscoveryPolicy { ValidateIssuerName = false };
                         options.EnableCaching = true;
                         options.CacheDuration = new TimeSpan(0, 1, 0);
                     })
                 .AddExternalIdentityProviders();
 
-            if (this.settings.Idp?.Google.IsValid() == true)
+            if (settings.Idp?.Google.IsValid() == true)
             {
-                this.logger.LogInformation("Configuring Google identity provider");
+                logger.LogInformation("Configuring Google identity provider");
                 authenticationServices.AddGoogle(
                     options =>
                     {
-                        options.ClientId = this.settings.Idp.Google.ClientId;
-                        options.ClientSecret = this.settings.Idp.Google.Secret;
+                        options.ClientId = settings.Idp.Google.ClientId;
+                        options.ClientSecret = settings.Idp.Google.Secret;
                     });
             }
 
             // TODO (Cameron): This is a bit messy. I think ultimately this should be configurable inside the application itself.
-            if (this.settings.Mail?.IsValid() == true)
+            if (settings.Mail?.IsValid() == true)
             {
                 services.AddSingleton<IEmailSender>(
                     new EmailSender(
-                        this.settings.Mail.Sender,
-                        this.settings.Mail.Host,
-                        this.settings.Mail.Port,
-                        this.settings.Mail.EnableSsl,
-                        this.settings.Mail.Username,
-                        this.settings.Mail.Password));
+                        settings.Mail.Sender,
+                        settings.Mail.Host,
+                        settings.Mail.Port,
+                        settings.Mail.EnableSsl,
+                        settings.Mail.Username,
+                        settings.Mail.Password));
             }
             else
             {
-                this.logger.LogWarning("No credentials specified for SMTP. Email will be disabled.");
+                logger.LogWarning("No credentials specified for SMTP. Email will be disabled.");
                 services.AddSingleton<IEmailSender>(new NullEmailSender());
             }
 
-            if (this.settings.Server?.DataProtection?.IsValid() == true)
+            if (settings.Server?.DataProtection?.IsValid() == true)
             {
                 services.AddDataProtection()
-                    .PersistKeysToAzureBlobStorage(new Uri(this.settings.Server.DataProtection.KeyfileUri))
-                    .ProtectKeysWithAzureKeyVault(this.settings.Azure.KeyVault.Client, this.settings.Server.DataProtection.KeyId);
+                    .PersistKeysToAzureBlobStorage(new Uri(settings.Server.DataProtection.KeyfileUri))
+                    .ProtectKeysWithAzureKeyVault(settings.Azure.KeyVault.Client, settings.Server.DataProtection.KeyId);
             }
 
             services.AddSingleton<IAuthorizationHandler, ScopeHandler>();
@@ -160,16 +159,30 @@ namespace Ironclad
                 app.UseDatabaseErrorPage();
             }
 
-            if (this.settings.Server.RespectXForwardedForHeaders)
+            if (settings.Server.RespectXForwardedForHeaders)
             {
-                var options = new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto };
-                app.UseForwardedHeaders(options);
+                var forwardedHeadersOptions = new ForwardedHeadersOptions
+                {
+                    ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto
+                };
+
+                app.UseForwardedHeaders(forwardedHeadersOptions);
+
+                app.Use((context, next) =>
+                {
+                    if (context.Request.Headers.TryGetValue("X-Forwarded-PathBase", out var pathBases))
+                    {
+                        context.Request.PathBase = pathBases.First();
+                    }
+
+                    return next();
+                });
             }
 
             app.UseStaticFiles();
             app.UseIdentityServer();
             app.UseMvcWithDefaultRoute();
-            app.InitializeDatabase().SeedDatabase(this.settings.Api.Secret);
+            app.InitializeDatabase().SeedDatabase(settings.Api.Secret);
         }
     }
 }
