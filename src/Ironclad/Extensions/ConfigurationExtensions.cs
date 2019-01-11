@@ -7,6 +7,7 @@ namespace Ironclad.Extensions
     using System.Globalization;
     using System.Linq;
     using System.Text;
+    using Microsoft.Azure.KeyVault.Models;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Configuration.AzureKeyVault;
 
@@ -40,7 +41,27 @@ namespace Ironclad.Extensions
 Please see https://gist.github.com/cameronfletcher/58673a468c8ebbbf91b81e706063ba56 for more information.");
             }
 
-            return builder.AddAzureKeyVault(settings.Endpoint, settings.Client, new DefaultKeyVaultSecretManager());
+            return builder.AddAzureKeyVault(settings.Endpoint, settings.Client, new UnderscoreKeyVaultSecretManager());
+        }
+
+        internal class UnderscoreKeyVaultSecretManager : IKeyVaultSecretManager
+        {
+            public bool Load(SecretItem secret)
+            {
+                // Load all
+                return true;
+            }
+
+            public string GetKey(SecretBundle secret)
+            {
+                // Replace one dash in any name with an underscore and replace two
+                // dashes in any name with the KeyDelimiter, which is the
+                // delimiter used in configuration (usually a colon). Azure
+                // Key Vault doesn't allow a colon in secret names or an underscore.
+                return secret.SecretIdentifier.Name
+                    .Replace("--", ConfigurationPath.KeyDelimiter, StringComparison.OrdinalIgnoreCase)
+                    .Replace("-", "_", StringComparison.OrdinalIgnoreCase);
+            }
         }
     }
 }
