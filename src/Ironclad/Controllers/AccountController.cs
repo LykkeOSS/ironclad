@@ -1,4 +1,4 @@
-﻿// Copyright (c) Lykke Corp.
+// Copyright (c) Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
 #pragma warning disable CA1054
@@ -57,6 +57,7 @@ namespace Ironclad.Controllers
         [TempData]
         public string ErrorMessage { get; set; }
 
+        [Route("/signin")]
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl = null)
@@ -78,6 +79,7 @@ namespace Ironclad.Controllers
             return this.View();
         }
 
+        [Route("/signin")]
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -113,6 +115,7 @@ namespace Ironclad.Controllers
             }
         }
 
+        [Route("/signin/2fa")]
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> LoginWith2fa(bool rememberMe, string returnUrl = null)
@@ -129,6 +132,7 @@ namespace Ironclad.Controllers
             return this.View(new LoginWith2faModel { RememberMe = rememberMe });
         }
 
+        [Route("/signin/2fa")]
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -168,6 +172,7 @@ namespace Ironclad.Controllers
             }
         }
 
+        [Route("/signin/recover")]
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> LoginWithRecoveryCode(string returnUrl = null)
@@ -184,6 +189,7 @@ namespace Ironclad.Controllers
             return this.View();
         }
 
+        [Route("/signin/recover")]
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -223,14 +229,17 @@ namespace Ironclad.Controllers
             }
         }
 
+        [Route("/signin/locked")]
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Lockout() => this.View();
 
+        [Route("/signin/error")]
         [HttpGet]
         [AllowAnonymous]
         public IActionResult LoginError() => this.View();
 
+        [Route("/signup")]
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Register(string returnUrl = null)
@@ -239,6 +248,7 @@ namespace Ironclad.Controllers
             return this.View();
         }
 
+        [Route("/signup")]
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -271,6 +281,7 @@ namespace Ironclad.Controllers
             return this.View(model);
         }
 
+        [Route("/signout")]
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Logout(string logoutId)
@@ -286,6 +297,7 @@ namespace Ironclad.Controllers
             return this.View(model);
         }
 
+        [Route("/signout")]
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -301,7 +313,7 @@ namespace Ironclad.Controllers
             {
                 // build a return URL so the upstream provider will redirect back to us after the user has logged out
                 // this allows us to then complete our single sign-out processing
-                string url = this.Url.Action("Logout", new { logoutId = model.LogoutId });
+                string url = this.Url.Action(nameof(this.Logout), new { logoutId = model.LogoutId });
 
                 // this triggers a redirect to the external provider for sign-out hack try/catch to handle social providers that throw
                 return this.SignOut(new AuthenticationProperties { RedirectUri = url }, model.ExternalAuthenticationScheme);
@@ -310,6 +322,7 @@ namespace Ironclad.Controllers
             return this.View("LoggedOut", model);
         }
 
+        [Route("/signin/external")]
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -321,6 +334,7 @@ namespace Ironclad.Controllers
             return this.Challenge(properties, provider);
         }
 
+        [Route("/signin/external/callback")]
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
@@ -414,6 +428,7 @@ namespace Ironclad.Controllers
             return this.View(nameof(this.ExternalLogin), new ExternalLoginModel { Email = email });
         }
 
+        [Route("/signin/external/callback")]
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -436,7 +451,7 @@ namespace Ironclad.Controllers
                     result = await this.userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
                     {
-                        await this.signInManager.SignInAsync(user, isPersistent: false);
+                        await this.signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
                         this.logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
                         return this.RedirectToLocal(returnUrl);
                     }
@@ -450,6 +465,7 @@ namespace Ironclad.Controllers
             return this.View(nameof(this.ExternalLogin), model);
         }
 
+        [Route("/settings/profile/email/confirm")]
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string userId, string code)
@@ -469,10 +485,12 @@ namespace Ironclad.Controllers
             return this.View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
+        [Route("/signin/forgotpassword")]
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ForgotPassword() => this.View();
 
+        [Route("/signin/forgotpassword")]
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -497,10 +515,12 @@ namespace Ironclad.Controllers
             return this.RedirectToAction(nameof(this.ForgotPasswordConfirmation));
         }
 
+        [Route("/signin/forgotpassword/complete")]
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ForgotPasswordConfirmation() => this.View();
 
+        [Route("/signin/resetpassword")]
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ResetPassword(string userId, string code)
@@ -514,6 +534,7 @@ namespace Ironclad.Controllers
             return this.View(model);
         }
 
+        [Route("/signin/resetpassword")]
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -544,10 +565,12 @@ namespace Ironclad.Controllers
             return this.View(model);
         }
 
+        [Route("/signin/resetpassword/complete")]
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ResetPasswordConfirmation() => this.View();
 
+        [Route("/signup/register")]
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> CompleteRegistration(string userId, string code)
@@ -575,6 +598,7 @@ namespace Ironclad.Controllers
             return this.View(model);
         }
 
+        [Route("/signup/register")]
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -623,10 +647,12 @@ namespace Ironclad.Controllers
             return this.RedirectToAction(nameof(this.CompleteRegistrationConfirmation));
         }
 
+        [Route("/signup/register/complete")]
         [HttpGet]
         [AllowAnonymous]
         public IActionResult CompleteRegistrationConfirmation() => this.View();
 
+        [Route("/signin/denied")]
         [HttpGet]
         public IActionResult AccessDenied() => this.View();
 

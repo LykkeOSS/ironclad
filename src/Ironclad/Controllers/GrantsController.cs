@@ -1,4 +1,4 @@
-﻿// Copyright (c) Lykke Corp.
+// Copyright (c) Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
 namespace Ironclad.Controllers
@@ -27,9 +27,11 @@ namespace Ironclad.Controllers
             this.resources = resources;
         }
 
+        [Route("/settings/applications")]
         [HttpGet]
         public async Task<IActionResult> Index() => this.View("Index", await this.BuildViewModelAsync());
 
+        [Route("/settings/applications/revoke")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Revoke(string clientId)

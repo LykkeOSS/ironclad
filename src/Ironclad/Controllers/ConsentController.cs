@@ -34,6 +34,7 @@ namespace Ironclad.Controllers
             this.logger = logger;
         }
 
+        [Route("/settings/applications/consent")]
         [HttpGet]
         public async Task<IActionResult> Index(string returnUrl)
         {
@@ -46,6 +47,7 @@ namespace Ironclad.Controllers
             return this.View("Error");
         }
 
+        [Route("/settings/applications/consent")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(ConsentInputModel model)

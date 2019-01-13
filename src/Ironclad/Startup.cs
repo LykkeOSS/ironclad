@@ -11,12 +11,14 @@ namespace Ironclad
     using IdentityModel.Client;
     using IdentityServer4.AccessTokenValidation;
     using IdentityServer4.Postgresql.Extensions;
+    using Ironclad.Sdk;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.DataProtection;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.HttpOverrides;
     using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -68,7 +70,7 @@ namespace Ironclad
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.AddMvc()
+            services.AddMvc(options => options.ValueProviderFactories.Add(new SnakeCaseQueryValueProviderFactory()))
                 .AddJsonOptions(
                     options =>
                     {
@@ -77,7 +79,22 @@ namespace Ironclad
                         options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                     });
 
-            services.AddIdentityServer(options => options.IssuerUri = this.settings.Server.IssuerUri)
+            services.AddSingleton<IUrlHelperFactory, SnakeCaseUrlHelperFactory>();
+
+            services.AddIdentityServer(
+                options =>
+                {
+                    options.IssuerUri = this.settings.Server.IssuerUri;
+                    options.UserInteraction.LoginUrl = "/signin";
+                    options.UserInteraction.LoginReturnUrlParameter = "return_url";
+                    options.UserInteraction.LogoutUrl = "/signout";
+                    options.UserInteraction.LogoutIdParameter = "logout_id";
+                    options.UserInteraction.ConsentUrl = "/settings/applications/consent";
+                    options.UserInteraction.ConsentReturnUrlParameter = "return_url";
+                    options.UserInteraction.CustomRedirectReturnUrlParameter = "return_url";
+                    options.UserInteraction.ErrorUrl = "/signin/error";
+                    options.UserInteraction.ErrorIdParameter = "error_id";
+                })
                 .AddSigningCredentialFromSettings(this.settings, this.loggerFactory)
                 .AddConfigurationStore(this.settings.Server.Database)
                 .AddOperationalStore()

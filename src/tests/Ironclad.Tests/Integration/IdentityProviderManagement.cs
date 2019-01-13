@@ -1,4 +1,4 @@
-﻿// Copyright (c) Lykke Corp.
+// Copyright (c) Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
 namespace Ironclad.Tests.Feature
@@ -219,7 +219,7 @@ namespace Ironclad.Tests.Feature
 
             var automation = new BrowserAutomation(null, null);
             var browser = new Browser(automation);
-            var url = this.Authority + "/account/login";
+            var url = this.Authority + "/signin";
 
             // act
             await automation.NavigateToLoginAsync(url).ConfigureAwait(false);

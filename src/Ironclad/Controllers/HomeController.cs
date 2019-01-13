@@ -1,4 +1,4 @@
-﻿// Copyright (c) Lykke Corp.
+// Copyright (c) Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
 namespace Ironclad.Controllers
@@ -32,6 +32,7 @@ namespace Ironclad.Controllers
 
         public IActionResult About() => this.View();
 
+        [Route("/signin/error")]
         public async Task<IActionResult> Error(string errorId)
         {
             var model = new ErrorModel();

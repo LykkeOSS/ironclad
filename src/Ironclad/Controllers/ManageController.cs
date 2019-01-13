@@ -1,4 +1,4 @@
-﻿// Copyright (c) Lykke Corp.
+// Copyright (c) Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
 namespace Ironclad.Controllers
@@ -48,6 +48,7 @@ namespace Ironclad.Controllers
         [TempData]
         public string StatusMessage { get; set; }
 
+        [Route("/settings/profile")]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -69,6 +70,7 @@ namespace Ironclad.Controllers
             return this.View(model);
         }
 
+        [Route("/settings/profile")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(IndexModel model)
@@ -119,6 +121,7 @@ namespace Ironclad.Controllers
             return this.RedirectToAction(nameof(this.Index));
         }
 
+        [Route("/settings/profile/email/verify")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SendVerificationEmail(IndexModel model)
@@ -143,6 +146,7 @@ namespace Ironclad.Controllers
             return this.RedirectToAction(nameof(this.Index));
         }
 
+        [Route("/settings/changepassword")]
         [HttpGet]
         public async Task<IActionResult> ChangePassword()
         {
@@ -162,6 +166,7 @@ namespace Ironclad.Controllers
             return this.View(model);
         }
 
+        [Route("/settings/changepassword")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
@@ -191,6 +196,7 @@ namespace Ironclad.Controllers
             return this.RedirectToAction(nameof(this.ChangePassword));
         }
 
+        [Route("/settings/setpassword")]
         [HttpGet]
         public async Task<IActionResult> SetPassword()
         {
@@ -211,6 +217,7 @@ namespace Ironclad.Controllers
             return this.View(model);
         }
 
+        [Route("/settings/setpassword")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetPassword(SetPasswordModel model)
@@ -239,6 +246,7 @@ namespace Ironclad.Controllers
             return this.RedirectToAction(nameof(this.SetPassword));
         }
 
+        [Route("/settings/logins")]
         [HttpGet]
         public async Task<IActionResult> ExternalLogins()
         {
@@ -258,6 +266,7 @@ namespace Ironclad.Controllers
             return this.View(model);
         }
 
+        [Route("/settings/logins/link")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LinkLogin(string provider)
@@ -271,6 +280,7 @@ namespace Ironclad.Controllers
             return new ChallengeResult(provider, properties);
         }
 
+        [Route("/settings/logins/link")]
         [HttpGet]
         public async Task<IActionResult> LinkLoginCallback()
         {
@@ -299,6 +309,7 @@ namespace Ironclad.Controllers
             return this.RedirectToAction(nameof(this.ExternalLogins));
         }
 
+        [Route("/settings/logins/remove")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveLogin(RemoveLoginModel model)
@@ -320,6 +331,7 @@ namespace Ironclad.Controllers
             return this.RedirectToAction(nameof(this.ExternalLogins));
         }
 
+        [Route("/settings/2fa")]
         [HttpGet]
         public async Task<IActionResult> TwoFactorAuthentication()
         {
@@ -339,6 +351,7 @@ namespace Ironclad.Controllers
             return this.View(model);
         }
 
+        [Route("/settings/2fa/disable")]
         [HttpGet]
         public async Task<IActionResult> Disable2faWarning()
         {
@@ -356,6 +369,7 @@ namespace Ironclad.Controllers
             return this.View(nameof(this.Disable2fa));
         }
 
+        [Route("/settings/2fa/disable")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Disable2fa()
@@ -376,6 +390,7 @@ namespace Ironclad.Controllers
             return this.RedirectToAction(nameof(this.TwoFactorAuthentication));
         }
 
+        [Route("/settings/2fa/enable")]
         [HttpGet]
         public async Task<IActionResult> EnableAuthenticator()
         {
@@ -401,6 +416,7 @@ namespace Ironclad.Controllers
             return this.View(model);
         }
 
+        [Route("/settings/2fa/enable")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EnableAuthenticator(EnableAuthenticatorModel model)
@@ -433,9 +449,11 @@ namespace Ironclad.Controllers
             return this.RedirectToAction(nameof(this.GenerateRecoveryCodes));
         }
 
+        [Route("/settings/2fa/reset")]
         [HttpGet]
         public IActionResult ResetAuthenticatorWarning() => this.View(nameof(this.ResetAuthenticator));
 
+        [Route("/settings/2fa/reset")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResetAuthenticator()
@@ -448,11 +466,13 @@ namespace Ironclad.Controllers
 
             await this.userManager.SetTwoFactorEnabledAsync(user, false);
             await this.userManager.ResetAuthenticatorKeyAsync(user);
+
             this.logger.LogInformation("this.User with id '{UserId}' has reset their authentication app key.", user.Id);
 
             return this.RedirectToAction(nameof(this.EnableAuthenticator));
         }
 
+        [Route("/settings/2fa/recoverycodes")]
         [HttpGet]
         public async Task<IActionResult> GenerateRecoveryCodes()
         {
@@ -507,7 +527,7 @@ namespace Ironclad.Controllers
             string.Format(
                 CultureInfo.InvariantCulture,
                 AuthenicatorUriFormat,
-                this.urlEncoder.Encode("Lykke Cloud"),
+                this.urlEncoder.Encode("Ironclad"),
                 this.urlEncoder.Encode(username),
                 unformattedKey);
     }
