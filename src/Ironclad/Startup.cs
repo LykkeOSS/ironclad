@@ -5,16 +5,19 @@ namespace Ironclad
 {
     using System;
     using System.Linq;
+    using System.Net;
     using Application;
     using Authorization;
     using Data;
     using IdentityModel.Client;
     using IdentityServer4.AccessTokenValidation;
     using IdentityServer4.Postgresql.Extensions;
+    using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.DataProtection;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.HttpOverrides;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
@@ -178,6 +181,43 @@ namespace Ironclad
                     return next();
                 });
             }
+
+            app.Use(async (ctx, next) =>
+            {
+                var schemeProvider = ctx.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
+                var handlerProvider = ctx.RequestServices.GetRequiredService<IAuthenticationHandlerProvider>();
+                foreach (var scheme in await schemeProvider.GetRequestHandlerSchemesAsync())
+                {
+                    if (await handlerProvider.GetHandlerAsync(ctx, scheme.Name) is IAuthenticationRequestHandler handler &&
+                        await handler.HandleRequestAsync())
+                    {
+                        string location = null;
+                        if (ctx.Response.StatusCode == (int)HttpStatusCode.Redirect)
+                        {
+                            location = ctx.Response.Headers["location"];
+                        }
+                        else if (ctx.Request.Method == "GET" && !ctx.Request.Query["skip"].Any())
+                        {
+                            location = ctx.Request.Path + ctx.Request.QueryString + "&skip=1";
+                        }
+
+                        if (location != null)
+                        {
+                            ctx.Response.StatusCode = (int)HttpStatusCode.OK;
+
+                            var html = $@"
+                                <html><head>
+                                    <meta http-equiv='refresh' content='0;url={location}' />
+                                </head></html>";
+                            await ctx.Response.WriteAsync(html);
+                        }
+
+                        return;
+                    }
+                }
+
+                await next();
+            });
 
             app.UseStaticFiles();
             app.UseIdentityServer();
