@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
+using Ironclad.Sdk;
+
 namespace Ironclad
 {
     using System;
@@ -170,55 +172,10 @@ namespace Ironclad
                 };
 
                 app.UseForwardedHeaders(forwardedHeadersOptions);
-
-                app.Use((context, next) =>
-                {
-                    if (context.Request.Headers.TryGetValue("X-Forwarded-PathBase", out var pathBases))
-                    {
-                        context.Request.PathBase = pathBases.First();
-                    }
-
-                    return next();
-                });
+                app.UseMiddleware<PathBaseHeaderMiddleware>();
             }
 
-            app.Use(async (ctx, next) =>
-            {
-                var schemeProvider = ctx.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
-                var handlerProvider = ctx.RequestServices.GetRequiredService<IAuthenticationHandlerProvider>();
-                foreach (var scheme in await schemeProvider.GetRequestHandlerSchemesAsync())
-                {
-                    if (await handlerProvider.GetHandlerAsync(ctx, scheme.Name) is IAuthenticationRequestHandler handler &&
-                        await handler.HandleRequestAsync())
-                    {
-                        string location = null;
-                        if (ctx.Response.StatusCode == (int)HttpStatusCode.Redirect)
-                        {
-                            location = ctx.Response.Headers["location"];
-                        }
-                        else if (ctx.Request.Method == "GET" && !ctx.Request.Query["skip"].Any())
-                        {
-                            location = ctx.Request.Path + ctx.Request.QueryString + "&skip=1";
-                        }
-
-                        if (location != null)
-                        {
-                            ctx.Response.StatusCode = (int)HttpStatusCode.OK;
-
-                            var html = $@"
-                                <html><head>
-                                    <meta http-equiv='refresh' content='0;url={location}' />
-                                </head></html>";
-                            await ctx.Response.WriteAsync(html);
-                        }
-
-                        return;
-                    }
-                }
-
-                await next();
-            });
-
+            app.UseMiddleware<AuthCookieMiddleware>();
             app.UseStaticFiles();
             app.UseIdentityServer();
             app.UseMvcWithDefaultRoute();
