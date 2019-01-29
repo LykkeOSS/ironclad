@@ -76,6 +76,7 @@ namespace Ironclad.Configuration
 
                     AllowedGrantTypes = GrantTypes.HybridAndClientCredentials,
                     ClientSecrets = { new Secret("secret".Sha256()) },
+                    LogoUri = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNVmKVcOIDLIeHBTd49h9ssgWP9GqEPH66YK8HxYZ75-EaN7Kx",
 
                     RedirectUris = { "http://localhost:5009/signin-oidc" },
                     PostLogoutRedirectUris = { "http://localhost:5009/signout-callback-oidc" },
