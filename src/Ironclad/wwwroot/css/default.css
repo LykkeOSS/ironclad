@@ -8686,7 +8686,12 @@ h3 {
 }
 .manage-nav .manage-nav-header .user-display-name {
   font-weight: 600;
-  font-size: 20px;
+  font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
 }
 .manage-nav .nav {
   width: calc(100% + 1px);
@@ -8694,6 +8699,28 @@ h3 {
 .manage-nav .nav .nav-link {
   border-top: 1px solid #dee2e6;
   border-radius: 0;
+}
+
+header .main-navigation {
+  width: calc(100% - 65px);
+}
+@media (min-width: 540px) {
+  header .main-navigation {
+    width: auto;
+  }
+}
+header .main-navigation .profile-link {
+  max-width: calc(100% - 150px);
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+@media (min-width: 720px) {
+  header .main-navigation .profile-link {
+    max-width: calc(100% - 90px);
+  }
 }
 
 .navbar-header {
