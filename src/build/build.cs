@@ -155,8 +155,8 @@
                     }
 
                     Run("docker", $"login {dockerRegistry} -u {dockerUsername} -p {dockerPassword}");
-                    Run("docker", $"tag ironclad-poc:latest {dockerRegistry}/ironclad-poc:{dockerTag}");
-                    Run("docker", $"push {dockerRegistry}/ironclad-poc:{dockerTag}");
+                    Run("docker", $"tag ironclad:latest {dockerRegistry}/ironclad-custom:{dockerTag}");
+                    Run("docker", $"push {dockerRegistry}/ironclad-custom:{dockerTag}");
                 });
 
             Target(
