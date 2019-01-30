@@ -22,6 +22,8 @@ namespace Ironclad
 
         public ApiSettings Api { get; set; }
 
+        public WebsiteSettings Website { get; set; }
+
         public IdpSettings Idp { get; set; }
 
         public MailSettings Mail { get; set; }
@@ -219,6 +221,20 @@ Please see https://gist.github.com/cameronfletcher/58673a468c8ebbbf91b81e706063b
                 {
                     yield return $"'{{0}}:{nameof(this.Secret).ToLowerInvariant()}' is null or empty.";
                 }
+            }
+        }
+
+        public sealed class WebsiteSettings
+        {
+            public string PathBase { get; set; }
+
+            public bool IsValid() => !this.GetValidationErrors().Any();
+
+            public IEnumerable<string> GetValidationErrors()
+            {
+                // Note (Pawel) if you add validation here, please make sure to make this config section mandatory
+                // (for now it is optional)
+                return Array.Empty<string>();
             }
         }
 

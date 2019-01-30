@@ -196,6 +196,12 @@ namespace Ironclad
             }
 
             app.UseMiddleware<AuthCookieMiddleware>();
+
+            if (!string.IsNullOrEmpty(this.settings.Website?.PathBase))
+            {
+                app.UsePathBase(this.settings.Website.PathBase);
+            }
+
             app.UseStaticFiles();
             app.UseIdentityServer();
             app.UseMvcWithDefaultRoute();
