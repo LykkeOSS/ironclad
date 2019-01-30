@@ -102,18 +102,18 @@
                 // dotnet test --test-adapter-path:C:\Users\cameronfletcher\.nuget\packages\xunitxml.testlogger\2.0.0\build\_common --logger:"xunit;LogFilePath=test_result.xml"
                 () => Run("dotnet", $"test src/tests/Ironclad.Tests/Ironclad.Tests.csproj -r ../../../{ArtifactsFolder} -l trx;LogFileName=Ironclad.Tests.xml --no-build"));
 
-            Target(
-                CreateNugetPackages,
-                DependsOn(BuildSolution),
-                ForEach(
-                    "src/Ironclad.Client/Ironclad.Client.csproj", 
-                    "src/Ironclad.Console/Ironclad.Console.csproj", 
-                    "src/tests/Ironclad.Tests.Sdk/Ironclad.Tests.Sdk.csproj"),
-                project => Run("dotnet", $"pack {project} -c Release -o ../../{(project.StartsWith("src/tests") ? "../" : "") + ArtifactsFolder} --no-build"));
+            //Target(
+            //    CreateNugetPackages,
+            //    DependsOn(BuildSolution),
+            //    ForEach(
+            //        "src/Ironclad.Client/Ironclad.Client.csproj", 
+            //        "src/Ironclad.Console/Ironclad.Console.csproj", 
+            //        "src/tests/Ironclad.Tests.Sdk/Ironclad.Tests.Sdk.csproj"),
+            //    project => Run("dotnet", $"pack {project} -c Release -o ../../{(project.StartsWith("src/tests") ? "../" : "") + ArtifactsFolder} --no-build"));
 
             Target(
                 PublishNugetPackages,
-                DependsOn(DetectEnvironment, CreateNugetPackages, TestDockerImage),
+                DependsOn(DetectEnvironment, /*CreateNugetPackages,*/ TestDockerImage),
                 () =>
                 {
                     var packagesToPublish = Directory.GetFiles(ArtifactsFolder, "*.nupkg", SearchOption.TopDirectoryOnly);
@@ -155,8 +155,8 @@
                     }
 
                     Run("docker", $"login {dockerRegistry} -u {dockerUsername} -p {dockerPassword}");
-                    Run("docker", $"tag ironclad:latest {dockerRegistry}/ironclad:{dockerTag}");
-                    Run("docker", $"push {dockerRegistry}/ironclad:{dockerTag}");
+                    Run("docker", $"tag ironclad-poc:latest {dockerRegistry}/ironclad-poc:{dockerTag}");
+                    Run("docker", $"push {dockerRegistry}/ironclad-poc:{dockerTag}");
                 });
 
             Target(
