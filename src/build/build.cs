@@ -27,13 +27,21 @@
             var settings = configuration.Get<Settings>();
 
             var isPullRequest = default(bool);
+            var isTag = default(bool);
+
+            var branch = default(string);
 
             var nugetServer = default(string);
             var nugetApiKey = default(string);
 
-            var dockerRegistry = default(string);
-            var dockerUsername = default(string);
-            var dockerPassword = default(string);
+            var dockerBetaRegistry = default(string);
+            var dockerBetaUsername = default(string);
+            var dockerBetaPassword = default(string);
+
+            var dockerProdRegistry = default(string);
+            var dockerProdUsername = default(string);
+            var dockerProdPassword = default(string);
+
             var dockerTag = default(string);
 
             Target(
@@ -44,6 +52,7 @@
                     if (settings.TRAVIS == true)
                     {
                         Console.WriteLine("Travis build server detected.");
+                        branch = settings.TRAVIS_BRANCH;
 
                         if (int.TryParse(settings.TRAVIS_PULL_REQUEST, out var _))
                         {
@@ -56,12 +65,19 @@
                         {
                             Console.WriteLine($"Release build detected for tag = '{settings.TRAVIS_TAG}'.");
 
+                            isTag = true;
+
                             nugetServer = settings.BUILD_SERVER?.NUGET?.SERVER;
                             nugetApiKey = settings.BUILD_SERVER?.NUGET?.API_KEY;
 
-                            dockerRegistry = settings.BUILD_SERVER?.DOCKER?.REGISTRY;
-                            dockerUsername = settings.BUILD_SERVER?.DOCKER?.USERNAME;
-                            dockerPassword = settings.BUILD_SERVER?.DOCKER?.PASSWORD;
+                            dockerBetaRegistry = settings.BUILD_SERVER?.DOCKER?.BETA_REGISTRY;
+                            dockerBetaUsername = settings.BUILD_SERVER?.DOCKER?.BETA_USERNAME;
+                            dockerBetaPassword = settings.BUILD_SERVER?.DOCKER?.BETA_PASSWORD;
+
+                            dockerProdRegistry = settings.BUILD_SERVER?.DOCKER?.REGISTRY;
+                            dockerProdUsername = settings.BUILD_SERVER?.DOCKER?.USERNAME;
+                            dockerProdPassword = settings.BUILD_SERVER?.DOCKER?.PASSWORD;
+
                             dockerTag = settings.TRAVIS_TAG;
                         }
                         else
@@ -71,9 +87,10 @@
                             nugetServer = settings.BUILD_SERVER?.NUGET?.BETA_SERVER;
                             nugetApiKey = settings.BUILD_SERVER?.NUGET?.BETA_API_KEY;
 
-                            dockerRegistry = settings.BUILD_SERVER?.DOCKER?.BETA_REGISTRY;
-                            dockerUsername = settings.BUILD_SERVER?.DOCKER?.BETA_USERNAME;
-                            dockerPassword = settings.BUILD_SERVER?.DOCKER?.BETA_PASSWORD;
+                            dockerBetaRegistry = settings.BUILD_SERVER?.DOCKER?.BETA_REGISTRY;
+                            dockerBetaUsername = settings.BUILD_SERVER?.DOCKER?.BETA_USERNAME;
+                            dockerBetaPassword = settings.BUILD_SERVER?.DOCKER?.BETA_PASSWORD;
+
                             dockerTag = "latest";
                         }
                     }
@@ -148,15 +165,31 @@
                         return;
                     }
 
-                    if (string.IsNullOrWhiteSpace(dockerRegistry) || string.IsNullOrWhiteSpace(dockerUsername) || string.IsNullOrWhiteSpace(dockerPassword))
+                    if (string.IsNullOrWhiteSpace(dockerBetaRegistry) || string.IsNullOrWhiteSpace(dockerBetaUsername) || string.IsNullOrWhiteSpace(dockerBetaPassword) || 
+                        string.IsNullOrEmpty(dockerProdRegistry) || string.IsNullOrEmpty(dockerProdUsername) || string.IsNullOrEmpty(dockerProdPassword))
                     {
                         Console.WriteLine("Docker settings not specified. Docker images will not be published.");
                         return;
                     }
 
-                    Run("docker", $"login {dockerRegistry} -u {dockerUsername} -p {dockerPassword}");
-                    Run("docker", $"tag ironclad:latest {dockerRegistry}/ironclad:{dockerTag}");
-                    Run("docker", $"push {dockerRegistry}/ironclad:{dockerTag}");
+                    if ((branch == "dev" || branch == "master") && !isTag)
+                    {
+                        DockerPush("ironclad", "latest", dockerBetaRegistry, dockerBetaUsername, dockerBetaPassword);
+                    }
+                    else if (branch == "dev" && isTag)
+                    {
+                        DockerPush("ironclad", "latest", dockerBetaRegistry, dockerBetaUsername, dockerBetaPassword);
+
+                        DockerPush("ironclad", "pre-release", dockerProdRegistry, dockerProdUsername, dockerProdPassword);
+                    }
+                    else if (branch == "master" && isTag)
+                    {
+                        DockerPush("ironclad", "latest", dockerBetaRegistry, dockerBetaUsername, dockerBetaPassword);
+                        
+                        DockerPush("ironclad", dockerTag, dockerProdRegistry, dockerProdUsername, dockerProdPassword);
+                        DockerPush("ironclad", "latest", dockerProdRegistry, dockerProdUsername, dockerProdPassword);
+                    }
+
                 });
 
             Target(
@@ -170,11 +203,20 @@
             RunTargets(args);
         }
 
+        private static void DockerPush(string imageName, string tag, string dockerRegistry, string dockerUsername, string dockerPassword)
+        {
+            Run("docker", $"login {dockerRegistry} -u {dockerUsername} -p {dockerPassword}");
+
+            Run("docker", $"tag {imageName}:latest {dockerRegistry}/{imageName}:{tag}");
+            Run("docker", $"push {dockerRegistry}/{imageName}:{tag}");
+        }
+
         private class Settings
         {
             // travis specific
             public bool? TRAVIS { get; set; }
             public string TRAVIS_PULL_REQUEST { get; set; }
+            public string TRAVIS_BRANCH { get; set; }
             public string TRAVIS_TAG { get; set; }
 
             public BuildSettings BUILD_SERVER { get; set; }
