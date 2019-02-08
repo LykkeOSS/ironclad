@@ -165,12 +165,13 @@
                         return;
                     }
 
-                    if (string.IsNullOrWhiteSpace(dockerBetaRegistry) || string.IsNullOrWhiteSpace(dockerBetaUsername) || string.IsNullOrWhiteSpace(dockerBetaPassword) || 
-                        string.IsNullOrEmpty(dockerProdRegistry) || string.IsNullOrEmpty(dockerProdUsername) || string.IsNullOrEmpty(dockerProdPassword))
+                    if (string.IsNullOrWhiteSpace(dockerBetaRegistry) || string.IsNullOrWhiteSpace(dockerBetaUsername) || string.IsNullOrWhiteSpace(dockerBetaPassword))
                     {
                         Console.WriteLine("Docker settings not specified. Docker images will not be published.");
                         return;
                     }
+
+                    var dockerProdSettingsSpecified = !string.IsNullOrEmpty(dockerProdRegistry) && !string.IsNullOrEmpty(dockerProdUsername) && !string.IsNullOrEmpty(dockerProdPassword);
 
                     if ((branch == "dev" || branch == "master") && !isTag)
                     {
@@ -180,14 +181,20 @@
                     {
                         DockerPush("ironclad", "latest", dockerBetaRegistry, dockerBetaUsername, dockerBetaPassword);
 
-                        DockerPush("ironclad", "pre-release", dockerProdRegistry, dockerProdUsername, dockerProdPassword);
+                        if (dockerProdSettingsSpecified)
+                        {
+                            DockerPush("ironclad", "pre-release", dockerProdRegistry, dockerProdUsername, dockerProdPassword);
+                        }
                     }
                     else if (branch == "master" && isTag)
                     {
                         DockerPush("ironclad", "latest", dockerBetaRegistry, dockerBetaUsername, dockerBetaPassword);
-                        
-                        DockerPush("ironclad", dockerTag, dockerProdRegistry, dockerProdUsername, dockerProdPassword);
-                        DockerPush("ironclad", "latest", dockerProdRegistry, dockerProdUsername, dockerProdPassword);
+
+                        if (dockerProdSettingsSpecified)
+                        {
+                            DockerPush("ironclad", dockerTag, dockerProdRegistry, dockerProdUsername, dockerProdPassword);
+                            DockerPush("ironclad", "latest", dockerProdRegistry, dockerProdUsername, dockerProdPassword);
+                        }
                     }
 
                 });
