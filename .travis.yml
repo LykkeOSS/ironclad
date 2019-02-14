@@ -3,7 +3,7 @@ sudo: required
 mono: none
 git:
   depth: false
-dotnet: 2.1.400
+dotnet: 2.2
 script: ./build.sh
 notifications:
   slack:
