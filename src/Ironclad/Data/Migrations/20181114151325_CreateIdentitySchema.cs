@@ -3,8 +3,8 @@
 
 namespace Ironclad.Data.Migrations
 {
-    using Microsoft.EntityFrameworkCore.Metadata;
     using Microsoft.EntityFrameworkCore.Migrations;
+    using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
     public partial class PendingChanges : Migration
     {
