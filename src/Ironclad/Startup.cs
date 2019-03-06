@@ -15,6 +15,7 @@ namespace Ironclad
     using Ironclad.Models;
     using Ironclad.Sdk;
     using Ironclad.Services.Email;
+    using Ironclad.WebApi;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.DataProtection;
@@ -36,11 +37,13 @@ namespace Ironclad
         private readonly ILoggerFactory loggerFactory;
         private readonly Settings settings;
         private readonly WebsiteSettings websiteSettings;
+        private readonly ApiInfo apiInfo;
 
         public Startup(ILogger<Startup> logger, ILoggerFactory loggerFactory, IConfiguration configuration)
         {
             this.logger = logger;
             this.loggerFactory = loggerFactory;
+            this.apiInfo = new ApiInfo(configuration);
             this.settings = configuration.Get<Settings>(options => options.BindNonPublicProperties = true);
             this.websiteSettings = configuration.GetSection("website").Get<WebsiteSettings>(options => options.BindNonPublicProperties = true) ?? new WebsiteSettings();
             this.settings.Validate();
@@ -52,6 +55,7 @@ namespace Ironclad
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton(this.websiteSettings);
+            services.AddSingleton(this.apiInfo);
 
             services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(this.settings.Server.Database));
 

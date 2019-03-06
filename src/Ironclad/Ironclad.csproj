@@ -20,13 +20,13 @@
   <ItemGroup>
     <TrimFilesRootFiles Include="Microsoft.AspNetCore.ApplicationInsights.HostingStartup.dll" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Compile Remove="logs\**" />
     <EmbeddedResource Remove="logs\**" />
     <None Remove="logs\**" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.6.0" />
     <PackageReference Include="IdentityServer4.AspNetIdentity" Version="2.1.0" />
@@ -143,5 +143,14 @@
   <ItemGroup>
     <ProjectReference Include="..\Ironclad.ExternalIdentityProvider\Ironclad.ExternalIdentityProvider.csproj" />
   </ItemGroup>
+
+  <Target Name="GitInfo" AfterTargets="Build" Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='CI'">
+    <Exec Command="dotnet run -p ../../build/build.csproj -- --project-dir $(MSBuildProjectDirectory) --output $(OutputPath) git-info" />
+  </Target>
+
+  <Target Name="GitInfoPublish" AfterTargets="Publish" Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='CI'">
+    <Exec Command="dotnet run -p ../../build/build.csproj -- --output $(PublishDir) git-info" />
+  </Target>
+
 
 </Project>
