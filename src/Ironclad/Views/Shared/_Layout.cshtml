@@ -23,32 +23,25 @@
     <link rel="stylesheet" href="~/@websiteSettings.Styles" />
 </head>
 <body>
-    <header>
-        <div class="navbar navbar-dark shadow-sm">
-            <div class="container d-flex justify-content-between">
-                <a href="~/" class="navbar-brand d-flex align-items-center">
-                    <span class="navbar-brand">
-                        <img src="~/@websiteSettings.Logo" class="icon-banner" height="32">
-                    </span>
-                </a>
-                <nav class="my-2 my-md-0 mr-md-3">
-                    @if (!websiteSettings.ShowLoginScreen)
-                    {
-                    }
-                    else if (!string.IsNullOrWhiteSpace(name))
-                    {
-                        <a asp-action="Index" asp-controller="Manage">@name</a>
-                        <a asp-action="Logout" asp-controller="Account">Logout</a>
-                    }
-                    else
-                    {
-                        <a asp-action="Login" asp-controller="Account">Login</a>
-                    }
-                </nav>
-            </div>
+    <header class="header d-none">
+        <div class="container-fluid justify-content-between">
+            <nav class="my-2 my-md-0 mr-md-3">
+                @if (!websiteSettings.ShowLoginScreen)
+                {
+                }
+                else if (!string.IsNullOrWhiteSpace(name))
+                {
+                    <a asp-action="Index" asp-controller="Manage">@name</a>
+                    <a asp-action="Logout" asp-controller="Account">Logout</a>
+                }
+                else
+                {
+                    <a asp-action="Login" asp-controller="Account">Login</a>
+                }
+            </nav>
         </div>
     </header>
-    <div class="container body-content">
+    <div class="container-fluid body-content">
         @RenderBody()
     </div>
     @RenderSection("scripts", required: false)

@@ -1,0 +1,88 @@
+﻿@font-face {
+    font-family: 'icon';
+    src: url('/fonts/icon.eot?w2imdq');
+    src: url('/fonts/icon.eot?w2imdq#iefix') format('embedded-opentype'), 
+    url('/fonts/icon.ttf?w2imdq') format('truetype'), 
+    url('/fonts/icon.woff?w2imdq') format('woff'), 
+    url('/fonts/icon.svg?w2imdq#icon') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+[class^="icon--"], [class*=" icon--"] {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'icon' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.icon--user:before {
+    content: "\e98e";
+}
+
+.icon--show:before {
+    content: "\e98c";
+}
+
+.icon--hide:before {
+    content: "\e98d";
+}
+
+.icon--back_arrow:before {
+    content: "\e986";
+}
+
+.icon--web:before {
+    content: "\e989";
+}
+
+.icon--cancel:before {
+    content: "\e983";
+}
+
+.icon--id:before {
+    content: "\e980";
+}
+
+.icon--help:before {
+    content: "\e97e";
+}
+
+.icon--delete:before {
+    content: "\e97b";
+}
+
+.icon--show_pin:before {
+    content: "\e96f";
+}
+
+.icon--unblock:before {
+    content: "\e970";
+}
+
+.icon--close:before {
+    content: "\e942";
+}
+
+.icon--cancel_round:before {
+    content: "\e943";
+}
+
+.icon--check_box_outline_blank:before {
+    content: "\e919";
+}
+
+.icon--check_box:before {
+    content: "\e91a";
+}
+
+.icon--check_thin:before {
+    content: "\e90b";
+}

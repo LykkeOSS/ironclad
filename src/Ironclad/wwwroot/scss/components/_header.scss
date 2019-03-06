@@ -1,0 +1,19 @@
+﻿.header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    padding: rem(18px) 0;
+    pointer-events: none;
+
+    a {
+        pointer-events: all;
+    }
+
+    @media all and (max-width: 767px) {
+        position: relative;
+        text-align: center;
+        padding: rem(14px 0 18px);
+    }
+}

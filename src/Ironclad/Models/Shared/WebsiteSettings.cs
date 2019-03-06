@@ -9,7 +9,9 @@ namespace Ironclad.Models
     {
         public string Styles { get; set; } = "css/default.css";
 
-        public string Logo { get; set; } = "img/fingerprint.svg";
+        public string Logo { get; set; } = "img/logo_white.svg";
+
+        public string DarkLogo { get; set; } = "img/logo.svg";
 
         // HACK (Cameron): This really doesn't belong here.
         public IEnumerable<string> RestrictedDomains { get; set; }
