@@ -1,8 +1,33 @@
-﻿@{
+﻿@inject WebsiteSettings websiteSettings
+@{
     ViewData["Title"] = "Locked out";
 }
 
-<header>
-    <h2 class="text-danger">@ViewData["Title"]</h2>
-    <p class="text-danger">This account has been locked out, please try again later.</p>
+<header class="header">
+    <div class="container-fluid">
+        <a href="~/" class="navbar-brand">
+            <img src="~/@websiteSettings.DarkLogo" width="132">
+        </a>
+    </div>
 </header>
+<div class="content row justify-content-center">
+    <div class="content_center col-11 col-md-7 col-xl-8 text-center">
+        <section class="content_form">
+            <div class="content_header">
+                <h1 class="h2 text-danger">@ViewData["Title"]</h1>
+                <p class="text-danger">
+                    This account has been locked out, please try again later.
+                </p>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-sm-8">
+                    <div class="form-group">
+                        <p class="muted text-center form-hint">
+                            <a asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]">Back to sign in</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
