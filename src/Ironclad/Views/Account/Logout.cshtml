@@ -1,13 +1,5 @@
 ﻿@model LogoutModel
-@inject WebsiteSettings websiteSettings
 
-<header class="header">
-    <div class="container-fluid">
-        <a href="~/" class="navbar-brand">
-            <img src="~/@websiteSettings.DarkLogo" width="132">
-        </a>
-    </div>
-</header>
 <div class="content row justify-content-center">
     <div class="content_center col-11 col-md-7 col-xl-8 text-center">
         <section class="content_form">
@@ -19,15 +11,13 @@
             </div>
             <form asp-action="Logout">
                 <input type="hidden" name="logoutId" value="@Model.LogoutId" />
-                <fieldset>
-                    <div class="row justify-content-center">
-                        <div class="col-sm-8">
-                            <div class="form-group">
-                                <button class="btn btn-primary btn-lg btn-block">Yes</button>
-                            </div>
+                <div class="row justify-content-center">
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            <button class="btn btn-primary btn-lg btn-block">Yes</button>
                         </div>
                     </div>
-                </fieldset>
+                </div>
             </form>
         </section>
     </div>
