@@ -1,30 +1,81 @@
 ﻿@model RegisterModel
+@inject WebsiteSettings websiteSettings
+
 @{
     ViewData["Title"] = "Register";
 }
-<div class="row">
-    <div class="offset-md-2 col-md-8 offset-lg-3 col-lg-6">
-        <h2>@ViewData["Title"]</h2>
-        <form asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
-            <h4>Create a new account.</h4>
-            <hr />
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Email"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
+<header class="header">
+    <div class="container-fluid">
+        <a href="~/" class="navbar-brand">
+            <img src="~/@websiteSettings.Logo" class="d-none d-md-inline-block" width="132">
+            <img src="~/@websiteSettings.DarkLogo" class="d-inline-block d-md-none" width="132">
+        </a>
+    </div>
+</header>
+<div class="content row justify-content-center">
+    <div class="content_left col-md-5 col-xl-4 d-none d-md-flex"
+         style="background-image: url(img/register_bg.jpg)">
+        <div class="content_left__hint align-self-end">
+            "Donec facilisis tortor ut augue lacinia, at viverra est semper.
+            Sed ss, scelerisque nec pharetra id, tem tortorlentesque non nissim neque.
+            Ut porta viverra est, ut dignissim elit elementum ut."
+        </div>
+    </div>
+    <div class="content_right col-11 col-md-7 col-xl-8 text-center">
+        <div class="row align-content-md-center justify-content-center">
+            <div class="col-md-11">
+                <div class="content_header">
+                    <h1 class="h2">Create your Lykke Account</h1>
+                    <p class="lead">Enter your email and create a password</p>
+                </div>
+                <section class="content_form">
+                    <form asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+                        <div asp-validation-summary="All" class="text-danger form-group"></div>
+                        <div class="form-group">
+                            <label asp-for="Email" class="control-label"></label>
+                            <input asp-for="Email" class="form-control" placeholder="Enter your email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Password" class="control-label"></label>
+                            <div class="input-group-alt">
+                                <input asp-for="Password" class="form-control" placeholder="Minimum 8 characters" />
+                                <button class="btn btn-icon btn-append" type="button">
+                                    <i class="icon icon--show"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="ConfirmPassword" class="control-label"></label>
+                            <input asp-for="ConfirmPassword" class="form-control" placeholder="Re-enter password" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="col-sm-9">
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-gradient btn-block btn-lg">Register</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="col-10 col-sm-6 col-lg-7 col-md-8">
+                                <p class="muted text-center form-hint">
+                                    By Signing Up, you Agree to the
+                                    <a href="https://www.lykke.com/terms-and-regulation/" target="_blank">Terms&nbsp;&&nbsp;Condition</a>
+                                    and <a href="https://www.lykke.com/privacy-policy/" target="_blank">Privacy&nbsp;Policy</a>
+                                </p>
+                                <p class="muted text-center">
+                                    Already have an account?
+                                    <a asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]">
+                                        Sign&nbsp;In
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </form>
+                </section>
             </div>
-            <div class="form-group">
-                <label asp-for="Password"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ConfirmPassword"></label>
-                <input asp-for="ConfirmPassword" class="form-control" />
-                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-            </div>
-            <button type="submit" class="btn btn-default">Register</button>
-        </form>
+        </div>
     </div>
 </div>

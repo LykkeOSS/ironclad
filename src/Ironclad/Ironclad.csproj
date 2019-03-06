@@ -77,6 +77,8 @@
       <DependentUpon>Dockerfile</DependentUpon>
     </None>
     <None Include="..\Dockerfile" Link="Dockerfile" />
+    <None Include="wwwroot\img\forgot_pass.svg" />
+    <None Include="wwwroot\img\forgot_pass_success.svg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -93,6 +95,35 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="wwwroot\css\custom.css" />
+    <Content Remove="wwwroot\css\custom.css" />
+    <Content Remove="wwwroot\css\default.css.map" />
+    <Content Remove="wwwroot\css\custom.css.map" />
+    <Content Remove="wwwroot\fonts\Akrobat-Regular.ttf" />
+    <Content Remove="wwwroot\fonts\ProximaNovaThin.eot" />
+    <Content Remove="wwwroot\fonts\ProximaNovaThin.svg" />
+    <Content Remove="wwwroot\fonts\ProximaNovaThin.ttf" />
+    <Content Remove="wwwroot\fonts\ProximaNovaThin.woff" />
+    <Content Remove="wwwroot\fonts\icon.eot" />
+    <Content Remove="wwwroot\fonts\icon.svg" />
+    <Content Remove="wwwroot\fonts\icon.ttf" />
+    <Content Remove="wwwroot\fonts\icon.woff" />
+    <Content Remove="wwwroot\fonts\selection.json" />
+    <Content Remove="wwwroot\img\logo.svg" />
+    <Content Remove="wwwroot\img\logo_white.svg" />
+    <Content Remove="wwwroot\scss\components\_content.scss" />
+    <Content Remove="wwwroot\scss\components\_header.scss" />
+    <Content Remove="wwwroot\scss\general\_fonts.scss" />
+    <Content Remove="wwwroot\scss\general\_icons.scss" />
+    <Content Remove="wwwroot\scss\general\_overrides.scss" />
+    <Content Remove="wwwroot\scss\general\_variables.scss" />
+    <Content Remove="wwwroot\scss\mixins\_rem.scss" />
+    <Content Remove="wwwroot\img\register-bg.jpg" />
+    <Content Remove="wwwroot\img\register_bg.jpg" />
+    <Content Remove="wwwroot\img\forgot_pass.svg" />
+    <Content Remove="wwwroot\img\forgot_pass_success.svg" />
+  </ItemGroup>
   <ItemGroup>
     <Content Update="appsettings.Custom.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
