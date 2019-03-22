@@ -1,6 +1,7 @@
 ﻿@inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
 @using IdentityServer4.Extensions
 @using Microsoft.Extensions.Options;
+@using Ironclad;
 
 @inject WebsiteSettings websiteSettings
 
@@ -31,13 +32,11 @@
                         <img src="~/@websiteSettings.Logo" class="icon-banner" height="32">
                     </span>
                 </a>
-                <nav class="my-2 my-md-0 mr-md-3">
-                    @if (!websiteSettings.ShowLoginScreen)
+                <nav class="my-2 my-md-0 mr-md-3 main-navigation">
+                    @if (!string.IsNullOrWhiteSpace(name))
                     {
-                    }
-                    else if (!string.IsNullOrWhiteSpace(name))
-                    {
-                        <a asp-action="Index" asp-controller="Manage">@name</a>
+                        <a class="profile-link" asp-action="Index" asp-controller="Manage">@name</a>
+                        <a asp-action="Index" asp-controller="Grants">Grants</a>
                         <a asp-action="Logout" asp-controller="Account">Logout</a>
                     }
                     else
@@ -48,9 +47,10 @@
             </div>
         </div>
     </header>
-    <div class="container body-content">
+    <div class="container body-content mb-5">
         @RenderBody()
     </div>
+    <script type="text/javascript" src="~/js/bootstrap-native-v4.min.js"></script>
     @RenderSection("scripts", required: false)
 </body>
 </html>

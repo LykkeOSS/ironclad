@@ -8620,10 +8620,11 @@ h3 {
 }
 .page-consent .client-logo {
   float: left;
+  margin: 10px 12px 10px 0;
 }
 .page-consent .client-logo img {
-  width: 80px;
-  height: 80px;
+  max-width: 100px;
+  height: auto;
 }
 .page-consent .consent-buttons {
   margin-top: 25px;
@@ -8639,6 +8640,7 @@ h3 {
   font-weight: normal;
 }
 .page-consent .consent-form .consent-remember {
+  margin-top: 15px;
   padding-left: 16px;
 }
 
@@ -8686,7 +8688,12 @@ h3 {
 }
 .manage-nav .manage-nav-header .user-display-name {
   font-weight: 600;
-  font-size: 20px;
+  font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
 }
 .manage-nav .nav {
   width: calc(100% + 1px);
@@ -8694,6 +8701,28 @@ h3 {
 .manage-nav .nav .nav-link {
   border-top: 1px solid #dee2e6;
   border-radius: 0;
+}
+
+header .main-navigation {
+  width: calc(100% - 65px);
+}
+@media (min-width: 540px) {
+  header .main-navigation {
+    width: auto;
+  }
+}
+header .main-navigation .profile-link {
+  max-width: calc(100% - 150px);
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+@media (min-width: 720px) {
+  header .main-navigation .profile-link {
+    max-width: calc(100% - 90px);
+  }
 }
 
 .navbar-header {

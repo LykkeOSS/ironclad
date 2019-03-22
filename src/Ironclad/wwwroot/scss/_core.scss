@@ -17,6 +17,29 @@ $breakpoints: (
 @import 'components/grants';
 @import 'components/manage';
 
+header {
+    .main-navigation {
+        width: calc(100% - 65px);
+
+        @include breakpoint(small) {
+            width: auto;
+        }
+
+        .profile-link {
+            max-width: calc(100% - 150px);
+            display: inline-block;
+            overflow: hidden;
+            vertical-align: top;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+
+            @include breakpoint(medium) {
+                max-width: calc(100% - 90px);
+            }
+        }
+    }
+}
+
 .navbar-header {
     position: relative;
     top: -4px;

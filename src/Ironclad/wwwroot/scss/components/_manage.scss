@@ -5,7 +5,12 @@
 
         .user-display-name {
             font-weight: 600;
-            font-size: 20px;
+            font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            display: inline-block;
         }
     }
 
