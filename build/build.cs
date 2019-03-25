@@ -140,7 +140,16 @@
 
                         foreach (var packageToPublish in packagesToPublish)
                         {
-                            Run("dotnet", $"nuget push {packageToPublish} -s {nugetServer} -k {nugetApiKey}", noEcho: true);
+                            // https://github.com/NuGet/Home/issues/1630
+                            // https://github.com/adamralph/simple-exec/issues/103
+                            try
+                            {
+                                Run("dotnet", $"nuget push {packageToPublish} -s {nugetServer} -k {nugetApiKey}", noEcho: true);
+                            }
+                            catch (SimpleExec.NonZeroExitCodeException ex)
+                            {
+                                Console.WriteLine(ex);
+                            }
                         }
                     });
 
