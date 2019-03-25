@@ -15,6 +15,7 @@ namespace Ironclad
     using Ironclad.Models;
     using Ironclad.Sdk;
     using Ironclad.Services.Email;
+    using Ironclad.Services.Passwords;
     using Ironclad.WebApi;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
@@ -172,6 +173,8 @@ namespace Ironclad
                     options.AddPolicy("auth_admin", policy => policy.AddAuthenticationSchemes("token").Requirements.Add(new SystemAdministratorRequirement()));
                     options.AddPolicy("user_admin", policy => policy.AddAuthenticationSchemes("token").Requirements.Add(new UserAdministratorRequirement()));
                 });
+
+            services.AddPwnedPasswordHttpClient(this.settings.Server.PwnedPasswordsUrl);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

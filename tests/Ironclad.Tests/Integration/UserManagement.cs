@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
+using IdentityModel.OidcClient.Browser;
+
 namespace Ironclad.Tests.Integration
 {
     using System;
@@ -48,7 +50,7 @@ namespace Ironclad.Tests.Integration
             var expectedUser = new User
             {
                 Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
-                Password = "password",
+                Password = "pas$wrod",
                 Email = "bit-bucket@test.smtp.org",
                 PhoneNumber = "123456789",
                 Roles = { "admin" },
@@ -207,7 +209,7 @@ namespace Ironclad.Tests.Integration
             var user = new User
             {
                 Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
-                Password = "password",
+                Password = "pas$wrod",
             };
 
             await httpClient.AddUserAsync(user).ConfigureAwait(false);
@@ -306,7 +308,7 @@ namespace Ironclad.Tests.Integration
             var model = new User
             {
                 Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
-                Password = "password",
+                Password = "pas$wrod",
                 Email = "bit-bucket@test.smtp.org",
                 PhoneNumber = "123456789",
                 Roles = { "admin", "lambo_owner" },
@@ -327,7 +329,7 @@ namespace Ironclad.Tests.Integration
             var model = new User
             {
                 Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
-                Password = "password",
+                Password = "pas$wrod",
                 Email = "bit-bucket@test.smtp.org",
                 PhoneNumber = "123456789",
                 Roles = { "admin" },
@@ -352,7 +354,7 @@ namespace Ironclad.Tests.Integration
             var model = new User
             {
                 Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
-                Password = "password",
+                Password = "pas$wrod",
                 Email = "bit-bucket@test.smtp.org",
                 PhoneNumber = "123456789",
                 Roles = { "admin" },
@@ -378,7 +380,7 @@ namespace Ironclad.Tests.Integration
             var model = new User
             {
                 Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
-                Password = "password",
+                Password = "pas$wrod",
                 Email = "bit-bucket@test.smtp.org",
                 PhoneNumber = "123456789",
                 Roles = { "admin" },
@@ -413,7 +415,7 @@ namespace Ironclad.Tests.Integration
             var model = new User
             {
                 Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
-                Password = "password",
+                Password = "pas$wrod",
                 Email = "bit-bucket@test.smtp.org",
                 PhoneNumber = "123456789",
                 Roles = { "admin" },
@@ -450,7 +452,7 @@ namespace Ironclad.Tests.Integration
             var model = new User
             {
                 Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
-                Password = "password",
+                Password = "pas$wrod",
                 Email = "bit-bucket@test.smtp.org",
                 PhoneNumber = "123456789"
             };
@@ -479,7 +481,7 @@ namespace Ironclad.Tests.Integration
             var model = new User
             {
                 Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
-                Password = "password",
+                Password = "pas$wrod",
                 Email = "bit-bucket@test.smtp.org",
                 PhoneNumber = "123456789",
                 Roles = { "admin" }
@@ -502,7 +504,7 @@ namespace Ironclad.Tests.Integration
             var model = new User
             {
                 Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
-                Password = "password",
+                Password = "pas$wrod",
                 Email = "bit-bucket@test.smtp.org",
                 PhoneNumber = "123456789",
                 Roles = {"admin"}
@@ -546,7 +548,7 @@ namespace Ironclad.Tests.Integration
             var model = new User
             {
                 Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
-                Password = "password",
+                Password = "pas$wrod",
                 Email = "bit-bucket@test.smtp.org",
                 PhoneNumber = "123456789"
             };
@@ -580,7 +582,7 @@ namespace Ironclad.Tests.Integration
             var model = new User
             {
                 Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
-                Password = "password",
+                Password = "pas$wrod",
                 Email = "bit-bucket@test.smtp.org",
                 PhoneNumber = "123456789"
             };
@@ -607,7 +609,7 @@ namespace Ironclad.Tests.Integration
             var model = new User
             {
                 Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
-                Password = "password",
+                Password = "pas$wrod",
                 Email = "bit-bucket@test.smtp.org",
                 PhoneNumber = "123456789",
                 Claims = new Dictionary<string, object> { {"claim1", "1"}, {"claim2", "2"} }

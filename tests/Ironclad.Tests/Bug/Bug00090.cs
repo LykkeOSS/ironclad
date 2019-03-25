@@ -26,7 +26,7 @@ namespace Ironclad.Tests.Bug
             var user = new User
             {
                 Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
-                Password = "password",
+                Password = "pas$wrod",
                 Email = "test@test.com",
                 PhoneNumber = "0123456789",
                 Roles = { "auth_admin", "user_admin" },

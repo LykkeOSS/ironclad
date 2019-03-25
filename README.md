@@ -171,3 +171,27 @@ sass scss/<you-new-scss-file>.scss css/<your-new-css-file>.css --watch
 ```
 
 [bootstrapThemeingGuide]: https://getbootstrap.com/docs/4.1/getting-started/theming
+
+
+### Pwned passwords check
+
+#### Datasource
+
+Current implementation supports additional security by using https://haveibeenpwned.com/ as a source of data breaches.
+
+#### Defaults
+
+In order to met those reqs, default password for ```admin``` user is ```pas$wrod```.
+
+#### Configuration
+
+By default this check is disabled. In order to enable it, you should specify valid ```pwned_passwords_url``` in settigs.
+```json
+...
+{
+  "server": {
+    "pwned_passwords_url": "https://api.pwnedpasswords.com"
+  }
+}
+...
+```

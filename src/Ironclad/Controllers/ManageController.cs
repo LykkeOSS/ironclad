@@ -1,4 +1,4 @@
-// Copyright (c) Lykke Corp.
+﻿// Copyright (c) Lykke Corp.
 // See the LICENSE file in the project root for more information.
 
 namespace Ironclad.Controllers
@@ -13,6 +13,7 @@ namespace Ironclad.Controllers
     using Ironclad.Models;
     using Ironclad.Sdk;
     using Ironclad.Services.Email;
+    using Ironclad.Services.Passwords;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
@@ -30,19 +31,22 @@ namespace Ironclad.Controllers
         private readonly IEmailSender emailSender;
         private readonly ILogger logger;
         private readonly UrlEncoder urlEncoder;
+        private readonly IPwnedPasswordsClient pwnedPasswordsClient;
 
         public ManageController(
           UserManager<ApplicationUser> userManager,
           SignInManager<ApplicationUser> signInManager,
           IEmailSender emailSender,
           ILogger<ManageController> logger,
-          UrlEncoder urlEncoder)
+          UrlEncoder urlEncoder,
+          IPwnedPasswordsClient pwnedPasswordsClient)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.emailSender = emailSender;
             this.logger = logger;
             this.urlEncoder = urlEncoder;
+            this.pwnedPasswordsClient = pwnedPasswordsClient;
         }
 
         [TempData]
@@ -171,6 +175,12 @@ namespace Ironclad.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
+            var isPwnd = await this.pwnedPasswordsClient.HasPasswordBeenPwnedAsync(model.NewPassword);
+            if (isPwnd)
+            {
+                this.ModelState.AddModelError(nameof(model.NewPassword), "This Password has previously appeared in a data breach and should never be used.");
+            }
+
             if (!this.ModelState.IsValid)
             {
                 return this.View(model);

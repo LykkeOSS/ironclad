@@ -50,7 +50,7 @@ namespace Ironclad.Data.Maintenance
 
             adminUser = Config.GetDefaultAdminUser();
 
-            await this.userManager.CreateAsync(adminUser, "password");
+            await this.userManager.CreateAsync(adminUser, "pas$wrod");
             await this.userManager.AddToRoleAsync(adminUser, "admin");
         }
 

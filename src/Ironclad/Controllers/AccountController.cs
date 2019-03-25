@@ -18,16 +18,19 @@ namespace Ironclad.Controllers
     using Ironclad.Models;
     using Ironclad.Sdk;
     using Ironclad.Services.Email;
+    using Ironclad.Services.Passwords;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
+    using Newtonsoft.Json;
 
     [Authorize]
     [SecurityHeaders]
     public class AccountController : Controller
     {
+        private const string PwnedPasswordMessage = "This Password has previously appeared in a data breach and should never be used.";
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IStore<IdentityProvider> store;
@@ -35,6 +38,7 @@ namespace Ironclad.Controllers
         private readonly ILogger logger;
         private readonly IIdentityServerInteractionService interaction;
         private readonly WebsiteSettings websiteSettings;
+        private readonly IPwnedPasswordsClient pwnedPasswordsClient;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
@@ -43,8 +47,10 @@ namespace Ironclad.Controllers
             IEmailSender emailSender,
             ILogger<AccountController> logger,
             IIdentityServerInteractionService interaction,
-            WebsiteSettings websiteSettings)
+            WebsiteSettings websiteSettings,
+            IPwnedPasswordsClient pwnedPasswordsClient)
         {
+            this.pwnedPasswordsClient = pwnedPasswordsClient;
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.store = store;
@@ -79,6 +85,20 @@ namespace Ironclad.Controllers
             return this.View();
         }
 
+        [Route("/signin/newpassword")]
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult LoginWithNewPassword(string returnUrl = null)
+        {
+            var model = JsonConvert.DeserializeObject<LoginModelExtended>((string)this.TempData["LoginModel"]);
+
+            this.ViewData["ReturnUrl"] = returnUrl;
+
+            this.ModelState.AddModelError(nameof(model.Password), PwnedPasswordMessage);
+
+            return this.View(model);
+        }
+
         [Route("/signin")]
         [HttpPost]
         [AllowAnonymous]
@@ -94,9 +114,77 @@ namespace Ironclad.Controllers
 
             // this doesn't count login failures towards account lockout to enable password failures to trigger account lockout, set lockoutOnFailure: true
             var result = await this.signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
+
+            if (result.Succeeded)
+            {
+                var isPwnd = await this.pwnedPasswordsClient.HasPasswordBeenPwnedAsync(model.Password);
+                if (isPwnd)
+                {
+                    this.TempData["LoginModel"] = JsonConvert.SerializeObject(model);
+                    await this.signInManager.SignOutAsync();
+                    return this.RedirectToAction("LoginWithNewPassword", new { returnUrl });
+                }
+
+                this.logger.LogInformation("User logged in.");
+
+                return this.RedirectToLocal(returnUrl);
+            }
+            else if (result.RequiresTwoFactor)
+            {
+                return this.RedirectToAction(nameof(this.LoginWith2fa), new { returnUrl, model.RememberMe });
+            }
+            else if (result.IsLockedOut)
+            {
+                this.logger.LogWarning("User account locked out.");
+                return this.RedirectToAction(nameof(this.Lockout));
+            }
+            else
+            {
+                this.ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                return this.View(model);
+            }
+        }
+
+        [Route("/signin/newpassword")]
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LoginWithNewPassword(LoginModelExtended model, string returnUrl = null)
+        {
+            var isPwnd = await this.pwnedPasswordsClient.HasPasswordBeenPwnedAsync(model.NewPassword);
+            if (isPwnd)
+            {
+                this.ModelState.AddModelError(nameof(model.NewPassword), PwnedPasswordMessage);
+            }
+
+            this.ViewData["ReturnUrl"] = returnUrl;
+
+            if (!this.ModelState.IsValid)
+            {
+                return this.View(model);
+            }
+
+            var result = await this.signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
             if (result.Succeeded)
             {
                 this.logger.LogInformation("User logged in.");
+
+                var user = await this.userManager.FindByNameAsync(model.Username);
+                if (user == null)
+                {
+                    throw new ApplicationException($"Unable to load user with ID '{this.userManager.GetUserId(this.User)}'.");
+                }
+
+                var changePasswordResult = await this.userManager.ChangePasswordAsync(user, model.Password, model.NewPassword);
+                if (!changePasswordResult.Succeeded)
+                {
+                    this.AddErrors(changePasswordResult);
+                    return this.View(model);
+                }
+
+                await this.signInManager.SignInAsync(user, isPersistent: false);
+                this.logger.LogInformation("this.User changed their password successfully.");
+
                 return this.RedirectToLocal(returnUrl);
             }
             else if (result.RequiresTwoFactor)
@@ -255,6 +343,12 @@ namespace Ironclad.Controllers
         public async Task<IActionResult> Register(RegisterModel model, string returnUrl = null)
         {
             this.ViewData["ReturnUrl"] = returnUrl;
+
+            var isPwnd = await this.pwnedPasswordsClient.HasPasswordBeenPwnedAsync(model.Password);
+            if (isPwnd)
+            {
+                this.ModelState.AddModelError(nameof(model.Password), PwnedPasswordMessage);
+            }
 
             if (this.ModelState.IsValid)
             {
@@ -604,6 +698,12 @@ namespace Ironclad.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CompleteRegistration(CompleteRegistrationModel model)
         {
+            var isPwnd = await this.pwnedPasswordsClient.HasPasswordBeenPwnedAsync(model.Password);
+            if (isPwnd)
+            {
+                this.ModelState.AddModelError(nameof(model.Password), PwnedPasswordMessage);
+            }
+
             if (!this.ModelState.IsValid)
             {
                 return this.View(model);

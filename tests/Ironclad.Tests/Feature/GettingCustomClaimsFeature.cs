@@ -54,7 +54,7 @@ namespace Ironclad.Tests.Feature
                     user = new User
                     {
                         Username = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
-                        Password = "password",
+                        Password = "pas$wrod",
                         PhoneNumber = "123",
                         Claims = { { "amaze", "yes" }, { "balls", "no" } },
                     }).ConfigureAwait(false));

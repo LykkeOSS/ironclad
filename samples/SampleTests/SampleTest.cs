@@ -25,7 +25,7 @@ namespace SampleTests
             var user = new User
             {
                 Username = "johnsmith",
-                Password = "password",
+                Password = "pas$wrod",
             };
 
             var usersClient = new UsersHttpClient(this.ApiUri, this.Handler);

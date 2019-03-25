@@ -111,6 +111,10 @@ Please see https://gist.github.com/cameronfletcher/58673a468c8ebbbf91b81e706063b
 
             internal DataProtectionSettings data_protection { get; set; }
 
+            public string PwnedPasswordsUrl => this.pwned_passwords_url;
+
+            public string pwned_passwords_url { get; set; }
+
             public bool IsValid() => !this.GetValidationErrors().Any();
 
             public IEnumerable<string> GetValidationErrors()
