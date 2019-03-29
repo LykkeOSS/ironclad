@@ -11,7 +11,7 @@ namespace Ironclad.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20181114151325_PendingChanges")]
-    partial class PendingChanges
+    partial class IdentitySchema02
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

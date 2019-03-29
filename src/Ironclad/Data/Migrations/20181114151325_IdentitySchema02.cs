@@ -6,7 +6,7 @@ namespace Ironclad.Data.Migrations
     using Microsoft.EntityFrameworkCore.Metadata;
     using Microsoft.EntityFrameworkCore.Migrations;
 
-    public partial class PendingChanges : Migration
+    public partial class IdentitySchema02 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
