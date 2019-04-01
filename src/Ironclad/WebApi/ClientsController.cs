@@ -95,6 +95,8 @@ namespace Ironclad.WebApi
                         AbsoluteRefreshTokenLifetime = document.AbsoluteRefreshTokenLifetime,
                         RefreshTokenUsage = ((TokenUsage)document.RefreshTokenUsage).ToString(),
                         RefreshTokenExpiration = ((TokenExpiration)document.RefreshTokenExpiration).ToString(),
+                        FrontChannelLogoutUri = document.FrontChannelLogoutUri,
+                        BackChannelLogoutUri = document.BackChannelLogoutUri
                     });
             }
         }
@@ -144,6 +146,8 @@ namespace Ironclad.WebApi
             client.AbsoluteRefreshTokenLifetime = model.AbsoluteRefreshTokenLifetime ?? client.AbsoluteRefreshTokenLifetime;
             client.RefreshTokenUsage = model.RefreshTokenUsage == null ? client.RefreshTokenUsage : refreshTokenUsage;
             client.RefreshTokenExpiration = model.RefreshTokenExpiration == null ? client.RefreshTokenExpiration : refreshTokenExpiration;
+            client.FrontChannelLogoutUri = model.FrontChannelLogoutUri;
+            client.BackChannelLogoutUri = model.BackChannelLogoutUri;
 
             using (var session = this.store.LightweightSession())
             {
@@ -231,6 +235,8 @@ namespace Ironclad.WebApi
                 document.AbsoluteRefreshTokenLifetime = model.AbsoluteRefreshTokenLifetime ?? document.AbsoluteRefreshTokenLifetime;
                 document.RefreshTokenUsage = model.RefreshTokenUsage == null ? document.RefreshTokenUsage : entity.RefreshTokenUsage;
                 document.RefreshTokenExpiration = model.RefreshTokenExpiration == null ? document.RefreshTokenExpiration : entity.RefreshTokenExpiration;
+                client.FrontChannelLogoutUri = model.FrontChannelLogoutUri;
+                client.BackChannelLogoutUri = model.BackChannelLogoutUri;
 
                 if (!string.IsNullOrEmpty(model.Secret))
                 {

@@ -50,6 +50,8 @@ namespace Ironclad.Console.Commands
             var optionDisabled =                     app.Option("-d|--disabled",                                       "Creates the new client in a disabled state",                              CommandOptionType.NoValue);
             var optionInteractive =                  app.Option("-i|--interactive",                                    "Enters interactive mode",                                                 CommandOptionType.NoValue);
             var optionDisableLocalLogin =            app.Option("-dl|--disable_local_login",                           "Disable local login",                                                     CommandOptionType.NoValue);
+            var optionFrontChannelLogoutUrl =        app.Option("-fcl|--front_channel_logout_url <uri>",               "Front-channel logout URL",                                                CommandOptionType.SingleValue);
+            var optionBackChannelLogoutUrl =         app.Option("-bcl|--front_channel_logout_url <uri>",               "Back-channel logout URL",                                                 CommandOptionType.SingleValue);
 #pragma warning restore SA1025
 
             app.HelpOption();
@@ -122,6 +124,8 @@ namespace Ironclad.Console.Commands
                             RefreshTokenUsage = optionRefreshTokenUsage.HasValue() ? optionRefreshTokenUsage.Value() : null,
                             RefreshTokenExpiration = optionRefreshTokenExpiration.HasValue() ? optionRefreshTokenExpiration.Value() : null,
                             AbsoluteRefreshTokenLifetime = optionAbsoluteRefreshTokenLifetime.HasValue() ? Convert.ToInt32(optionAbsoluteRefreshTokenLifetime.Value(), NumberFormatInfo.InvariantInfo) : (int?)null,
+                            FrontChannelLogoutUri = optionFrontChannelLogoutUrl.Value(),
+                            BackChannelLogoutUri = optionBackChannelLogoutUrl.Value()
                         });
 
                     reporter.Verbose("Prototype client (from command line arguments):");
