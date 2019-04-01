@@ -2,6 +2,7 @@
 // See the LICENSE file in the project root for more information.
 
 #pragma warning disable CA1724
+#pragma warning disable CA1056
 
 namespace Ironclad.Client
 {
@@ -57,6 +58,18 @@ namespace Ironclad.Client
 #if CLIENT
             = new HashSet<string>();
 #endif
+
+        /// <summary>
+        /// Gets or sets URL which should be used for front-channel logout notification.
+        /// </summary>
+        /// <value>Returns <c>true</c> if consent is required; otherwise, <c>false</c>.</value>
+        public string FrontChannelLogoutUri { get; set; }
+
+        /// <summary>
+        /// Gets or sets URL which should be used for back-channel logout notification.
+        /// </summary>
+        /// <value>Returns <c>true</c> if consent is required; otherwise, <c>false</c>.</value>
+        public string BackChannelLogoutUri { get; set; }
 
         /// <summary>
         /// Gets or sets the allowed scopes.

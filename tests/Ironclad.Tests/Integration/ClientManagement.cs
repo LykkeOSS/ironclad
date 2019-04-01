@@ -66,7 +66,9 @@ namespace Ironclad.Tests.Integration
                 EnableLocalLogin = false,
                 AbsoluteRefreshTokenLifetime = 14,
                 RefreshTokenUsage = "OneTimeOnly",
-                RefreshTokenExpiration = "Sliding"
+                RefreshTokenExpiration = "Sliding",
+                BackChannelLogoutUri = "http://back-channel",
+                FrontChannelLogoutUri = "http://front-channel"
             };
 
             // act
@@ -147,7 +149,9 @@ namespace Ironclad.Tests.Integration
                 EnableLocalLogin = true,
                 AbsoluteRefreshTokenLifetime = 1,
                 RefreshTokenUsage = "ReUse",
-                RefreshTokenExpiration = "Absolute"
+                RefreshTokenExpiration = "Absolute",
+                BackChannelLogoutUri = "http://back-channel",
+                FrontChannelLogoutUri = "http://front-channel"
             };
 
             var expectedClient = new Client
@@ -169,7 +173,9 @@ namespace Ironclad.Tests.Integration
                 EnableLocalLogin = false,
                 AbsoluteRefreshTokenLifetime = 14,
                 RefreshTokenUsage = "OneTimeOnly",
-                RefreshTokenExpiration = "Sliding"
+                RefreshTokenExpiration = "Sliding",
+                BackChannelLogoutUri = "http://back-channel",
+                FrontChannelLogoutUri = "http://front-channel"
             };
 
             await httpClient.AddClientAsync(originalClient).ConfigureAwait(false);
